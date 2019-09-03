@@ -1,0 +1,804 @@
+#grailBox, #phoneBox, #recommendBox {
+    background-color: #F5F5F5;
+    border-radius: 5px;
+    padding: 12px;
+    color: #999;
+    margin-bottom: 5px;
+}
+
+#grailBox>div:last-child {
+    margin-bottom: 0;
+}
+
+#grailBox .empty {
+    display: flex;
+}
+
+#grailBox .empty .text {
+    margin: 7px 0 0 7px;
+}
+
+#grailBox .rounded {
+    border-radius: 5px;
+}
+
+#grailBox .active, #pageHeader .tag.active {
+    background: linear-gradient(#ffdc51, #ffe971);
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+}
+
+#grailBox .title {
+    padding-top: 0px;
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #ccc;
+}
+
+#grailBox .text_button {
+    margin: 0 8px 0 0;
+    padding: 0;
+    width: fit-content;
+    height: fit-content;
+    min-width: fit-content;
+    color: #0084B4;
+}
+
+#grailBox .text {
+    flex-grow: 1;
+    color: #999;
+}
+
+#grailBox .title .balance {
+    color: #666;
+    font-weight: bold;
+}
+
+#grailBox input, #phoneBox input, #recommendBox input {
+    border: none;
+    border-radius: 0;
+    height: 32px;
+    font-size: 15px;
+    text-align: right;
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+#grail .total {
+    float: right;
+    font-weight: bold;
+}
+
+#phoneBox input::-webkit-input-placeholder, #recommendBox input::-webkit-input-placeholder {
+    color: #ddd;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+#recommendBox {
+    flex-wrap: wrap;
+}
+
+#recommendBox>div {
+    display: flex;
+    font-size: 14px;
+}
+
+#recommendBox input {
+    text-align: center;
+}
+
+#recommendBox .desc {
+    margin-top: 10px;
+}
+
+#recommendBox .code {
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+#grailBox .trade {
+    display: flex;
+}
+
+#grailBox .desc {
+    font-size: 15px;
+    margin: 10px 0;
+    color: #0084B4;
+    display: flex;
+}
+
+#grailBox .trade .money {
+    flex-grow: 1;
+}
+
+#grailBox button, #phoneBox button, #recommendBox button {
+    border: none;
+    width: fit-content;
+    min-width: 80px;
+    padding: 0 10px;
+    height: 32px;
+    font-size: 15px;
+}
+
+#grailBox .progress_bar {
+    height: 32px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+#grailBox .progress {
+    height: 32px;
+    border-radius: 5px;
+    background: linear-gradient(#ceff65, #64ee10);
+    margin: 0;
+    padding: 0;
+    border: none;
+    text-align: center;
+    line-height: 32px;
+    color: white;
+    text-shadow: 1px 1px 1px #aaa;
+}
+
+#grailBox .bold {
+    font-weight: bold;
+}
+
+#grailBox .desc .bold {
+    flex-grow: 1;
+}
+
+#grailBox .sub {
+    color: #999;
+    font-weight: normal;
+}
+
+#grailBox #loginButton {
+    border-radius: 5px;
+    height: 20px;
+    width: 80px;
+    font-size: 12px;
+}
+
+#grailBox .users {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0 0 0;
+    padding: 10px 10px 2px 10px;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+#grailBox .user {
+    display: flex;
+    margin: 0 5px 5px 0;
+    width: 130px;
+    height: 42px;
+}
+
+#grailBox .user img {
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    margin-right: 6px;
+}
+
+#grailBox .user:first-child img {
+    width: 40px;
+    height: 40px;
+    margin-top: -3px;
+    box-shadow: 0px 0px 5px #FFEB3B;
+    border: 1px solid #FFC107;
+}
+
+#grailBox .user .name {
+    color: #666;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#grailBox .user .tag, .item_list .tag {
+    color: #fff;
+    text-shadow: 1px 1px 1px #666;
+    font-weight: bold;
+    background: linear-gradient(#d965ff, #ffabf5);
+    border-radius: 5px;
+    transform: scale(0.8);
+    padding: 0 5px;
+    margin-left: -5px;
+    font-size: 12px;
+    border: none;
+    width: fit-content;
+}
+
+#grailBox .user:first-child .tag {
+    background: linear-gradient(#FFC107, #FFEB3B);
+}
+
+#grailBox .user .name .title {
+    display: inline;
+    color: #bbb;
+    font-size: 15px;
+    margin-right: 5px;
+    border: none;
+}
+
+.item_list .tag {
+    margin: -28px 5px 0 0;
+    padding: 2px 6px;
+    float: right;
+}
+
+.item_list .badge {
+    font-size: 12px;
+}
+
+.item_list .tag.even {
+    margin-right: 5px;
+}
+
+#pageHeader .tag {
+    float: right;
+    margin: -30px 0 0 0;
+    padding: 2px 6px;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    text-shadow: 1px 1px 1px #aaa;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.grail_list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px;
+}
+
+.grail_list li {
+    width: 150px;
+    display: flex;
+    padding: 0 10px 10px 0;
+}
+
+.grail_list .name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.grail_list img {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-right: 5px;
+}
+
+.grail_list .feed {
+    color: #999;
+}
+
+.grail_index {
+    display: flex;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.grail_index .title {
+    font-size: 15px;
+    font-weight: bold;
+    padding: 20px 10px 10px 10px;
+}
+
+.grail_index .index:first-child {
+    margin-left: 0;
+}
+
+.grail_index .index:last-child {
+    margin-right: 0;
+}
+
+.grail_index .index {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    margin: 5px;
+    flex-grow: 1;
+    min-width: 226px;
+    overflow: hidden;
+}
+
+.initial_item {
+    display: flex;
+    margin: 10px;
+    height: 80px;
+}
+
+.initial_item:first-child {
+    height: 95px;
+}
+
+.badge {
+    background: linear-gradient(45deg, #FFC107, #FFEB3B);
+    width: fit-content;
+    color: white;
+    text-align: center;
+    padding: 2px 6px 1px 6px;
+    text-shadow: 1px 1px 1px #66666666;
+    border-radius: 6px;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.initial_item .avatar .badge {
+    position: relative;
+    top: -79px;
+    left: -13px;
+    border-radius: 8px;
+}
+
+.initial_item:first-child .progress {
+    width: 145px;
+}
+
+.initial_item:first-child .name {
+    font-size: 15px;
+    margin-right: 5px;
+}
+
+.initial_item .name span {
+    font-weight: normal;
+    margin-right: 2px;
+}
+
+.initial_item .name a {
+    margin-right: 5px;
+}
+
+.initial_item:first-child .name span {
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.initial_item img {
+    width: 64px;
+    height: 64px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+.initial_item:first-child img {
+    width: 81px;
+    height: 81px;
+}
+
+.initial_item:first-child .badge {
+    top: -96px;
+}
+
+@media (max-width: 800px) {
+    .initial_item img {
+        width: 50px;
+        height: 50px;
+    }
+    .initial_item:first-child img {
+        width: 60px;
+        height: 60px;
+    }
+    .initial_item .avatar .badge {
+        top: -64px;
+    }
+    .initial_item:first-child .badge {
+        top: -72px;
+    }
+}
+
+.initial_item .info {
+    margin-left: 10px;
+}
+
+.initial_item .money {
+    font-size: 13px;
+    font-weight: bold;
+    color: #ccc;
+}
+
+.initial_item .time {
+    color: #999;
+}
+
+.initial_item .name {
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 160px;
+}
+
+.initial_item .progress {
+    white-space: nowrap;
+    background: #f9f9f9;
+    border-radius: 5px;
+    width: 160px;
+    text-align: center;
+    border: none;
+}
+
+.center_button {
+    text-align: center;
+    margin: 10px 0 20px 0;
+}
+
+.load_more_button {
+    font-size: 15px;
+    color: #0084B4;
+    border: none;
+    background: transparent;
+}
+
+#grailBox.rakuen_home, #phoneBox, #recommendBox {
+    margin: 12px auto 12px auto;
+    display: flex;
+    width: 777px;
+}
+
+#grailBox.rakuen_home .bold {
+    flex-grow: 1;
+    font-size: 13px;
+}
+
+#grailBox.rakuen_home button, #grailBox.rakuen_home #loginButton, #phoneBox button {
+    font-size: 13px;
+    border-radius: 5px;
+    width: 80px;
+    height: 27px;
+    margin-left: 5px;
+}
+
+.text_button {
+    color: #999;
+    background: none;
+    margin: 0;
+}
+
+.text_button:hover {
+    color: #0084B4;
+}
+
+.predicted {
+    display: flex;
+    margin: 10px 0;
+    font-size: 12px;
+}
+
+.tag {
+    border-radius: 5px;
+    color: white;
+    text-shadow: 1px 1px 1px #aaa;
+    font-weight: bold;
+}
+
+.predicted .tag, .initial_item .tag, .trade .tag, .title .tag {
+    background: linear-gradient(#d965ff, #ffabf5);
+    padding: 1px 10px;
+}
+
+.info .name .tag {
+    margin: -2px 10px 0 0;
+    padding: 1px 5px;
+}
+
+.initial_item .tag {
+    padding: 0px;
+}
+
+.title .tag {
+    margin-left: 5px;
+}
+
+.tag.lv0, .tag.even, .info .name .tag.even {
+    background: linear-gradient(#d2d2d2, #e0e0e0);
+}
+
+.tag.lv1, .tag.new {
+    background: linear-gradient(#40f343, #b2ffa5);
+}
+
+.tag.lv2 {
+    background: linear-gradient(#70bbff, #9bd0ff)
+}
+
+.tag.lv3 {
+    background: linear-gradient(#ffdc51, #ffe971);
+}
+
+.tag.lv4 {
+    background: linear-gradient(#FF9800, #FFC107);
+}
+
+.tag.lv5 {
+    background: linear-gradient(#d965ff, #ffabf5);
+}
+
+.tag.lv6 {
+    background: linear-gradient(#ff5555, #ff9999);
+}
+
+.tag.raise, #grailBox button.bid, .depth .bid_depth li div:hover {
+    background: linear-gradient(#ff658d, #ffa7cc);
+}
+
+.tag.fall, #grailBox button.ask, .depth .ask_depth li div:hover {
+    background: linear-gradient(#65bcff, #a7e3ff);
+}
+
+#reverseButton {
+    float: right;
+    border: none;
+    background: transparent;
+    display: flex;
+    color: #999;
+}
+
+#reverseButton:focus {
+    outline: none;
+}
+
+.slider {
+    border-radius: 10px;
+    background-color: #eee;
+    display: block;
+    width: 40px;
+    height: 20px;
+    margin-left: 5px;
+}
+
+.slider .button {
+    border-radius: 10px;
+    width: 20px;
+    height: 20px;
+    display: block;
+    background-color: #ccc;
+}
+
+.on .slider .button {
+    background-color: #7fc3ff;
+    margin-left: 20px;
+}
+
+.trade_box {
+    display: flex;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.trade_box>div {
+    flex-grow: 1;
+    width: 200px;
+    margin-right: 10px;
+    position: relative;
+}
+
+.trade_box>div:last-child {
+    margin-right: 0;
+}
+
+#grailBox .trade_box .title {
+    padding-top: 5px;
+}
+
+#grailBox .trade_box .label {
+    flex-grow: 1;
+    width: 50px;
+    text-align: right;
+}
+
+.trade_box .list {
+    min-height: 100px;
+    padding-bottom: 45px;
+}
+
+.trade_box .list li {
+    margin-top: 3px;
+}
+
+.trade_box .list li.ask {
+    background: #ceefff;
+    color: #4196bd;
+}
+
+.trade_box .list li.bid {
+    background: #ffdeec;
+    color: #e46fa1;
+}
+
+.trade_box .list li:hover {
+    background-color: #e3e3e3;
+}
+
+.trade_box .list .cancel {
+    float: right;
+    cursor: default;
+}
+
+.trade_box .ask_depth {
+    background: #ceefff;
+}
+
+.trade_box .bid_depth {
+    background: #ffdeec;
+}
+
+#grailBox .trade_list {
+    display: flex;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+}
+
+.trade_list>div {
+    flex-grow: 1;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+#grailBox .trade_box .trade_list .label {
+    text-align: left;
+    width: -webkit-fill-available;
+}
+
+#grailBox .trade_box input, #grailBox .trade_box button {
+    height: 24px;
+    font-size: 12px;
+    width: -webkit-fill-available;
+    width: -moz-available;
+    flex-grow: 1;
+}
+
+.trade .value {
+    display: flex;
+    flex-grow: 1;
+    font-size: 15px;
+    margin-top: 9px;
+}
+
+.trade .value .tag {
+    height: 18px;
+    margin: -1px 0 0 5px;
+}
+
+.depth .title {
+    margin-bottom: 5px;
+}
+
+.depth li {
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    font-weight: bold;
+    text-align: right;
+    display: flex;
+    flex-direction: row-reverse;
+    border-bottom: 1px solid #F5F5F5;
+    cursor: default;
+    height: 20px;
+}
+
+.depth li:hover {
+    background-color: #eee;
+}
+
+.depth li span {
+    padding: 2px 5px 2px 0px;
+    white-space: nowrap;
+    position: absolute;
+    text-align: right;
+    pointer-events: none;
+}
+
+.depth .bid_depth li div {
+    background-color: #ffa7cc;
+    height: 20px;
+}
+
+.depth .ask_depth li div {
+    background-color: #a7e3ff;
+    height: 20px;
+}
+
+.current {
+    font-size: 15px;
+    color: #d2d2d2;
+    line-height: 20px;
+    font-weight: bold;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.row .even, .time .even {
+    color: #d2d2d2;
+}
+
+.current.raise, .row .raise, .time .raise {
+    color: #ffa7cc;
+}
+
+.current.fall, .row .fall, .time .fall {
+    color: #a7e3ff;
+}
+
+.row small, .time small {
+    margin-right: 5px;
+}
+
+.current .tag {
+    margin: 0 0 0 5px;
+    padding: 0 5px 0 5px;
+    font-size: 12px;
+}
+
+#grailIndexTab {
+    display: flex;
+    margin: 10px auto;
+    width: 800px;
+}
+
+.tab_button {
+    border-top: 1px solid #d2d2d2;
+    border-bottom: 1px solid #d2d2d2;
+    font-size: 15px;
+    padding: 5px 20px;
+}
+
+.tab_button.active {
+    background: linear-gradient(#ff658d, #ffa7cc);
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    font-weight: bold;
+    border: none;
+    padding-top: 7px;
+}
+
+.tab_button:first-child {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-left: 1px solid #d2d2d2;
+}
+
+.tab_button:last-child {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-right: 1px solid #d2d2d2;
+}
+
+.load_more {
+    padding: 10px 0;
+    text-align: center;
+}
+
+#chart {
+    height: 240px;
+    width: 100%;
+}
+
+#eden_tpc_list .item_log div.inner {
+    margin-left: 10px;
+}
+
+#eden_tpc_list .item_log .tag {
+    margin: 7px 5px 0 0;
+    font-size: 14px;
+}
+
+#rakuen_infobox {
+    width: fit-content;
+    padding-right: 50px;
+}
+
+#kChart {
+    height: 360px;
+}
