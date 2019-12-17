@@ -1,1 +1,0 @@
-alert('hello content script!');
