@@ -1,0 +1,20 @@
+{"name": "TinyGrail Exchange Dev",
+  "version": "1.0.3.33",
+  "manifest_version":2,
+  "description": "Anime Character Exchange System",
+  "icons": { "48": "48.jpg" },
+  "page_action": { "default_icon": "tinygrail.jpg" },
+  "permissions": [ 
+    "tabs",
+    "webRequest",
+		"webRequestBlocking",
+		"storage",
+		"https://tinygrail.com/*"
+  ],
+  "content_scripts": [{
+      "matches": ["https://bgm.tv/*"],
+      "js": ["js/jquery-3.4.1.js","script.js"],
+      "css": ["style.css"],
+      "all_frames": true
+      }]
+  }
