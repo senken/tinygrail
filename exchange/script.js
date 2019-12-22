@@ -69,6 +69,7 @@ function loadGrailBox(id, callback) {
 
 function loadTradeBox(chara) {
   $('#grailBox').html(box);
+  $('#grailBox').addClass('chara' + chara.Id);
   getData(`chara/user/${chara.Id}`, function (d, s) {
     if (d.State === 0 && d.Value) {
       var flu = '0.00';
@@ -400,16 +401,14 @@ function loadFixedAssets(chara, userChara, callback) {
 
         var name = '光辉圣殿';
         var rate = '+0.20';
-        var full = '500';
+        var full = formatNumber(temple.Sacrifices, 0);
 
         if (temple.Level == 2) {
           name = '闪耀圣殿';
-          rate = '+0.40';
-          full = '2,500';
+          rate = '+0.30';
         } else if (temple.Level == 3) {
           name = '奇迹圣殿';
-          rate = '+0.80';
-          full = '12,500';
+          rate = '+0.60';
         }
 
         var card = `<div class="item">
@@ -418,10 +417,10 @@ function loadFixedAssets(chara, userChara, callback) {
             <div class="buff">${rate}</div>
           </div>
           <div class="title">
-            <span title="${name} ${formatNumber(temple.Sacrifices, 0)} / ${full}">${name} ${formatNumber(temple.Sacrifices, 0)} / ${full}</span>
+            <span title="${name} ${formatNumber(temple.Assets, 0)} / ${full}">${name} ${formatNumber(temple.Assets, 0)} / ${full}</span>
           </div>
           <div class="name">
-            <span>所有者 </span><a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">${temple.Nickname}</a>
+            <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
           </div>
         </div>`
         $('.assets_box .assets').append(card);
@@ -459,16 +458,14 @@ function renderTemple(temple) {
   var avatar = normalizeAvatar(temple.Avatar);
   var name = '光辉圣殿';
   var rate = '+0.20';
-  var full = '500';
+  var full = formatNumber(temple.Sacrifices, 0);
 
   if (temple.Level == 2) {
     name = '闪耀圣殿';
-    rate = '+0.40';
-    full = '2,500';
+    var rate = '+0.30';
   } else if (temple.Level == 3) {
     name = '奇迹圣殿';
-    rate = '+0.80';
-    full = '12,500';
+    var rate = '+0.60';
   }
 
   var card = `<div class="item">
@@ -480,7 +477,7 @@ function renderTemple(temple) {
             <span><a href="/character/${temple.CharacterId}" target="_blank">${temple.Name}</a></span>
           </div>
           <div class="title">
-            <span title="${rate} / ${formatNumber(temple.Sacrifices, 0)} / ${full}">${name} ${formatNumber(temple.Sacrifices, 0)} / ${full}</span>
+            <span title="${rate} / ${formatNumber(temple.Assets, 0)} / ${full}">${name} ${formatNumber(temple.Assets, 0)} / ${full}</span>
           </div>
         </div>`
 
@@ -515,7 +512,7 @@ function showTemple(temple, chara) {
         $('#changeCoverButton').show();
         $('#resetCoverButton').show();
       }
-      if (d.Value.Type == 999 || d.Value.Id == 702) {
+      if (d.Value.Type >= 999 || d.Value.Id == 702) {
         $('#resetCoverButton').show();
       }
     }
@@ -539,6 +536,9 @@ function showTemple(temple, chara) {
   $('body').append(dialog);
 
   $('#TB_closeWindowButton').on('click', closeDialog);
+  $('#TB_window.temple img.cover').on('click', closeDialog);
+  $('#TB_window.temple').on('click', '.card', closeDialog);
+
   $('#changeCoverButton').on('click', (e) => {
     $("#picture").click();
     e.stopPropagation();
@@ -665,7 +665,7 @@ function resetTempleCover(temple, callback) {
 
 function openSacrificeDialog(chara, amount) {
   var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
+  <div id="TB_window" class="dialog">
     <div class="title">资产重组 - #${chara.Id} 「${chara.Name}」 ${formatNumber(amount, 0)} / ${formatNumber(chara.Total, 0)}</div>
     <div class="desc">将股份转化为固定资产，同时获得现金奖励并掉落道具。输入资产重组的数量：</div>
     <div class="option"><button id="captialButton" class="checkbox">股权融资<span class="slider"><span class="button"></span></span></button></div>
@@ -725,18 +725,20 @@ function openSacrificeDialog(chara, amount) {
 }
 
 function openRecommendDialog(uid, name) {
-  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
-    <div class="title">推荐关系详情 - ${name}</div>
-    <div class="desc" style="display:none"></div>
-    <div class="result" style="display:none"></div>
+  var dialog = `<div id="recommendDialog" class="new_overlay">
+  <div class="new_dialog">
+    <div class="info_box">
+      <div class="title">推荐关系详情 - ${name}</div>
+      <div class="desc" style="display:none"></div>
+      <div class="result" style="display:none"></div>
+    </div>
     <div class="loading"></div>
-    <a id="TB_closeWindowButton" title="Close">X关闭</a>
-  </div>`;
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
   $('body').append(dialog);
 
   getData(`chara/recommend/user/${uid}`, (d => {
-    $('#TB_window .loading').hide();
+    $('#recommendDialog .loading').hide();
     if (d.State == 0) {
       d.Value.Recommends.forEach((a) => {
         //var name = '';
@@ -748,45 +750,51 @@ function openRecommendDialog(uid, name) {
           var record = `<div class="row">
           <span class="time">${formatDate(a.LogTime)}</span>
           <span class="user" title="被推荐人"><a target="_blank" href="/user/${uid}">${name}</a></span></div>`;
-          $('#TB_window .result').append(record);
+          $('#recommendDialog .result').append(record);
         }
       });
 
       var count = d.Value.Recommends.length;
-      $('#TB_window .desc').text(`共推荐${count}人，获得奖励₵${formatNumber(count * 10000)}`);
+      $('#recommendDialog .desc').text(`共推荐${count}人，获得奖励₵${formatNumber(count * 10000)}`);
       if (d.Value.Recommender) {
         console.log(d.Value.Recommender);
         var list2 = d.Value.Recommender.Description.split('#');
         if (list2.length > 1) {
-          $('#TB_window .desc').append(`<a style="margin-left:10px" target="_blank" href="/user/${list2[0]}">推荐人：${list2[1]}</a>`);
+          $('#recommendDialog .desc').append(`<a style="margin-left:10px" target="_blank" href="/user/${list2[0]}">推荐人：${list2[1]}</a>`);
         }
       }
-      $('#TB_window .result').show();
+      $('#recommendDialog .result').show();
+      centerDialog('#recommendDialog .new_dialog');
     }
 
-    $('#TB_window .desc').show();
+    $('#recommendDialog .desc').show();
+    addCloseDialog('#recommendDialog');
     // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
     // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
   }));
 
   // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
   // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
-  $('#TB_closeWindowButton').on('click', closeDialog);
+  //$('#TB_closeWindowButton').on('click', closeDialog);
 }
 
 function openHistoryDialog(chara) {
-  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
-    <div class="title">上周拍卖结果 - #${chara.Id} 「${chara.Name}」 ₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)}</div>
-    <div class="desc" style="display:none"></div>
-    <div class="result" style="display:none"></div>
+  var dialog = `<div id="auctionHistoryDialog" class="new_overlay">
+  <div class="new_dialog">
+    <div class="info_box">
+      <div class="title">上周拍卖结果 - #${chara.Id} 「${chara.Name}」 ₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)}</div>
+      <div class="desc" style="display:none"></div>
+      <div class="result" style="display:none"></div>
+    </div>
     <div class="loading"></div>
-    <a id="TB_closeWindowButton" title="Close">X关闭</a>
+    <a class="close_button" title="Close">X关闭</a>
+  </div>
   </div>`;
   $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
 
   getData(`chara/auction/list/${chara.Id}/1`, (d => {
-    $('#TB_window .loading').hide();
+    $('#auctionHistoryDialog .loading').hide();
     if (d.State == 0 && d.Value.length > 0) {
       var success = 0;
       var total = 0;
@@ -806,71 +814,94 @@ function openHistoryDialog(chara) {
           <span class="price">₵${formatNumber(a.Price, 2)} / ${formatNumber(a.Amount, 0)}</span>
           <span class="tag ${state}">${name}</span>
         </div>`;
-        $('#TB_window .result').append(record);
+        $('#auctionHistoryDialog .result').append(record);
       });
-      $('#TB_window .desc').text(`共有${d.Value.length}人参与拍卖，成功${success}人 / ${total}股`);
-      $('#TB_window .result').show();
+      $('#auctionHistoryDialog .desc').text(`共有${d.Value.length}人参与拍卖，成功${success}人 / ${total}股`);
+      $('#auctionHistoryDialog .result').show();
     } else {
-      $('#TB_window .desc').text('暂无拍卖数据');
+      $('#auctionHistoryDialog .desc').text('暂无拍卖数据');
     }
-    $('#TB_window .desc').show();
-    // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
-    // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
+    $('#auctionHistoryDialog .desc').show();
+    centerDialog('#auctionHistoryDialog .new_dialog');
   }));
 
-  // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
-  // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
-  $('#TB_closeWindowButton').on('click', closeDialog);
+  centerDialog('#auctionHistoryDialog .new_dialog');
+  addCloseDialog('#auctionHistoryDialog');
+}
+
+function centerDialog(id) {
+  var w = $(id).width();
+  var h = $(id).height();
+
+  if (window.innerHeight > h) {
+    $(id).css('top', (window.innerHeight - h) / 2 - 40);
+  } else {
+    $(id).css('top', 0);
+  }
+
+  if (window.innerWidth > w) {
+    $(id).css('left', (window.innerWidth - w) / 2 - 40);
+  } else {
+    $(id).css('left', 0);
+  }
 }
 
 function openTradeHistoryDialog(chara) {
-  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
-    <div class="title">交易历史记录 - #${chara.Id} 「${chara.Name}」 ₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)}</div>
-    <div class="desc" style="display:none"></div>
-    <div class="result" style="display:none"></div>
+  var dialog = `<div id="tradeHistoryDialog" class="new_overlay">
+  <div class="new_dialog">
+    <div class="info_box">
+      <div class="title">交易历史记录 - #${chara.Id} 「${chara.Name}」 ₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)}</div>
+      <div class="desc" style="display:none"></div>
+      <div class="result" style="display:none"></div>
+    </div>
     <div class="loading"></div>
-    <a id="TB_closeWindowButton" title="Close">X关闭</a>
+    <a class="close_button" title="Close">X关闭</a>
+  </div>
   </div>`;
   $('body').append(dialog);
 
-  loadTradeHistory(chara.Id, 1, false);
+  loadTradeHistory('#tradeHistoryDialog', chara.Id, 1, false);
 
+  centerDialog('#tradeHistoryDialog .new_dialog');
+  addCloseDialog('#tradeHistoryDialog');
   // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
   // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
-  $('#TB_closeWindowButton').on('click', closeDialog);
+  //$('#TB_closeWindowButton').on('click', closeDialog);
 }
 
 function openUserHistoryDialog(user) {
-  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
-    <div class="title">用户交易记录 - @${user.Name} 「${user.Nickname}」 ₵${formatNumber(user.Balance, 2)} / ${formatNumber(user.Assets, 0)}</div>
-    <div class="desc" style="display:none"></div>
-    <div class="result" style="display:none"></div>
+  var dialog = `<div id="userHistoryDialog" class="new_overlay">
+  <div class="new_dialog">
+    <div class="info_box">
+      <div class="title">用户交易记录 - @${user.Name} 「${user.Nickname}」 ₵${formatNumber(user.Balance, 2)} / ${formatNumber(user.Assets, 0)}</div>
+      <div class="desc" style="display:none"></div>
+      <div class="result" style="display:none"></div>
+    </div>
     <div class="loading"></div>
-    <a id="TB_closeWindowButton" title="Close">X关闭</a>
-  </div>`;
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
   $('body').append(dialog);
 
-  loadTradeHistory(user.Id, 1, true);
+  loadTradeHistory('#userHistoryDialog', user.Id, 1, true);
 
   // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
   // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
-  $('#TB_closeWindowButton').on('click', closeDialog);
+  centerDialog('#userHistoryDialog .new_dialog');
+  addCloseDialog('#userHistoryDialog');
 }
 
-function loadTradeHistory(id, page, isUser) {
-  $('#TB_window .result').hide();
-  $('#TB_window .loading').show();
+function loadTradeHistory(target, id, page, isUser) {
+  $(`${target} .result`).hide();
+  $(`${target} .loading`).show();
 
   var url = `chara/history/${id}/${page}`;
   if (isUser)
     url = `chara/user/history/${id}/${page}`;
 
   getData(url, (d => {
-    $('#TB_window .loading').hide();
-    $('#TB_window .result').show();
-    $('#TB_window .result').html('');
+    $(`${target} .loading`).hide();
+    $(`${target} .result`).show();
+    $(`${target} .result`).html('');
     if (d.State == 0 && d.Value.TotalItems > 0) {
       d.Value.Items.forEach(a => {
         var chara = ``;
@@ -884,57 +915,58 @@ function loadTradeHistory(id, page, isUser) {
           <span class="fit user" title="买家"><a target="_blank" href="/user/${a.Buyer}">${a.BuyerName}</a></span>
           <span class="fit" title="价格 / 数量">₵${formatNumber(a.Price, 2)} / ${formatNumber(a.Amount, 0)}</span>
         </div>`;
-        $('#TB_window .result').append(record);
+        $(`${target} .result`).append(record);
       });
 
-      $('#TB_window .desc').html('');
-      $('#TB_window .desc').text(`共有${d.Value.TotalItems}条记录，当前 ${d.Value.CurrentPage} / ${d.Value.TotalPages} 页`);
+      $(`${target} .desc`).html('');
+      $(`${target} .desc`).text(`共有${d.Value.TotalItems}条记录，当前 ${d.Value.CurrentPage} / ${d.Value.TotalPages} 页`);
 
       for (var i = 1; i <= d.Value.TotalPages; i++) {
         var pager = `<span class="page" data-page="${i}">[${i}]</span>`;
-        $('#TB_window .desc').append(pager);
+        $(`${target} .desc`).append(pager);
       }
 
-      $('#TB_window .desc .page').on('click', (e) => {
+      $(`${target} .desc .page`).on('click', (e) => {
         var p = $(e.target).data('page');
-        loadTradeHistory(id, p, isUser);
+        loadTradeHistory(target, id, p, isUser);
       })
 
-      $('#TB_window .result').show();
+      $(`${target} .result`).show();
     } else {
-      $('#TB_window .desc').text('暂无交易记录');
+      $(`${target} .desc`).text('暂无交易记录');
     }
-    $('#TB_window .desc').show();
-    // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
-    // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
+    $(`${target} .desc`).show();
+    centerDialog(`${target} .new_dialog`);
   }));
 }
 
 function openUserLogDialog(username, nickname) {
-  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
-    <div class="title">用户资金日志 - @${username} 「${nickname}」</div>
-    <div class="desc" style="display:none"></div>
-    <div class="result" style="display:none"></div>
+  var dialog = `<div id="userLogDialog" class="new_overlay">
+  <div class="new_dialog">
+    <div class="info_box">
+      <div class="title">用户资金日志 - @${username} 「${nickname}」</div>
+      <div class="desc" style="display:none"></div>
+      <div class="result" style="display:none"></div>
+    </div>
     <div class="loading"></div>
-    <a id="TB_closeWindowButton" title="Close">X关闭</a>
-  </div>`;
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
   $('body').append(dialog);
 
   loadAdminUserLog(username, 1);
-
+  addCloseDialog('#userLogDialog');
   // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
   // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
-  $('#TB_closeWindowButton').on('click', closeDialog);
+  //$('#TB_closeWindowButton').on('click', closeDialog);
 }
 
 function loadAdminUserLog(username, page) {
-  $('#TB_window .result').hide();
-  $('#TB_window .loading').show();
+  $('#userLogDialog .result').hide();
+  $('#userLogDialog .loading').show();
   getData(`chara/user/balance/${page}/20/${username}`, (d => {
-    $('#TB_window .loading').hide();
-    $('#TB_window .result').show();
-    $('#TB_window .result').html('');
+    $('#userLogDialog .loading').hide();
+    $('#userLogDialog .result').show();
+    $('#userLogDialog .result').html('');
     if (d.State == 0 && d.Value.TotalItems > 0) {
       d.Value.Items.forEach(a => {
         var record = `<div class="row">
@@ -944,29 +976,30 @@ function loadAdminUserLog(username, page) {
           <span class="fit" title="对象 / 类型">#${a.RelatedId} / ${a.Type}</span>
           <span class="info" title="信息">${a.Description}</span>
         </div>`;
-        $('#TB_window .result').append(record);
+        $('#userLogDialog .result').append(record);
       });
 
-      $('#TB_window .desc').html('');
-      $('#TB_window .desc').text(`共有${d.Value.TotalItems}条记录，当前 ${d.Value.CurrentPage} / ${d.Value.TotalPages} 页`);
+      $('#userLogDialog .desc').html('');
+      $('#userLogDialog .desc').text(`共有${d.Value.TotalItems}条记录，当前 ${d.Value.CurrentPage} / ${d.Value.TotalPages} 页`);
 
       for (var i = 1; i <= d.Value.TotalPages; i++) {
         var pager = `<span class="page" data-page="${i}">[${i}]</span>`;
-        $('#TB_window .desc').append(pager);
+        $('#userLogDialog .desc').append(pager);
       }
 
-      $('#TB_window .desc .page').on('click', (e) => {
+      $('#userLogDialog .desc .page').on('click', (e) => {
         var p = $(e.target).data('page');
         loadAdminUserLog(username, p);
       })
 
-      $('#TB_window .result').show();
+      $('#userLogDialog .result').show();
     } else {
-      $('#TB_window .desc').text('暂无交易记录');
+      $('#userLogDialog .desc').text('暂无交易记录');
     }
-    $('#TB_window .desc').show();
+    $('#userLogDialog .desc').show();
     // $('#TB_window').css("margin-left", $('#TB_window').width() / -2);
     // $('#TB_window').css("margin-top", $('#TB_window').height() / -2);
+    centerDialog('#userLogDialog .new_dialog');
   }));
 }
 
@@ -1970,7 +2003,7 @@ function loadICOBox(ico) {
 
   var badge = '';
   if (ico.Type === 1)
-    badge = `<span class="badge" title = "剩余${ico.Bonus}期额外分红" >lv${ico.Level}</span>`;
+    badge = `<span class="badge new" title="剩余${ico.Bonus}期额外分红">×${ico.Bonus}</span>`;
 
   var box = `<div class="title"><div class="text">#${ico.CharacterId} -「${ico.Name}」 ICO进行中${badge}</div> <div class="balance"></div></div>
       <div class="desc">
@@ -1980,7 +2013,8 @@ function loadICOBox(ico) {
     ${ predictedBox}
     <div class="progress_bar"><div class="progress" style="width:${p}%">${percent}%</div></div>`
   $('#grailBox').html(box);
-  countDown(end, function () { loadGrailBox(cid); });
+  $('#grailBox').addClass('chara' + ico.CharacterId);
+  countDown('#grailBox.chara' + ico.CharacterId, end, function () { loadGrailBox(cid); });
 
   getInitialUsers(ico.Id, 1, function (d, s) {
     if (d.State === 0) {
@@ -2099,7 +2133,7 @@ function getUserAssets(callback) {
 
 function getGameMaster(callback) {
   getData('chara/user/assets', (d) => {
-    if (d.State == 0 && (d.Value.Type == 999 || d.Value.Id == 702)) {
+    if (d.State == 0 && (d.Value.Type >= 999 || d.Value.Id == 702)) {
       if (callback) callback(d.Value);
     }
   });
@@ -2280,10 +2314,15 @@ function formatNumber(number, decimals, dec_point, thousands_sep) {
   return s.join(dec);
 }
 
-function countDown(end, callback) {
+function countDown(target, end, callback) {
   var now = new Date();
   var times = (end - now) / 1000;
   var timer = setInterval(function () {
+    if ($(target).length == 0) {
+      clearInterval(timer);
+      return;
+    }
+
     var day = 0;
     var hour = 0;
     var minute = 0;
@@ -2299,10 +2338,10 @@ function countDown(end, callback) {
     // if (minute <= 9) minute = '0' + minute;
     // if (second <= 9) second = '0' + second;
 
-    $('span#day').text(day + '天');
-    $('span#hour').text(hour + '时');
-    $('span#minute').text(minute + '分');
-    $('span#second').text(second + '秒');
+    $(`${target} span#day`).text(day + '天');
+    $(`${target} span#hour`).text(hour + '时');
+    $(`${target} span#minute`).text(minute + '分');
+    $(`${target} span#second`).text(second + '秒');
 
     now = new Date();
     times = (end - now) / 1000;
@@ -2681,7 +2720,7 @@ function renderInitial(item, index) {
   if (item.Type === 1)
     badge = `<span class="badge" title="剩余${item.Bonus}期额外分红">×${item.Bonus}</span>`;
 
-  var box = `<li class="initial_item"><a target="right" href="/rakuen/topic/crt/${item.CharacterId}" class="avatar"><img src="${normalizeAvatar(item.Icon)}">${badge}</a>
+  var box = `<li class="initial_item initial"><a data-id="${item.CharacterId}" class="avatar"><img src="${normalizeAvatar(item.Icon)}">${badge}</a>
         <div class="info"><div class="name"><a target="_blank" href="/character/${item.CharacterId}">${index + 1}. ${item.Name}</a></div><div class="money">₵${formatNumber(item.Total, 0)} / ${formatNumber(item.Users, 0)}人</div>
           <div class="progress"><div style="width:${p}%" class="tag lv${predicted.Level}">lv${predicted.Level} ${percent}%</div></div>
           <div class="time">${formatTime(item.End)}</div>
@@ -3004,7 +3043,7 @@ function openAuctionDialog(chara) {
   var price = Math.ceil(chara.Price);
   var total = formatNumber(price * chara.State, 2);
   var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-              <div id="TB_window" class="dialog" style="display:block;max-width:640px;">
+              <div id="TB_window" class="dialog" style="display:block;">
                 <div class="title" title="拍卖底价 / 竞拍数量 / 流通股份">股权拍卖 - #${chara.Id} 「${chara.Name}」 ₵${formatNumber(chara.Price, 2)} / ${formatNumber(chara.State, 0)} / ${formatNumber(chara.Total, 0)}</div>
                 <div class="desc">输入竞拍出价和数量参与竞拍</div>
                 <div class="label"><span class="input">价格</span><span class="input">数量</span><span class="total">合计 -₵${total}</span></div>
@@ -3797,8 +3836,8 @@ function fixMobilePage() {
 }
 
 function openCharacterDialog(id) {
-  var dialog = `<div class="new_overlay">
-  <div id="tradeDialog" class="new_dialog">
+  var dialog = `<div class="new_overlay" id="tradeDialog">
+  <div class="new_dialog">
     <div id="grailBox"><div class="loading"></div></div>
     <a class="close_button" title="Close">X关闭</a>
   </div></div>`;
@@ -3821,13 +3860,18 @@ function openCharacterDialog(id) {
     }
   });
 
-  $('.new_dialog .close_button').on('click', closeNewDialog);
+  addCloseDialog('#tradeDialog');
 }
 
-function closeNewDialog() {
-  $('.new_overlay').remove();
-  $('.new_dialog').remove();
-  $('body').css('overflow-y', 'scroll');
+function addCloseDialog(id) {
+  if (!id.startsWith('#'))
+    id = '#' + id;
+
+  $(`${id} .close_button`).on('click', () => {
+    $(id).remove();
+    if ($('.new_overlay').length == 0)
+      $('body').css('overflow-y', 'scroll');
+  });
 }
 
 function loadLastTemples(page) {
@@ -3859,22 +3903,11 @@ function loadLastTemples(page) {
           ${level}<span data-id="${temple.CharacterId}" title="${name} ${formatNumber(temple.Assets, 0)} / ${full}">${name}</span>
         </div>
         <div class="name">
-          <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">${temple.Nickname}</a>
+          <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
         </div>
       </div>`
       $('#lastTemples .assets').append(card);
-    });
-
-    $('#lastTemples .item .card').on('click', e => {
-      var tid = $(e.currentTarget).data('id');
-      var temple = d.Value.Items.find(t => { return tid == `${t.UserId}#${t.CharacterId}` });
-      if (temple)
-        showTemple(temple);
-    });
-
-    $('#lastTemples .item .title').on('click', e => {
-      var cid = $(e.currentTarget).data('id');
-      openCharacterDialog(cid);
+      $(`#lastTemples .item .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
     });
 
     $('#loadMoreButton3').remove();
@@ -3911,10 +3944,21 @@ if (path.startsWith('/character/')) {
   if (parent.document.querySelector('html[data-theme=dark]'))
     $(document).find('html').attr('data-theme', 'dark');
 
-  $('body').delegate('.initial_item.chara a.avatar', 'click', e => {
+  $('body').on('click', '.initial_item a.avatar', e => {
     var id = $(e.currentTarget).data('id');
     if (id)
       openCharacterDialog(id);
+  });
+
+  $('body').on('click', '#lastTemples .item .card', e => {
+    var temple = $(e.currentTarget).data('temple');
+    if (temple)
+      showTemple(temple);
+  });
+
+  $('body').on('click', '#lastTemples .item .title', e => {
+    var cid = $(e.currentTarget).data('id');
+    openCharacterDialog(cid);
   });
 
   loadGrailBox2(function () {

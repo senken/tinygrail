@@ -3,7 +3,7 @@ html[data-theme='dark'] body {
     background-color: #2d2e2f!important;
 }
 
-html[data-theme='dark'] #grailBox, html[data-theme='dark'] #grailBox2, html[data-theme='dark'] #phoneBox, html[data-theme='dark'] #recommendBox {
+html[data-theme='dark'] #grailBox, html[data-theme='dark'] #grailBox2, html[data-theme='dark'] #phoneBox, html[data-theme='dark'] #recommendBox, html[data-theme='dark'] .new_dialog {
     background-color: #262728;
 }
 
@@ -63,8 +63,16 @@ html[data-theme='dark'] .depth li {
     background-color: #2d2e2f;
 }
 
-html[data-theme='dark'] #TB_window .result .row {
+html[data-theme='dark'] .result .row {
     border-bottom: 1px solid #444;
+}
+
+html[data-theme='dark'] .new_overlay, html[data-theme='dark'] #TB_overlay {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+a.avatar {
+    cursor: pointer;
 }
 
 #grailBox, #phoneBox, #recommendBox, #grailBox2 {
@@ -92,7 +100,7 @@ html[data-theme='dark'] #TB_window .result .row {
     border-radius: 5px;
 }
 
-#grailBox .active, #pageHeader .tag.active, #TB_window .active, #grailBox2 .active {
+#grailBox .active, #pageHeader .tag.active, #TB_window .active, #grailBox2 .active, .new_dialog .active {
     background: linear-gradient(#ffdc51, #ffe971);
     color: #fff!important;
     text-shadow: 1px 1px 1px #aaa!important;
@@ -189,11 +197,11 @@ html[data-theme='dark'] #TB_window .result .row {
     margin-right: 5px;
 }
 
-#grailBox .trade, #TB_window .trade {
+#grailBox .trade, #TB_window .trade, .new_dialog .trade {
     display: flex;
 }
 
-#grailBox .desc, #TB_window .desc {
+#grailBox .desc, #TB_window .desc, .new_dialog .desc {
     font-size: 15px;
     margin: 10px 0;
     color: #0084B4;
@@ -219,7 +227,7 @@ html[data-theme='dark'] #TB_window .result .row {
     flex-grow: 1;
 }
 
-#grailBox button, #phoneBox button, #recommendBox button, #TB_window button, #grailBox2 button {
+#grailBox button, #phoneBox button, #recommendBox button, #TB_window button, #grailBox2 button, .new_dialog button {
     border: none;
     width: fit-content;
     min-width: 80px;
@@ -1057,6 +1065,8 @@ html[data-theme='dark'] #TB_window .result .row {
     background-size: cover;
     width: 480px;
     height: 640px;
+    max-width: 90vw;
+    max-height: 90vh;
 }
 
 #TB_window img.cover {
@@ -1064,11 +1074,12 @@ html[data-theme='dark'] #TB_window .result .row {
     width: auto;
     height: auto;
     margin-bottom: 0;
+    max-width: 90vw;
+    max-height: 90vh;
 }
 
 #TB_window .action {
     text-align: center;
-    /* padding-top: 725px; */
 }
 
 #TB_window .action .text_button {
@@ -1076,17 +1087,6 @@ html[data-theme='dark'] #TB_window .result .row {
     min-width: inherit;
     height: inherit;
     color: #d4d4d4;
-}
-
-#TB_window.dialog {
-    border-radius: 20px;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: transparent;
-}
-
-#TB_window.temple {
-    min-width: 120px;
 }
 
 #TB_window.temple .card {
@@ -1110,36 +1110,40 @@ html[data-theme='dark'] #TB_window .result .row {
     width: 160px;
 }
 
-#TB_window .result {
-    margin: 20px 15px;
-    max-height: 600px;
-    overflow-y: auto;
+.result {
+    margin: 20px 0;
 }
 
-#TB_window .result .user, #TB_window .result .price {
+.result .user, .result .price {
     margin: 0 10px;
-    width: 80px;
-    display: inline-block;
+    white-space: nowrap;
 }
 
-#TB_window .result .user a {
+.result .user a {
     color: #4f93cf;
 }
 
-#TB_window .result .time {
+.result .time {
     color: #888;
 }
 
-#TB_window .result .row {
+.result .row {
     margin: 10px 5px;
     padding: 0 0 10px 0;
     border-bottom: 1px solid #eee;
 }
 
-#TB_window .result .tag {
+.result .tag {
     padding: 1px 5px;
     color: #fff;
     float: right;
+}
+
+#TB_window.dialog {
+    border-radius: 18px;
+    transform: translate(-50%, -50%);
+    min-width: 120px;
+    min-height: 60px;
 }
 
 @media (max-width: 640px) {
@@ -1254,6 +1258,10 @@ html[data-theme='dark'] #TB_window .result .row {
     display: block;
 }
 
+#tradeDialog .new_dialog {
+    width: -webkit-fill-available;
+}
+
 .new_dialog {
     position: relative;
     z-index: 100;
@@ -1261,10 +1269,19 @@ html[data-theme='dark'] #TB_window .result .row {
     top: 0;
     left: 0;
     margin: 20px;
-    width: -webkit-fill-available;
-    min-height: 240px;
+    width: fit-content;
+    max-width: 90vw;
     box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
     border-radius: 10px;
+    background-color: #fff;
+}
+
+.new_dialog .info_box {
+    padding: 20px;
+}
+
+.new_dialog .info_box .title {
+    padding-top: 0;
 }
 
 .new_dialog .close_button {
@@ -1287,7 +1304,12 @@ html[data-theme='dark'] #TB_window .result .row {
     left: 0px;
     height: 100%;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+#TB_overlay {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.75);
 }
 
 #lastTemples {
