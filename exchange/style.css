@@ -11,7 +11,7 @@ html[data-theme='dark'] #grailBox .users, html[data-theme='dark'] #grailBox .ass
     background-color: #2d2e2f;
 }
 
-html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] #lastTemples {
+html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] .temples {
     border-color: #333!important;
     background-color: #262728;
 }
@@ -26,7 +26,6 @@ html[data-theme='dark'] .initial_item .money {
 }
 
 html[data-theme='dark'] .item .card {
-    border: 1px solid #555;
     box-shadow: 3px 3px 5px #222;
 }
 
@@ -49,7 +48,7 @@ html[data-theme='dark'] .grail.page_inner .p_cur {
     background: #F09199;
 }
 
-html[data-theme='dark'] #recommendBox .code {
+html[data-theme='dark'] #recommendBox .code, html[data-theme='dark'] #grailBox .assets .item .title, html[data-theme='dark'] .assets .item .title, html[data-theme='dark'] .temple_list .item .title {
     color: #fff;
 }
 
@@ -113,6 +112,27 @@ a.avatar {
     border-bottom: 1px solid #ccc;
 }
 
+#grailBox .title .avatar {
+    width: 50px;
+    height: 50px;
+    margin: 0 10px 5px 0;
+    border-radius: 5px;
+    background-size: cover;
+}
+
+#grailBox .title .text {
+    display: flex;
+    line-height: inherit;
+}
+
+#grailBox .title .name, #grailBox .title .info {
+    flex-grow: 1;
+}
+
+#grailBox .title .info .text>span {
+    margin: 5px 5px 5px 0;
+}
+
 #grailBox .text_button {
     margin: 0 8px 0 0;
     padding: 0;
@@ -130,6 +150,7 @@ a.avatar {
 #grailBox .title .balance {
     color: #666;
     font-weight: bold;
+    font-size: 14px;
 }
 
 #grailBox input, #phoneBox input, #recommendBox input, #TB_window .trade input, #grailBox2 input {
@@ -153,18 +174,13 @@ a.avatar {
     margin-right: 10px;
 }
 
-#grail .item .title, .assets .item .title span {
+#grail .item .name, .assets .item .name span, .assets .item .name a {
     color: #aaa;
     padding-top: 0;
     max-width: 96px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-}
-
-#grail .item .name {
-    padding-top: 7px;
-    font-weight: bold;
 }
 
 #phoneBox input::-webkit-input-placeholder, #recommendBox input::-webkit-input-placeholder {
@@ -361,7 +377,7 @@ a.avatar {
     margin: 0 10px 10px 0;
 }
 
-#grailBox .assets .item .title {
+/* #grailBox .assets .item .title {
     padding: 7px 0 0 0;
     font-weight: bold;
     border: none;
@@ -373,7 +389,7 @@ a.avatar {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-}
+} */
 
 .item .card {
     background-size: cover;
@@ -383,32 +399,40 @@ a.avatar {
     box-shadow: 3px 3px 5px #d8d8d8;
     border: 1px solid #e0e0e0;
     overflow: hidden;
+    position: relative;
 }
 
 .card .tag {
-    background: linear-gradient(45deg, #FFC107, #FFEB3B);
-    width: 42px;
-    height: 42px;
-    border-radius: 21px;
-    margin: -20px 0 0 -20px;
-    padding: 1px 0 0 0px;
+    background: #ddd;
+    color: #666;
+    text-shadow: #fff 1px 1px 1px;
+    text-align: center;
+    width: 21px;
+    height: 21px;
+    border-radius: 0 0 100% 0;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .card .buff {
-    color: #fff;
+    color: #666;
     width: fit-content;
     padding: 1px 20px 1px 7px;
-    margin: 75px 0 0 55px;
     border-radius: 5px;
-    text-shadow: 1px 1px 1px #a5002e;
-    background: linear-gradient(#ff658d99, #ffa7cc99);
+    text-shadow: #fff 1px 1px 1px;
+    background: #ddd;
     font-weight: bold;
     text-overflow: ellipsis;
     white-space: nowrap;
+    position: absolute;
+    right: -10px;
+    bottom: 16px;
 }
 
 .card .tag>span {
-    padding: 20px 0 0 25px;
+    padding: 0;
+    margin-left: -5px;
     display: block;
 }
 
@@ -695,31 +719,31 @@ a.avatar {
     margin-left: 5px;
 }
 
-.tag.lv0, .tag.even, .info .name .tag.even {
+.tag.lv0, .tag.even, .info .name .tag.even, .badge.lv0 {
     background: linear-gradient(#d2d2d2, #e0e0e0);
 }
 
-.tag.lv1, .tag.new {
+.tag.lv1, .tag.new, .badge.lv1 {
     background: linear-gradient(#40f343, #b2ffa5);
 }
 
-.tag.lv2 {
+.tag.lv2, .badge.lv2 {
     background: linear-gradient(#70bbff, #9bd0ff)
 }
 
-.tag.lv3 {
+.tag.lv3, .badge.lv3 {
     background: linear-gradient(#ffdc51, #ffe971);
 }
 
-.tag.lv4 {
+.tag.lv4, .badge.lv4 {
     background: linear-gradient(#FF9800, #FFC107);
 }
 
-.tag.lv5, .tag.board {
+.tag.lv5, .tag.board, .badge.lv5 {
     background: linear-gradient(#d965ff, #ffabf5);
 }
 
-.tag.lv6 {
+.tag.lv6, .badge.lv6 {
     background: linear-gradient(#ff5555, #ff9999);
 }
 
@@ -1042,6 +1066,7 @@ a.avatar {
 
 #grail .temple_list .item {
     margin: 5px 15px 5px 0;
+    width: 99px;
 }
 
 #TB_window .title {
@@ -1144,6 +1169,7 @@ a.avatar {
     transform: translate(-50%, -50%);
     min-width: 120px;
     min-height: 60px;
+    max-width: 90vw;
 }
 
 @media (max-width: 640px) {
@@ -1202,10 +1228,14 @@ a.avatar {
 
 .grail.page_inner {
     text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .grail.page_inner .p {
     cursor: pointer;
+    margin-bottom: 5px;
 }
 
 .grail.page_inner .p_cur {
@@ -1260,6 +1290,7 @@ a.avatar {
 
 #tradeDialog .new_dialog {
     width: -webkit-fill-available;
+    max-width: -webkit-fill-available;
 }
 
 .new_dialog {
@@ -1312,7 +1343,7 @@ a.avatar {
     background-color: rgba(255, 255, 255, 0.75);
 }
 
-#lastTemples {
+.temples {
     width: 788px;
     margin: 10px auto;
     padding: 7px 0 12px 12px;
@@ -1321,41 +1352,117 @@ a.avatar {
     border: 1px solid #eee;
 }
 
-#lastTemples .title {
+.auction_button {
+    cursor: pointer;
+}
+
+.temples .title {
     font-size: 15px;
     font-weight: bold;
     padding: 10px;
     margin-bottom: 5px;
 }
 
-#lastTemples .assets {
+.temples .assets {
     display: flex;
     flex-wrap: wrap;
 }
 
-#lastTemples .assets .item {
+.assets .item {
     width: 96px;
     margin-right: 16px;
 }
 
-#lastTemples .assets .item .title {
-    margin: 0;
+#grailBox .assets .item .title, .assets .item .title, .temple_list .item .title {
+    color: #000;
+    margin: 2px 0;
     padding: 5px 0 0 0;
     font-size: 13px;
+    font-weight: bold;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     cursor: pointer;
+    border: none;
 }
 
-#lastTemples .assets .item .badge {
+.assets .item .badge, .temple_list .item .badge {
     margin: 0 5px 0 0;
     color: #fff;
     font-size: 10px;
 }
 
-#lastTemples .assets .item .name {
+.assets .item .name, .temple_list .item .name {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+#topWeek .assets .item {
+    width: 128px;
+    margin: 0 0 10px 0;
+}
+
+#topWeek .item .card {
+    width: 128px;
+    height: 170px;
+    border-radius: 0;
+}
+
+#topWeek .item.gold .card .tag, #topWeek .item.silver .card .tag, #topWeek .item.bronze .card .tag {
+    width: 32px;
+    height: 32px;
+    border-radius: 0 0 32px 0;
+    top: 0;
+    left: 0;
+}
+
+#topWeek .item.gold .card .buff, #topWeek .item.silver .card .buff, #topWeek .item.bronze .card .buff {
+    font-size: 14px;
+    padding: 3px 20px 3px 10px;
+}
+
+#topWeek .item.gold .card .tag>span, #topWeek .item.silver .card .tag>span, #topWeek .item.bronze .card .tag>span {
+    padding: 3px 0 0 0;
+    font-size: 20px;
+}
+
+.item.purple .card {
+    border: 1px solid #b169ff;
+}
+
+.item.purple .card .tag, .item.purple .card .buff {
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    background: linear-gradient(45deg, #d965ff, #7359ff);
+}
+
+.item.gold .card {
+    border: 1px solid #ffeb3b;
+}
+
+.item.gold .card .tag, .item.gold .card .buff {
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    background: linear-gradient(45deg, #ffc107, #ffeb3b);
+}
+
+.item.silver .card {
+    border: 1px solid #f4f4f4;
+}
+
+.item.silver .card .tag, .item.silver .card .buff {
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    background: linear-gradient(45deg, #c0c0c0, #ffffff);
+}
+
+.item.bronze .card {
+    border: 1px solid #df9c00;
+}
+
+.item.bronze .card .tag, .item.bronze .card .buff {
+    color: #fff;
+    text-shadow: 1px 1px 1px #666;
+    background: linear-gradient(45deg, #b36b00, #ffbf00);
 }

@@ -83,9 +83,20 @@ function loadTradeBox(chara) {
       }
       var badge = renderBadge(chara);
       var userChara = d.Value;
+      var avatar = normalizeAvatar(chara.Icon);
 
-      var box = `<div class="title"><button id="kChartButton" class="text_button">[K线图]</button><div class="text" title="现价 / 流通 / 持有">#${chara.Id} -「${chara.Name}」₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)} / ${formatNumber(d.Value.Amount, 0)}<span class="tag ${fclass}">${flu}</span>${badge}</div><div class="balance">账户余额：<span>₵${formatNumber(d.Value.Balance, 2)}</span></div></div>
-     <div class="trade_box">
+      var box = `<div class="title">
+        <a href="/character/${chara.Id}" target="_blank"><div class="avatar" style="background-image:url(${avatar})">
+        </div></a>
+        <div class="info">
+          <div class="text" title="现价 / 流通 / 持有">
+            <div class="name"><a href="/character/${chara.Id}" target="_blank">#${chara.Id} -「${chara.Name}」₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)} / ${formatNumber(d.Value.Amount, 0)} </a><button id="kChartButton" class="text_button">[K线图]</button></div>
+            <div class="balance">账户余额：<span>₵${formatNumber(d.Value.Balance, 2)}</span></div>
+          </div>
+          <div class="text"><span class="tag ${fclass}">${flu}</span>${badge}</div>
+        </div>
+      </div>
+      <div class="trade_box">
         <div class="bid">
           <div class="title"><span>价格 / 数量 / 总计</span><span class="label">买入委托</span></div>
           <ul class="bid_list list"></ul>
@@ -396,39 +407,13 @@ function loadFixedAssets(chara, userChara, callback) {
         var temple = d.Value[i];
         temples[temple.UserId] = temple;
 
-        var cover = getSmallCover(temple.Cover);
-        var avatar = normalizeAvatar(temple.Avatar);
-
-        var name = '光辉圣殿';
-        var rate = '+0.20';
-        var full = formatNumber(temple.Sacrifices, 0);
-
-        if (temple.Level == 2) {
-          name = '闪耀圣殿';
-          rate = '+0.30';
-        } else if (temple.Level == 3) {
-          name = '奇迹圣殿';
-          rate = '+0.60';
-        }
-
-        var card = `<div class="item">
-          <div class="card" data-id="${temple.UserId}" style="background-image:url(${cover})">
-            <div class="tag"><span>${temple.Level}</span></div>
-            <div class="buff">${rate}</div>
-          </div>
-          <div class="title">
-            <span title="${name} ${formatNumber(temple.Assets, 0)} / ${full}">${name} ${formatNumber(temple.Assets, 0)} / ${full}</span>
-          </div>
-          <div class="name">
-            <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
-          </div>
-        </div>`
+        var card = renderTemple(temple, 'fix');
         $('.assets_box .assets').append(card);
+        $(`.assets_box .assets .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
       }
 
-      $('#grailBox .item .card').on('click', (e) => {
-        var uid = $(e.currentTarget).data('id');
-        var temple = temples[uid];
+      $('.assets_box .assets .card').on('click', (e) => {
+        var temple = $(e.currentTarget).data('temple');
         showTemple(temple, chara);
       });
 
@@ -453,32 +438,87 @@ function loadFixedAssets(chara, userChara, callback) {
   });
 }
 
-function renderTemple(temple) {
+function renderTemple(temple, type) {
   var cover = getSmallCover(temple.Cover);
   var avatar = normalizeAvatar(temple.Avatar);
-  var name = '光辉圣殿';
-  var rate = '+0.20';
   var full = formatNumber(temple.Sacrifices, 0);
 
-  if (temple.Level == 2) {
-    name = '闪耀圣殿';
-    var rate = '+0.30';
+  var charaName = temple.Name;
+  if (temple.CharacterName)
+    charaName = temple.CharacterName;
+
+  var templeLevel = temple.Level;
+  if (temple.Index)
+    templeLevel = temple.Index;
+
+  var grade = '';
+  var rate = '';
+  var level = '';
+
+  if (temple.Level == 1) {
+    grade = '光辉圣殿';
+    rate = '+0.20';
+    level = ' silver';
+  } else if (temple.Level == 2) {
+    grade = '闪耀圣殿';
+    rate = '+0.30';
+    level = ' gold';
   } else if (temple.Level == 3) {
-    name = '奇迹圣殿';
-    var rate = '+0.60';
+    grade = '奇迹圣殿';
+    rate = '+0.60';
+    level = ' purple';
   }
 
-  var card = `<div class="item">
-          <div class="card" data-id="${temple.CharacterId}" style="background-image:url(${cover})">
-            <div class="tag"><span>${temple.Level}</span></div>
-            <div class="buff">+${formatNumber(temple.Rate, 2)}</div>
+  var title = `<div class="title" data-id="${temple.CharacterId}">
+  <span class="badge lv${temple.CharacterLevel}">lv${temple.CharacterLevel}</span><span data-id="${temple.CharacterId}" title="${charaName} ${formatNumber(temple.Assets, 0)} / ${full}">${charaName}</span>
+  </div>`;
+  var name = `<div class="name">
+  <span title="${rate} / ${formatNumber(temple.Assets, 0)} / ${full}">${formatNumber(temple.Assets, 0)} / ${full}</span>
+  </div>`;
+
+  if (type != 'fix') {
+    rate = `+${formatNumber(temple.Rate, 2)}`;
+  } else {
+    title = `<div class="title">
+    <span title="+${formatNumber(temple.Rate, 2)} / ${formatNumber(temple.Assets, 0)} / ${full}">${formatNumber(temple.Assets, 0)} / ${full}</span>
+    </div>`;
+  }
+
+  if (type == 'extra') {
+    rate = `+₵${formatNumber(temple.Extra, 0)}`;
+    grade = `超出总额 ₵${formatNumber(temple.Extra, 0)}`;
+
+    if (temple.Extra < 0) {
+      rate = `-₵${formatNumber(-temple.Extra, 0)}`;
+      grade = `未满余额 ₵${formatNumber(temple.Extra, 0)}`;
+    }
+
+    if (templeLevel == 1 && temple.Extra > 0) {
+      level = ' gold';
+    } else if (templeLevel == 2 && temple.Extra > 0) {
+      level = ' silver';
+    } else if (templeLevel == 3 && temple.Extra > 0) {
+      level = ' bronze';
+    }
+
+    name = `<div class="name auction_button" data-id="${temple.CharacterId}">
+    <span title="竞拍人数 / 竞拍数量 / 拍卖总数">${formatNumber(temple.Type, 0)} / ${formatNumber(temple.Assets, 0)} / ${full}</span>
+    </div>`;
+  }
+
+  if (type != 'mine' && type != 'extra') {
+    name = `<div class="name">
+    <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
+    </div>`;
+  }
+
+  var card = `<div class="item${level}">
+          <div class="card" title="${grade}" data-id="${temple.UserId}#${temple.CharacterId}" style="background-image:url(${cover})">
+            <div class="tag"><span>${templeLevel}</span></div>
+            <div class="buff">${rate}</div>
           </div>
-          <div class="name" title="${temple.Name}">
-            <span><a href="/character/${temple.CharacterId}" target="_blank">${temple.Name}</a></span>
-          </div>
-          <div class="title">
-            <span title="${rate} / ${formatNumber(temple.Assets, 0)} / ${full}">${name} ${formatNumber(temple.Assets, 0)} / ${full}</span>
-          </div>
+          ${title}
+          ${name}
         </div>`
 
   return card;
@@ -665,7 +705,7 @@ function resetTempleCover(temple, callback) {
 
 function openSacrificeDialog(chara, amount) {
   var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
-  <div id="TB_window" class="dialog">
+  <div id="TB_window" class="dialog" style="display:block;">
     <div class="title">资产重组 - #${chara.Id} 「${chara.Name}」 ${formatNumber(amount, 0)} / ${formatNumber(chara.Total, 0)}</div>
     <div class="desc">将股份转化为固定资产，同时获得现金奖励并掉落道具。输入资产重组的数量：</div>
     <div class="option"><button id="captialButton" class="checkbox">股权融资<span class="slider"><span class="button"></span></span></button></div>
@@ -2524,6 +2564,11 @@ function loadUserPage(name) {
       loadUserCharacters(1);
       loadUserInitials(1);
 
+      $('body').on('click', '.temple_list .item .title', e => {
+        var cid = $(e.currentTarget).data('id');
+        openCharacterDialog(cid);
+      });
+
       $('#grail .total').text(`总资产：₵${formatNumber(data.Assets, 2)} / ${formatNumber(data.Balance, 2)}`);
 
       $('#initTab').on('click', function () {
@@ -2590,13 +2635,14 @@ function loadUserTemples(page) {
       $('#templeTab a').text(`${data.Value.TotalItems}座圣殿`);
 
       for (i = 0; i < data.Value.Items.length; i++) {
-        var item = renderTemple(data.Value.Items[i]);
+        var temple = data.Value.Items[i];
+        var item = renderTemple(temple, 'mine');
         $(`#grail .temple_list .page${page}`).append(item);
+        $(`#grail .temple_list .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
       }
 
       $(`#grail .temple_list .page${page} .item .card`).on('click', (e) => {
-        var cid = $(e.currentTarget).data('id');
-        var temple = data.Value.Items.find((t) => { return t.CharacterId == cid; });
+        var temple = $(e.currentTarget).data('temple');
         showTemple(temple, null);
       });
 
@@ -2930,7 +2976,7 @@ function loadIndexPage() {
 
 function loadIndexTab() {
   var tab = `<div id="grailIndexTab" class="grail_index_tab"><div id="tabButton1" class="tab_button active">交易榜单</div><div id="tabButton2" class="tab_button">ICO榜单</div></div>`;
-  $('#grailBox2').after(tab);
+  $('#lastTemples').after(tab);
   $('#tabButton1').on('click', function () {
     $('#tabButton1').addClass('active');
     $('#tabButton2').removeClass('active');
@@ -2951,7 +2997,7 @@ function loadIndexTab() {
 
 function loadNewTab() {
   var tab = `<div id="grailIndexTab2" class="grail_index_tab"><div id="tabButton3" class="tab_button active">热门榜单</div><div id="tabButton4" class="tab_button">英灵殿</div></div>`;
-  $('#grailBox2').after(tab);
+  $('#lastTemples').after(tab);
   $('#tabButton3').on('click', function () {
     $('#tabButton3').addClass('active');
     $('#tabButton4').removeClass('active');
@@ -3874,41 +3920,74 @@ function addCloseDialog(id) {
   });
 }
 
-function loadLastTemples(page) {
+function loadTopWeek(callback) {
+  var top = `<div id="topWeek" class="temples">
+  <div class="title">/ 本周萌王</div>
+  <div class="assets"></div></div>`;
+  $('#grailBox2').after(top);
+
+  getData(`chara/topweek`, d => {
+    var index = 1;
+    d.Value.forEach(temple => {
+      temple.Index = index++;
+      var card = renderTemple(temple, 'extra');
+      $('#topWeek .assets').append(card);
+      $(`#topWeek .item .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
+    });
+    $('#topWeek').on('click', '.auction_button', e => {
+      var cid = $(e.currentTarget).data('id');
+      var temple = d.Value.find(t => t.CharacterId == cid);
+      var chara = { Id: cid };
+      chara.State = temple.Sacrifices;
+      chara.Name = temple.CharacterName;
+      chara.Price = temple.Price;
+      chara.Total = 0;
+
+      openAuctionDialog(chara);
+    });
+    if (callback) callback();
+  });
+}
+
+function loadLastTemples(page, callback) {
   if (page == 1) {
-    var last = `<div id="lastTemples">
+    var last = `<div id="lastTemples" class="temples">
   <div class="title">/ 最新圣殿</div>
   <div class="assets"></div></div>`;
-    $('#grailBox2').after(last);
+    $('#topWeek').after(last);
   }
 
   getData(`chara/temple/last/${page}/14`, d => {
     d.Value.Items.forEach(temple => {
-      var cover = getSmallCover(temple.Cover);
-      var avatar = normalizeAvatar(temple.Avatar);
+      var card = renderTemple(temple, 'new');
+      // var cover = getSmallCover(temple.Cover);
+      // var avatar = normalizeAvatar(temple.Avatar);
 
-      var name = temple.CharacterName;
-      var rate = `+${formatNumber(temple.Rate, 2)}`;
-      var full = formatNumber(temple.Sacrifices, 0);
-      var level = '';
-      if (temple.CharacterLevel > 1)
-        level = `<span class="badge">lv${temple.CharacterLevel}</span>`;
+      // var name = temple.CharacterName;
+      // var rate = `+${formatNumber(temple.Rate, 2)}`;
 
-      var card = `<div class="item">
-        <div class="card" data-id="${temple.UserId}#${temple.CharacterId}" style="background-image:url(${cover})">
-          <div class="tag"><span>${temple.Level}</span></div>
-          <div class="buff">${rate}</div>
-        </div>
-        <div class="title" data-id="${temple.CharacterId}">
-          ${level}<span data-id="${temple.CharacterId}" title="${name} ${formatNumber(temple.Assets, 0)} / ${full}">${name}</span>
-        </div>
-        <div class="name">
-          <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
-        </div>
-      </div>`
+      // var full = formatNumber(temple.Sacrifices, 0);
+      // var level = '';
+      // if (temple.CharacterLevel > 1)
+      //   level = `<span class="badge">lv${temple.CharacterLevel}</span>`;
+
+      // var card = `<div class="item">
+      //   <div class="card" data-id="${temple.UserId}#${temple.CharacterId}" style="background-image:url(${cover})">
+      //     <div class="tag"><span>${temple.Level}</span></div>
+      //     <div class="buff">${rate}</div>
+      //   </div>
+      //   <div class="title" data-id="${temple.CharacterId}">
+      //     ${level}<span data-id="${temple.CharacterId}" title="${name} ${formatNumber(temple.Assets, 0)} / ${full}">${name}</span>
+      //   </div>
+      //   <div class="name">
+      //     <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
+      //   </div>
+      // </div>`;
       $('#lastTemples .assets').append(card);
-      $(`#lastTemples .item .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
+      $(`#lastTemples .assets .item .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
     });
+
+    if (callback) callback();
 
     $('#loadMoreButton3').remove();
     if (d.Value.CurrentPage != d.Value.TotalPages) {
@@ -3950,23 +4029,26 @@ if (path.startsWith('/character/')) {
       openCharacterDialog(id);
   });
 
-  $('body').on('click', '#lastTemples .item .card', e => {
+  $('body').on('click', '.temples .item .card', e => {
     var temple = $(e.currentTarget).data('temple');
     if (temple)
       showTemple(temple);
   });
 
-  $('body').on('click', '#lastTemples .item .title', e => {
+  $('body').on('click', '.temples .item .title', e => {
     var cid = $(e.currentTarget).data('id');
     openCharacterDialog(cid);
   });
 
-  loadGrailBox2(function () {
-    loadIndexTab();
-    loadIndexPage2();
-    loadNewTab();
-    loadNewBangumi(1);
-    loadLastTemples(1);
+  loadGrailBox2(() => {
+    loadTopWeek(() => {
+      loadLastTemples(1, () => {
+        loadIndexTab();
+        loadIndexPage2();
+        loadNewTab();
+        loadNewBangumi(1);
+      });
+    });
   });
 } else if (path.startsWith('/user/')) {
   var id = path.split('?')[0].substr(6);
