@@ -48,7 +48,7 @@ html[data-theme='dark'] .grail.page_inner .p_cur {
     background: #F09199;
 }
 
-html[data-theme='dark'] #recommendBox .code, html[data-theme='dark'] #grailBox .assets .item .title, html[data-theme='dark'] .assets .item .title, html[data-theme='dark'] .temple_list .item .title {
+html[data-theme='dark'] #recommendBox .code, html[data-theme='dark'] #grailBox .assets .item .title, html[data-theme='dark'] .assets .item .title, html[data-theme='dark'] .temple_list .item .title, html[data-theme='dark'] .container .line .text textarea {
     color: #fff;
 }
 
@@ -68,6 +68,10 @@ html[data-theme='dark'] .result .row {
 
 html[data-theme='dark'] .new_overlay, html[data-theme='dark'] #TB_overlay {
     background-color: rgba(0, 0, 0, 0.75);
+}
+
+html[data-theme='dark'] .container .line .text {
+    background-color: #000000bb;
 }
 
 a.avatar {
@@ -307,19 +311,40 @@ a.avatar {
     height: 42px;
 }
 
+#grailBox .user .avatar {
+    position: relative;
+}
+
+#grailBox .user .avatar .badge, #headerProfile .headerAvatar .badge, .initial_item.user .avatar .badge {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    margin: 0;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    border-radius: 11px;
+    display: block;
+    font-size: 12px;
+    transform: scale(.9);
+}
+
 #grailBox .user.banned .name a, .initial_item.banned .name a {
     color: #f09199;
 }
 
-#grailBox .user img {
+#grailBox .user .avatar {
     width: 32px;
     height: 32px;
+    background-size: cover;
+    background-position: center;
     border-radius: 5px;
     border: 1px solid #eee;
     margin-right: 6px;
 }
 
-#grailBox .user:first-of-type img {
+#grailBox .user:first-of-type .avatar {
     width: 40px;
     height: 40px;
     margin-top: -3px;
@@ -327,12 +352,12 @@ a.avatar {
     border: 1px solid #FFC107;
 }
 
-#grailBox .user.inactive img {
+#grailBox .user.inactive .avatar {
     box-shadow: 0px 0px 5px #d2d2d2;
     border: 1px solid #d2d2d2;
 }
 
-#grailBox .user.banned img, .initial_item.banned img {
+#grailBox .user.banned .avatar, .initial_item.banned .avatar {
     box-shadow: 0px 0px 5px #d2d2d2;
     border: 1px solid #f09199;
 }
@@ -374,27 +399,26 @@ a.avatar {
 }
 
 .assets .item {
-    margin: 0 10px 10px 0;
+    margin: 0 12px 10px 0;
+    width: 100px;
 }
 
-/* #grailBox .assets .item .title {
-    padding: 7px 0 0 0;
-    font-weight: bold;
-    border: none;
-    color: #d3d3d3;
+.assets .item.replicated {
+    display: none;
 }
 
-#grailBox .assets .item .name, #grail .temple_list .item .name {
-    max-width: 96px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-} */
+.assets .item.replicated.expanded {
+    display: block;
+}
+
+.assets .item.expanded .replicates {
+    display: none;
+}
 
 .item .card {
     background-size: cover;
-    width: 96px;
-    height: 128px;
+    width: 104px;
+    height: 140px;
     border-radius: 5px;
     box-shadow: 3px 3px 5px #d8d8d8;
     border: 1px solid #e0e0e0;
@@ -428,6 +452,41 @@ a.avatar {
     position: absolute;
     right: -10px;
     bottom: 16px;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.card .line {
+    right: 0;
+    bottom: 0;
+    text-shadow: #000 1px 1px 1px;
+    color: #fff;
+    position: absolute;
+    font-size: 20px;
+    padding: 5px;
+}
+
+.card .avatar_bg {
+    width: 100%;
+    height: 100%;
+    filter: blur(10px);
+    background-size: cover;
+}
+
+.card .avatar {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background-size: cover;
+}
+
+.card:hover .tag, .card:hover .buff {
+    transition: opacity .5s;
+    opacity: 1;
 }
 
 .card .tag>span {
@@ -548,10 +607,26 @@ a.avatar {
 }
 
 .initial_item .avatar .badge {
-    position: relative;
-    top: -79px;
-    left: -13px;
-    border-radius: 8px;
+    position: absolute;
+    margin: 0;
+    padding: 0 5px;
+    top: -5px;
+    left: -8px;
+}
+
+.initial_item .avatar .badge.new {
+    bottom: 15px;
+    top: inherit;
+    left: inherit;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    overflow: hidden;
+    display: block;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    font-size: 0;
 }
 
 .initial_item:first-of-type .progress {
@@ -572,6 +647,11 @@ a.avatar {
     margin-right: 5px;
 }
 
+.initial_item .name .badge {
+    margin: 0;
+    font-weight: bold;
+}
+
 .initial_item:first-of-type .name span {
     font-size: 16px;
     line-height: 24px;
@@ -589,12 +669,9 @@ a.avatar {
     height: 81px;
 }
 
-.initial_item:first-of-type .badge {
-    top: -96px;
-}
-
 .initial_item .avatar {
     width: 64px;
+    position: relative;
 }
 
 .initial_item:first-of-type .avatar {
@@ -719,31 +796,31 @@ a.avatar {
     margin-left: 5px;
 }
 
-.tag.lv0, .tag.even, .info .name .tag.even, .badge.lv0 {
+.tag.lv0, .tag.even, .info .name .tag.even, .badge.lv0, .card_front.lv0 .buff {
     background: linear-gradient(#d2d2d2, #e0e0e0);
 }
 
-.tag.lv1, .tag.new, .badge.lv1 {
+.tag.lv1, .tag.new, .badge.lv1, .card_front.lv1 .buff {
     background: linear-gradient(#40f343, #b2ffa5);
 }
 
-.tag.lv2, .badge.lv2 {
+.tag.lv2, .badge.lv2, .card_front.lv2 .buff {
     background: linear-gradient(#70bbff, #9bd0ff)
 }
 
-.tag.lv3, .badge.lv3 {
+.tag.lv3, .badge.lv3, .card_front.lv3 .buff {
     background: linear-gradient(#ffdc51, #ffe971);
 }
 
-.tag.lv4, .badge.lv4 {
+.tag.lv4, .badge.lv4, .card_front.lv4 .buff {
     background: linear-gradient(#FF9800, #FFC107);
 }
 
-.tag.lv5, .tag.board, .badge.lv5 {
+.tag.lv5, .tag.board, .badge.lv5, .card_front.lv5 .buff {
     background: linear-gradient(#d965ff, #ffabf5);
 }
 
-.tag.lv6, .badge.lv6 {
+.tag.lv6, .badge.lv6, .card_front.lv6 .buff {
     background: linear-gradient(#ff5555, #ff9999);
 }
 
@@ -1054,7 +1131,7 @@ a.avatar {
     height: 360px;
 }
 
-#grail .loading, #grailBox .loading, #TB_window .loading, .grail_index .loading, .new_dialog .loading {
+#grail .loading, #grailBox .loading, #TB_window .loading, .grail_index .loading, .new_dialog .loading, .temples .loading {
     height: 100px;
     width: -webkit-fill-available;
     background: url(https://bgm.tv/img/loadingAnimation.gif) no-repeat center;
@@ -1119,6 +1196,44 @@ a.avatar {
     left: 50%;
     transform: translate(-50%);
     background-position: top;
+}
+
+#TB_window.temple .container {
+    position: relative;
+    background-size: cover;
+}
+
+#TB_window.temple .container .line {
+    position: absolute;
+    bottom: 0;
+    padding: 20px;
+    width: -webkit-fill-available;
+}
+
+.container .line .name {
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px #000;
+    margin: 0 0 5px 5px;
+}
+
+.container .line .text {
+    height: 100px;
+    background-color: #ffffffcc;
+    border-radius: 10px;
+    font-size: 18px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.container .line textarea {
+    width: -webkit-fill-available;
+    height: -webkit-fill-available;
+    background: transparent;
+    border: none;
+    color: rgb(0, 0, 0);
+    font-size: 18px;
 }
 
 #TB_window .label {
@@ -1208,10 +1323,6 @@ a.avatar {
 #valhalla .initial_item:first-of-type img {
     width: 64px;
     height: 64px;
-}
-
-#valhalla .initial_item:first-of-type .badge {
-    top: -79px;
 }
 
 #valhalla .time button {
@@ -1368,11 +1479,6 @@ a.avatar {
     flex-wrap: wrap;
 }
 
-.assets .item {
-    width: 96px;
-    margin-right: 16px;
-}
-
 #grailBox .assets .item .title, .assets .item .title, .temple_list .item .title {
     color: #000;
     margin: 2px 0;
@@ -1415,11 +1521,13 @@ a.avatar {
     border-radius: 0 0 32px 0;
     top: 0;
     left: 0;
+    opacity: 1;
 }
 
 #topWeek .item.gold .card .buff, #topWeek .item.silver .card .buff, #topWeek .item.bronze .card .buff {
     font-size: 14px;
     padding: 3px 20px 3px 10px;
+    opacity: 1;
 }
 
 #topWeek .item.gold .card .tag>span, #topWeek .item.silver .card .tag>span, #topWeek .item.bronze .card .tag>span {
@@ -1465,4 +1573,333 @@ a.avatar {
     color: #fff;
     text-shadow: 1px 1px 1px #666;
     background: linear-gradient(45deg, #b36b00, #ffbf00);
+}
+
+#scratchDialog .new_dialog {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1rem;
+    min-width: 60vw;
+}
+
+#scratchDialog .title {
+    padding: 0;
+    margin: .5rem 0;
+    font-size: 1rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+#scratchDialog .new_dialog .action {
+    text-align: right;
+}
+
+#scratchDialog .cards {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 1rem;
+    justify-content: center;
+}
+
+#scratchDialog .card {
+    margin: 0 .5rem .5rem 0;
+}
+
+#scratchDialog .card .cover {
+    width: 12rem;
+    height: 16rem;
+    position: relative;
+    perspective: 600px;
+}
+
+#scratchDialog .card .action {
+    text-align: center;
+    margin-top: .5rem;
+    transform: scale(.9);
+}
+
+.card .action button:first-of-type {
+    border-radius: .5rem 0 0 .5rem;
+}
+
+.card .action button:last-of-type {
+    border-radius: 0 .5rem .5rem 0;
+}
+
+.card .cover.front .card_back {
+    transform: rotateY(180deg);
+}
+
+.card .cover.sold .card_back:after {
+    content: ' ';
+    background-color: #fff;
+    display: block;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    position: absolute;
+    opacity: .9;
+    border-radius: 1rem;
+}
+
+.card .cover.front .card_front {
+    transform: rotateX(0deg) rotateY(0deg);
+    z-index: 10;
+    position: absolute;
+}
+
+.card_back {
+    border: 1px solid #cff6ff;
+    border-radius: 1rem;
+    background-image: url('https://tinygrail.oss-cn-hangzhou.aliyuncs.com/image/tinygrail_card2.png!w240');
+    background-size: cover;
+    background-position: center;
+    border-radius: .5rem;
+    width: 12rem;
+    height: 16rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: all 1s ease-in-out;
+    transform: rotateX(0deg) rotateY(0deg);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.card_front {
+    overflow: hidden;
+    border: 1px solid #cff6ff;
+    border-radius: 1rem;
+    background-image: url('https://tinygrail.oss-cn-hangzhou.aliyuncs.com/image/tinygrail_card2.png!w240');
+    background-size: cover;
+    background-position: center;
+    border-radius: .5rem;
+    width: 12rem;
+    height: 16rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    transition: all 1s ease-in-out;
+    transform: rotateY(-180deg);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.card_front.lv0 {
+    border-color: #d2d2d2;
+}
+
+.card_front.lv1 {
+    border-color: #40f343;
+}
+
+.card_front.lv2 {
+    border-color: #70bbff;
+}
+
+.card_front.lv3 {
+    border-color: #ffdc51;
+}
+
+.card_front.lv4 {
+    border-color: #FF9800;
+}
+
+.card_front.lv5 {
+    border-color: #d965ff;
+}
+
+.card_front.lv6 {
+    border-color: #ff5555;
+}
+
+.card_front .tag {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    color: #fff;
+    line-height: 25px;
+    text-shadow: none;
+}
+
+.card_front .buff {
+    opacity: 1;
+    color: #fff;
+    text-shadow: 1px 1px 1px #aaa;
+    font-size: 16px;
+    padding: 5px 20px 5px 12px;
+    bottom: 25px;
+}
+
+.card_name {
+    font-size: 15px;
+    margin-top: .75rem;
+    color: #999;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+}
+
+.spin_loading {
+    position: absolute;
+    -webkit-animation: spin 10s linear infinite;
+    animation: spin 10s linear infinite;
+    top: 50%;
+    left: 50%;
+}
+
+.spin_loading .dot {
+    height: 20px;
+    width: 20px;
+    border-radius: 100%;
+    position: absolute;
+    opacity: 0;
+    -webkit-transform-origin: 0% 0%;
+    -ms-transform-origin: 0% 0%;
+    transform-origin: 0% 0%;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(360deg);
+    }
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes osc {
+    0% {
+        transform: scale(.5);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(.5);
+        opacity: 0;
+    }
+}
+
+@keyframes rainbow {
+    0% {
+        background: #ff0000;
+    }
+    20% {
+        background: #ff9800;
+    }
+    40% {
+        background: #ffe500;
+    }
+    60% {
+        background: #89ff00;
+    }
+    80% {
+        background: #00b0ff;
+    }
+    100% {
+        background: #da00ff;
+    }
+}
+
+#topWeekRecords .list {
+    display: flex;
+    align-items: center;
+}
+
+#topWeekRecords .chara {
+    margin-right: 10px;
+    max-width: 50px;
+}
+
+#topWeekRecords .record {
+    padding-left: 5px;
+    margin-bottom: 10px;
+}
+
+#topWeekRecords .week {
+    font-size: 15px;
+    margin: 0 15px 5px 0;
+    color: #999;
+    border-bottom: 1px solid #f4f4f4;
+    padding-bottom: 5px;
+}
+
+html[data-theme='dark'] #topWeekRecords .week {
+    border-bottom: 1px solid #333;
+}
+
+#topWeekRecords .chara.rank1 {
+    max-width: 72px;
+}
+
+#topWeekRecords .chara.rank1 .avatar {
+    width: 72px;
+    height: 72px;
+    border: 1px solid #ffeb3b;
+    box-shadow: #fff555 0px 0px 3px 1px;
+}
+
+#topWeekRecords .chara.rank2 {
+    max-width: 68px;
+}
+
+#topWeekRecords .chara.rank2 .avatar {
+    width: 68px;
+    height: 68px;
+    border: 1px solid #f4f4f4;
+}
+
+#topWeekRecords .chara.rank3 {
+    max-width: 64px;
+}
+
+#topWeekRecords .chara.rank3 .avatar {
+    width: 64px;
+    height: 64px;
+    border: 1px solid #df9c00;
+}
+
+#topWeekRecords .chara .avatar {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-size: cover;
+    position: relative;
+}
+
+#topWeekRecords .chara .name {
+    font-weight: bold;
+    margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #999;
+}
+
+#headerProfile .headerAvatar {
+    position: relative;
+}
+
+#headerProfile .headerAvatar .badge, .initial_item.user .avatar .badge {
+    transform: scale(1);
+    top: -5px;
+    left: -10px;
+    color: #fff;
+    font-weight: bold;
+}
+
+#TB_window.send_dialog .trade.message {
+    margin: 10px 20px;
+}
+
+#TB_window.send_dialog .trade.message input {
+    font-weight: normal;
+    text-align: left;
+    padding: 0 10px;
+    box-shadow: none;
 }

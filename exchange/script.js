@@ -81,7 +81,7 @@ function loadTradeBox(chara) {
         flu = `${formatNumber(chara.Fluctuation * 100, 2)}%`;
         fclass = 'fall';
       }
-      var badge = renderBadge(chara);
+      var badge = renderBadge(chara, true, true, true);
       var userChara = d.Value;
       var avatar = normalizeAvatar(chara.Icon);
 
@@ -89,8 +89,8 @@ function loadTradeBox(chara) {
         <a href="/character/${chara.Id}" target="_blank"><div class="avatar" style="background-image:url(${avatar})">
         </div></a>
         <div class="info">
-          <div class="text" title="现价 / 流通 / 持有">
-            <div class="name"><a href="/character/${chara.Id}" target="_blank">#${chara.Id} -「${chara.Name}」₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)} / ${formatNumber(d.Value.Amount, 0)} </a><button id="kChartButton" class="text_button">[K线图]</button></div>
+          <div class="text" title="现价 / 流通 / 持有 / 资产">
+            <div class="name"><a href="/character/${chara.Id}" target="_blank">#${chara.Id} -「${chara.Name}」₵${formatNumber(chara.Current, 2)} / ${formatNumber(chara.Total, 0)} / ${formatNumber(d.Value.Amount, 0)} / ${formatNumber(d.Value.Sacrifices, 0)} </a><button id="kChartButton" class="text_button">[K线图]</button></div>
             <div class="balance">账户余额：<span>₵${formatNumber(d.Value.Balance, 2)}</span></div>
           </div>
           <div class="text"><span class="tag ${fclass}">${flu}</span>${badge}</div>
@@ -384,7 +384,13 @@ function getStyle(url) {
 function loadFixedAssets(chara, userChara, callback) {
   getData(`chara/temple/${chara.Id}`, function (d) {
     if (d.State === 0) {
-      var box = `<div class="assets_box"><div class="desc"><div class="bold">固定资产 ${d.Value.length}<span class="sub"> / +${formatNumber(chara.Rate, 2)}</span></div><button id="auctionHistoryButton" class="text_button">[上期公示]</button><button id="buildButton" class="text_button">[资产重组]</button></div><div class="assets"></div></div>`;
+      var box = `<div class="assets_box"><div class="desc">
+      <div class="bold">固定资产 ${d.Value.length}<span class="sub"> / +${formatNumber(chara.Rate, 2)}</span>
+        <button id="expandButton" data-expanded="false" class="text_button">[+显示全部]</button>
+      </div>
+      <button id="auctionHistoryButton" class="text_button">[上期公示]</button>
+      <button id="buildButton" class="text_button">[资产重组]</button>
+      </div><div class="assets"></div></div>`;
       $('#grailBox .loading').before(box);
       $('#buildButton').on('click', () => {
         openSacrificeDialog(chara, userChara.Amount);
@@ -403,19 +409,44 @@ function loadFixedAssets(chara, userChara, callback) {
       });
 
       var temples = {};
+      var visibleTemples = [];
       for (i = 0; i < d.Value.length; i++) {
         var temple = d.Value[i];
+        temple.Replicates = 0;
         temples[temple.UserId] = temple;
 
-        var card = renderTemple(temple, 'fix');
-        $('.assets_box .assets').append(card);
-        $(`.assets_box .assets .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
+        var replicate = visibleTemples.find(t => { return t.Cover == temple.Cover && t.Level == temple.Level });
+        if (replicate) {
+          temple.Replicated = true;
+          replicate.Replicates += 1;
+        } else {
+          visibleTemples.push(temple);
+        }
       }
 
-      $('.assets_box .assets .card').on('click', (e) => {
-        var temple = $(e.currentTarget).data('temple');
+      for (i = 0; i < d.Value.length; i++) {
+        var temple = d.Value[i];
+        var card = renderTemple(temple, 'fix');
+        $('.assets_box .assets').append(card);
+        $(`.assets_box .assets .item[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
+      }
+
+      $('.assets_box .assets').on('click', '.card', (e) => {
+        var temple = $(e.currentTarget).parent().data('temple');
         showTemple(temple, chara);
       });
+
+      // $('.assets_box .assets .item .load_replicates').on('click', (e) => {
+      //   var temple = $(e.currentTarget).parents('.item').data('temple');
+      //   var current = $(e.currentTarget).parents('.item');
+      //   temple.Replicates.forEach(t => {
+      //     var card = renderTemple(t, 'fix');
+      //     current.after(card);
+      //     $(`.assets_box .assets .item[data-id="${t.UserId}#${t.CharacterId}"]`).data('temple', t);
+      //   });
+      //   $(e.currentTarget).remove();
+      //   //showTemple(temple, chara);
+      // });
 
       if (d.Value.length === 0) {
         var card = '<div class="empty">啊咧？啥都没有~( T oT)//</div>';
@@ -423,15 +454,30 @@ function loadFixedAssets(chara, userChara, callback) {
       }
 
       getData(`chara/user/${chara.Id}/valhalla@tinygrail.com/false`, (d) => {
+        chara.Price = d.Value.Price;
+        chara.State = d.Value.Amount;
+        var button = `<button id="auctionButton" class="text_button">[萌王投票]</button>`;
+
         if (d.State == 0 && d.Value.Amount > 0) {
-          chara.Price = d.Value.Price;
-          chara.State = d.Value.Amount;
-          var button = `<button id="auctionButton" class="text_button">[参与竞拍]</button>`;
-          $('#buildButton').before(button);
-          $('#auctionButton').on('click', () => {
-            openAuctionDialog(chara);
-          });
+          button = `<button id="auctionButton" class="text_button">[参与竞拍]</button>`;
         }
+
+        $('#buildButton').before(button);
+        $('#auctionButton').on('click', () => {
+          openAuctionDialog(chara);
+        });
+
+        $('#expandButton').on('click', e => {
+          if (!$(e.currentTarget).data('expanded')) {
+            $(e.currentTarget).data('expanded', true);
+            $(e.currentTarget).text('[-隐藏重复]');
+            $('.assets .item').addClass('expanded');
+          } else {
+            $(e.currentTarget).data('expanded', false);
+            $(e.currentTarget).text('[+显示全部]');
+            $('.assets .item').removeClass('expanded');
+          }
+        });
       });
     }
     if (callback) callback();
@@ -439,7 +485,6 @@ function loadFixedAssets(chara, userChara, callback) {
 }
 
 function renderTemple(temple, type) {
-  var cover = getSmallCover(temple.Cover);
   var avatar = normalizeAvatar(temple.Avatar);
   var full = formatNumber(temple.Sacrifices, 0);
 
@@ -454,10 +499,16 @@ function renderTemple(temple, type) {
   var grade = '';
   var rate = '';
   var level = '';
+  var line = '';
+  var lineDisplay = 'display:none;';
+  if (temple.Line && temple.Line.length > 0) {
+    line = encodeHtml(temple.Line);
+    lineDisplay = '';
+  }
 
   if (temple.Level == 1) {
     grade = '光辉圣殿';
-    rate = '+0.20';
+    rate = '+0.10';
     level = ' silver';
   } else if (temple.Level == 2) {
     grade = '闪耀圣殿';
@@ -507,16 +558,41 @@ function renderTemple(temple, type) {
   }
 
   if (type != 'mine' && type != 'extra') {
+    var replicates = '';
+
+    if (temple.Replicates && temple.Replicates > 0)
+      replicates = `<span class="replicates">×${temple.Replicates + 1}</span>`;
+
     name = `<div class="name">
     <a target="_blank" title="${temple.Nickname}" href="/user/${temple.Name}">@${temple.Nickname}</a>
+    ${replicates}
     </div>`;
   }
 
-  var card = `<div class="item${level}">
-          <div class="card" title="${grade}" data-id="${temple.UserId}#${temple.CharacterId}" style="background-image:url(${cover})">
-            <div class="tag"><span>${templeLevel}</span></div>
-            <div class="buff">${rate}</div>
-          </div>
+  var cover = '';
+  if (temple.Cover) {
+    //cover = getSmallCover(temple.Cover);
+    cover = `<div class="card" title="${line}" data-id="${temple.UserId}#${temple.CharacterId}" style="background-image:url(${getSmallCover(temple.Cover)})">
+      <div title="${grade}" class="tag"><span>${templeLevel}</span></div>
+      <div class="buff">${rate}</div>
+      <div class="line" style="${lineDisplay}">...</div>
+    </div>`;
+  } else {
+    cover = `<div class="card" title="${line}" data-id="${temple.UserId}#${temple.CharacterId}">
+    <div class="avatar_bg" style="background-image:url(${avatar})"></div>
+    <div class="avatar" style="background-image:url(${avatar})"></div>
+    <div class="tag"><span>${templeLevel}</span></div>
+    <div class="buff">${rate}</div>
+    <div class="line" style="${lineDisplay}">...</div>
+    </div>`;
+  }
+
+  var replicated = '';
+  if (temple.Replicated)
+    replicated = ' replicated';
+
+  var card = `<div class="item${level}${replicated}" data-id="${temple.UserId}#${temple.CharacterId}">
+          ${cover}
           ${title}
           ${name}
         </div>`
@@ -524,9 +600,27 @@ function renderTemple(temple, type) {
   return card;
 }
 
+function encodeHtml(s) {
+  var regx = /"|&|'|<|>|[\x00-\x20]|[\x7F-\xFF]|[\u0100-\u2700]/g;
+  return (typeof s != 'string') ? s :
+    s.replace(regx,
+      function ($0) {
+        var c = $0.charCodeAt(0), r = ['&#'];
+        c = (c == 0x20) ? 0xA0 : c;
+        r.push(c); r.push(';');
+        return r.join('');
+      });
+};
+
 function sacrificeCharacter(id, count, captial, callback) {
   postData(`chara/sacrifice/${id}/${count}/${captial}`, null, (d) => {
     if (callback) { callback(d); }
+  });
+}
+
+function askCharacter(id, count, price, callback) {
+  postData(`chara/ask/${id}/${price}/${count}`, null, function (d) {
+    if (callback) callback(d);
   });
 }
 
@@ -535,6 +629,7 @@ function showTemple(temple, chara) {
   var action = `<div class="action">
       <button style="display:none" id="changeCoverButton" class="text_button">[修改]</button>
       <button style="display:none" id="resetCoverButton" class="text_button">[重置]</button>
+      <button style="display:none" id="editLineButton" class="text_button">[台词]</button>
       <input style="display:none" id="picture" type="file" accept="image/*">
     </div>`;
   // if (temple.UserId == userId) {
@@ -546,28 +641,45 @@ function showTemple(temple, chara) {
   //   });
   // }
 
-  getUserAssets((d) => {
-    if (d.State == 0) {
-      if (d.Value.Id == temple.UserId) {
-        $('#changeCoverButton').show();
-        $('#resetCoverButton').show();
-      }
-      if (d.Value.Type >= 999 || d.Value.Id == 702) {
-        $('#resetCoverButton').show();
-      }
-    }
-  });
-
   var position = '';
   if (cover.indexOf('//lain.') >= 0)
     position = 'background-position:top;';
 
   //var image=`<div class="card" style="background-image:url(${cover});${position}">`;
   var image = `<img class="cover" src='${cover}' />`;
+  var name = temple.CharacterName;
+  if (!temple.CharacterName)
+    name = temple.Name;
+  if (chara)
+    name = chara.Name;
+
+  var lineDisplay = 'display:none;';
+  var lineContent = '';
+  if (temple.Line && temple.Line.length > 0) {
+    lineContent = encodeHtml(temple.Line);
+    var lines = lineContent.split('\n');
+    if (lines.length > 1) {
+      lineContent = '';
+      lines.forEach(l => lineContent += `<div>${l}</div>`);
+    }
+  }
+
+  if (temple.Line && temple.Line.length > 0)
+    lineDisplay = '';
+  var line = `<div class="line" style="${lineDisplay}">
+  <div class="name">${name}</div>
+  <div class="text">
+    <span>${lineContent}</span>
+    <textarea id="editLine" style="display:none;">${lineContent}</textarea>
+  </div>
+  </div>`;
 
   var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
   <div id="TB_window" class="dialog temple" style="display:block;">
+    <div class="container">
       ${image}
+      ${line}
+    </div>
       ${action}
       <div class="loading" style="display:none;"></div>
       <a id="TB_closeWindowButton" title="Close">X关闭</a>
@@ -575,9 +687,56 @@ function showTemple(temple, chara) {
   </div>`;
   $('body').append(dialog);
 
+  var showEdit = (e) => {
+    $('#TB_window.temple .line').show();
+    $('#TB_window.temple .line .text>span').hide();
+    $('#TB_window.temple .line .text>textarea').show();
+    $('#editLine').focus();
+    e.stopPropagation();
+  };
+
+  var commitEdit = (e) => {
+    //console.log('lost focus');
+    var value = $('#editLine').val();
+    var oldValue = $('#TB_window.temple .line .text>span').text();
+    if (value != oldValue) {
+      $('#TB_window.temple .line .text>span').text(value);
+      postData(`chara/temple/line/${temple.CharacterId}`, value, function (d) {
+        if (d.State != 0) {
+          alert(d.Message);
+        }
+      });
+    }
+    $('#TB_window.temple .line .text>span').show();
+    $('#TB_window.temple .line .text>textarea').hide();
+    e.stopPropagation();
+  };
+
+  getUserAssets((d) => {
+    if (d.State == 0) {
+      if (d.Value.Id == temple.UserId) {
+        $('#changeCoverButton').show();
+        $('#resetCoverButton').show();
+        $('#editLineButton').show();
+        $('#TB_window.temple').on('click', '.line .text', showEdit);
+      }
+      if (d.Value.Type >= 999 || d.Value.Id == 702) {
+        $('#resetCoverButton').show();
+      }
+    }
+  });
+
   $('#TB_closeWindowButton').on('click', closeDialog);
-  $('#TB_window.temple img.cover').on('click', closeDialog);
-  $('#TB_window.temple').on('click', '.card', closeDialog);
+  $('#TB_window.temple img.cover').on('click', e => {
+    //console.log('click image');
+    if ($('#TB_window.temple .line .text>textarea').is(':visible'))
+      commitEdit(e);
+    else if ($('#TB_window.temple .line').is(':visible'))
+      $('#TB_window.temple .line').hide();
+    else if (temple.Line && temple.Line.length > 0)
+      $('#TB_window.temple .line').show();
+  });
+  $('#TB_overlay').on('click', closeDialog);
 
   $('#changeCoverButton').on('click', (e) => {
     $("#picture").click();
@@ -587,6 +746,10 @@ function showTemple(temple, chara) {
     resetTempleCover(temple);
     e.stopPropagation();
   });
+
+  $('#editLineButton').on('click', showEdit);
+  //$('#editLine').blur(commitEdit);
+
   $("#picture").on("change", function () {
     if (this.files.length > 0) {
       var file = this.files[0];
@@ -729,6 +892,7 @@ function openSacrificeDialog(chara, amount) {
       $('#captialButton .button').animate({ 'margin-left': '20px' });
       $('#captialButton .button').css('background-color', '#7fc3ff');
       $('#TB_window .desc').text('将股份出售给英灵殿，立刻获取现金。输入股权融资的数量：');
+      $('.trade.finance input').val(amount);
     }
   });
   $('#financeButton').on('click', function () {
@@ -1100,10 +1264,10 @@ function loadBoardMember(id, page, total, callback) {
           banned = '(被封禁)';
         }
 
-
+        var badge = renderUserBadge(user);
 
         var u = `<div class="user ${inactive}">
-      <a target="_blank" href="/user/${user.Name}"><img src="${avatar}"></a>
+        <a class="avatar" target="_blank" href="/user/${user.Name}" style="background-image:url(${avatar})">${badge}</a>
         <div class="name">
           <a target="_blank" title="${user.Nickname}${banned}" href="/user/${user.Name}"><span class="title">${title}</span>${user.Nickname}</a>
           <div class="${tag}">${amount} ${p}%</div>
@@ -2121,8 +2285,10 @@ function RenderInitialUser(icu, index) {
   if (icu.Amount == 0)
     amount = '???';
 
+  var badge = renderUserBadge(icu);
+
   var user = `<div class="user">
-      <a target="_blank" href="/user/${icu.Name}"><img src="${avatar}"></a>
+      <a class="avatar" target="_blank" href="/user/${icu.Name}" style="background-image:url(${avatar})">${badge}</a>
         <div class="name">
           <a target="_blank" href="/user/${icu.Name}"><span class="title">${index + 1}</span>${icu.NickName}</a>
           <div class="tag board">+${amount}</div>
@@ -2138,7 +2304,7 @@ function login(callback) {
       callback();
     }
   });
-  var login = 'https://bgm.tv/oauth/authorize?response_type=code&client_id=bgm2525b0e4c7d93fec&redirect_uri=https%3A%2F%2Ftinygrail.com%2Fcb';
+  var login = 'https://bgm.tv/oauth/authorize?response_type=code&client_id=bgm2525b0e4c7d93fec&redirect_uri=https%3A%2F%2Ftinygrail.com%2Fapi%2Faccount%2Fcallback';
   window.open(login);
 }
 
@@ -2475,6 +2641,7 @@ function loadUserPage(name) {
   else
     title = '我的小圣杯';
 
+  loadSendButton();
   getData(`chara/user/assets/${name}`, function (d, s) {
     if (d.State === 0) {
       var data = d.Value;
@@ -2485,6 +2652,11 @@ function loadUserPage(name) {
 
       if (data.State == 666)
         $('h1.nameSingle .inner small.grey').after('<small class="red">[小圣杯已封禁]</small>');
+
+      if (data.LastIndex != 0) {
+        var badge = `<span class="badge" title="「小圣杯」排名第${data.LastIndex}位">#${data.LastIndex}</span>`;
+        $('#headerProfile .headerAvatar').append(badge);
+      }
 
       getGameMaster((result) => {
         if (result) {
@@ -2797,18 +2969,22 @@ function renderUser(item, index) {
     name += '(被封禁)';
   }
 
-  var badge = '';
-  // if (item.LastIndex != 0)
-  //   badge = `<span class="badge" title="昨日排名第${item.LastIndex}位">No.${item.LastIndex}</span>`;
-  // if (item.Type === 1)
-  //   badge = `<span class="badge" title="${formatNumber(item.Rate, 1)}倍分红剩余${item.Bonus}期">×${item.Bonus}</span>`;
-
+  item.LastIndex = index + 1;
+  var badge = renderUserBadge(item);
   var avatar = normalizeAvatar(item.Avatar);
-  var box = `<li class="initial_item ${banned}"><a target="right" href="/user/${item.Name}" class="avatar"><img src="${avatar}">${badge}</a>
-          <div class="info"><div class="name" title="${name}"><a target="_blank" href="/user/${item.Name}"><span>${index + 1}.</span>${item.Nickname}</a><span class="tag ${tclass}">${flu}</span></div><div class="money" title="每周股息 / 流动资金 / 初始资金">+₵${formatNumber(item.Share, 0)} / ₵${formatNumber(item.TotalBalance, 0)} / ${formatNumber(item.Principal, 0)}</div>
+
+  var box = `<li class="initial_item user ${banned}"><a target="right" href="/user/${item.Name}" class="avatar"><img src="${avatar}">${badge}</a>
+          <div class="info"><div class="name" title="${name}"><a target="_blank" href="/user/${item.Name}">${item.Nickname}</a><span class="tag ${tclass}">${flu}</span></div><div class="money" title="每周股息 / 流动资金 / 初始资金">+₵${formatNumber(item.Share, 0)} / ₵${formatNumber(item.TotalBalance, 0)} / ${formatNumber(item.Principal, 0)}</div>
             <div class="current ${tclass}" title="总资产">₵${formatNumber(item.Assets, 0)}</div>
             <div class="time"><small>${formatTime(item.LastActiveDate)}</small></div></div></li>`;
   return box;
+}
+
+function renderUserBadge(item) {
+  var badge = '';
+  if (item.LastIndex != 0)
+    badge = `<span class="badge" title="排名第${item.LastIndex}位">#${item.LastIndex}</span>`;
+  return badge;
 }
 
 function renderCharacter(item, index) {
@@ -2822,25 +2998,29 @@ function renderCharacter(item, index) {
     flu = `${formatNumber(item.Fluctuation * 100, 2)}%`;
   }
   var depth = renderCharacterDepth(item);
-  var badge = renderBadge(item);
+  var badge = renderBadge(item, false, true, true);
+  var badge2 = renderBadge(item, true, false, false);
 
   var box = `<li class="initial_item chara"><a target="right" class="avatar" data-id="${item.Id}"><img src="${normalizeAvatar(item.Icon)}">${badge}</a>
-            <div class="info"><div class="name" title="${item.Name}"><a target="_blank" href="/character/${item.Id}"><span>${index + 1}.</span>${item.Name}</a></div><div class="money" title="股息 / 总股份 / 总市值">+${formatNumber(item.Rate, 2)} / ${formatNumber(item.Total, 0)} / ₵${formatNumber(item.MarketValue, 0)}</div>
+            <div class="info"><div class="name" title="${item.Name}"><a target="_blank" href="/character/${item.Id}"><span>${index + 1}.</span>${item.Name}</a>${badge2}</div><div class="money" title="股息 / 总股份 / 总市值">+${formatNumber(item.Rate, 2)} / ${formatNumber(item.Total, 0)} / ₵${formatNumber(item.MarketValue, 0)}</div>
               <div class="current ${tclass}" title="现价 / 涨跌">₵${formatNumber(item.Current, 2)}<span class="tag ${tclass}">${flu}</span></div>
               <div class="time" title="买入 / 卖出 / 成交量"><small>${formatTime(item.LastOrder)}</small>${depth}</div></div></li>`;
   return box;
 }
 
-function renderBadge(item) {
+function renderBadge(item, withCrown, withNew, withLevel) {
   var badge = '';
-  if (item.Level > 1) {
-    if (item.Type == 1)
-      badge = `<span class="badge" title="${formatNumber(item.Rate, 1)}倍分红剩余${item.Bonus}期">lv${item.Level}</span>`;
-    else
-      badge = `<span class="badge">lv${item.Level}</span>`;
-  } else if (item.Type == 1) {
-    badge = `<span class="badge new" title="${formatNumber(item.Rate, 1)}倍分红剩余${item.Bonus}期">×${item.Bonus}</span>`;
+
+  if (withLevel)
+    badge = `<span class="badge level lv${item.Level}">lv${item.Level}</span>`;
+
+  if (item.Type == 1 && withNew) {
+    badge += `<span class="badge new" title="+${formatNumber(item.Rate, 1)}新番加成剩余${item.Bonus}期">×${item.Bonus}</span>`;
   }
+
+  if (item.State > 0 && withCrown)
+    badge += `<span class="badge crown" title="获得${item.State}次萌王">×${item.State}</span>`;
+
   return badge;
 }
 
@@ -2855,7 +3035,7 @@ function renderCharacter3(item, index) {
     flu = `${formatNumber(item.Fluctuation * 100, 2)}%`;
   }
 
-  var badge = renderBadge(item);
+  var badge = renderBadge(item, false, false, true);
   var box = `<li class="initial_item chara"><a target="right" class="avatar" data-id="${item.Id}"><img src="${normalizeAvatar(item.Icon)}">${badge}</a>
               <div class="info"><div class="name" title="${item.Name}"><a target="_blank" href="/character/${item.Id}"><span>${index + 1}.</span>${item.Name}</a></div><div class="money" title="股息 / 底价 / 数量">+${formatNumber(item.Rate, 2)} / ₵${formatNumber(item.Price, 0)} / ${formatNumber(item.State, 0)}</div>
                 <div class="current ${tclass}" title="现价 / 涨跌">₵${formatNumber(item.Current, 2)}<span class="tag ${tclass}">${flu}</span></div>
@@ -3243,15 +3423,7 @@ function loadGrailBox2(callback) {
         });
       });
       $('#scratchButton').on('click', function () {
-        if (confirm('消费₵1,000购买一张环保刮刮乐彩票？')) {
-          getData('event/scratch/bonus', (d) => {
-            if (d.State == 0) {
-              alert(d.Value);
-            } else {
-              alert(d.Message);
-            }
-          });
-        }
+        openScratchDialog();
       });
       $('#bonusButton').on('click', function () { getDailyBangumiBonus(loadGrailBox2) });
     } else {
@@ -3264,6 +3436,165 @@ function loadGrailBox2(callback) {
     loadShareBonusButton();
     if (callback) callback();
   });
+}
+
+function openScratchDialog() {
+  var dialog = `<div class="new_overlay" id="scratchDialog">
+  <div class="new_dialog">
+    <div class="title">彩票抽奖</div>
+    <div class="desc">消费₵1,000购买一张环保刮刮乐彩票？</div>
+    <div class="action"><button id="cancelButton">取消</button><button class="active" id="confirmButton">确定</button></div>
+    <div class="loading" style="display:none;"></div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  $('#scratchDialog').on('click', '.sell_button', e => {
+    if ($(e.currentTarget).hasClass('disabled')) return;
+    $(e.currentTarget).addClass('disabled');
+    var id = $(e.currentTarget).data('id');
+    var amount = $(e.currentTarget).data('amount') * 1;
+    var price = $(e.currentTarget).data('price') * 1;
+    askCharacter(id, amount, price, d => {
+      if (d.State == 0) {
+        $(e.currentTarget).remove();
+        var total = $(`#scratchDialog .card[data-id=${id}]`).data('amount') * 1;
+        var rest = total - amount;
+        if (rest > 0) {
+          $(`#scratchDialog .card[data-id=${id}] .finance_button`).data('amount', rest);
+          $(`#scratchDialog .card[data-id=${id}] .card_name .badge`).text(`×${rest}`);
+        } else {
+          $(`#scratchDialog .card[data-id=${id}] .finance_button`).remove();
+          $(`#scratchDialog .card[data-id=${id}] .card_name .badge`).remove();
+        }
+        alert(`出售完成：获得资金 ₵${formatNumber(price * amount, 0)}`);
+      } else {
+        alert(d.Message);
+      }
+      $(e.currentTarget).removeClass('disabled');
+    });
+  });
+
+  $('#scratchDialog').on('click', '.finance_button', e => {
+    if ($(e.currentTarget).hasClass('disabled')) return;
+    $(e.currentTarget).addClass('disabled');
+    var id = $(e.currentTarget).data('id');
+    var amount = $(e.currentTarget).data('amount');
+    sacrificeCharacter(id, amount, true, d => {
+      if (d.State == 0) {
+        $(`#scratchDialog .card[data-id=${id}] .action`).hide();
+        $(`#scratchDialog .card[data-id=${id}] .card_name .badge`).remove();
+        var message = `融资完成：获得资金 ₵${formatNumber(d.Value.Balance, 0)}`;
+        alert(message);
+      } else {
+        alert(d.Message);
+      }
+      $(e.currentTarget).removeClass('disabled');
+    });
+  });
+
+  $('#scratchDialog #confirmButton').on('click', e => {
+    $('#scratchDialog .loading').show();
+    $('#scratchDialog .action').hide();
+    $('#scratchDialog .desc').hide();
+    getData('event/scratch/bonus2', data => {
+      $('.loading').hide();
+      if (data.State == 0) {
+        var cards = '<div class="cards">';
+        for (var i = 0; i < data.Value.length; i++) {
+          var chara = data.Value[i];
+          var cover = chara.Cover;
+
+          var sellButton = `<button class="sell_button active" data-id="${chara.Id}" data-amount="${chara.SellAmount}" data-price="${chara.SellPrice}">出售(₵${formatNumber(chara.SellPrice, 0)})</button>`;
+          if (chara.SellPrice == 0 || chara.SellAmount == 0)
+            sellButton = '';
+
+          if (cover.startsWith('https://tinygrail.oss-cn-hangzhou.aliyuncs.com/'))
+            cover += '!w240';
+          var card = `<div class="card" data-id="${chara.Id}" data-name="${chara.Name}" data-amount="${chara.Amount}">
+              <div class="cover">
+                <div class="card_back"></div>
+                <div class="card_front lv${chara.Level}" style="background-image:url(${cover})">
+                  <div class="tag lv${chara.Level}">${chara.Level}</div>
+                  <div class="buff">₵${formatNumber(chara.CurrentPrice, 0)}</div>
+                </div>
+              </div>
+              <div class="card_name"><span class="name">???</span><span class="badge">×${chara.Amount}</span></div>
+      <div class="action" style="display:none;">${sellButton}<button class="finance_button" data-id="${chara.Id}" data-amount="${chara.Amount}" >融资</button></div>
+            </div>`;
+          cards += card;
+        }
+        cards += '</div>';
+        $('#scratchDialog .new_dialog').append(cards);
+        $('#scratchDialog .cover').on('click', e => {
+          var cover = $(e.currentTarget);
+          if (!cover.hasClass('front')) {
+            cover.addClass('front');
+            var card = cover.parent();
+            var id = card.data('id');
+            var name = card.data('name');
+            //console.log(id);
+            card.find('.card_name .name').text(name);
+            card.find('.card_name .name').on('click', e => {
+              openCharacterDialog(id);
+            });
+            card.find('.card_front').on('click', e => {
+              openCharacterDialog(id);
+            });
+            card.find('.action').show();
+
+            //cover.addClass('loading');
+            // addSpinLoading(e.currentTarget);
+            // setTimeout(() => {
+            //   removeSpinLoading(e.currentTarget);
+            //   cover.removeClass('loading');
+            //   cover.addClass('front');
+            // }, 5000);
+          }
+        });
+      } else {
+        $('#scratchDialog .desc').show();
+        $('#scratchDialog .desc').text(data.Message);
+      }
+    });
+  });
+
+  addCloseDialog('#scratchDialog');
+  $('#scratchDialog #cancelButton').on('click', e => {
+    closeNewDialog('#scratchDialog');
+  });
+}
+
+function sellCharacter(id, amount) {
+
+}
+
+function addSpinLoading(target) {
+  var spinner = document.createElement('div');
+  spinner.className = 'spin_loading';
+  var num = 7,
+    ang = 360 / num,
+    rad = num * 3;
+  for (var i = 0; i < num; i++) {
+    var button = document.createElement('div');
+    button.className = "dot" + i + " dot";
+    button.style.top = rad * Math.cos(ang * i * Math.PI / 180) - 10 + "px";
+    button.style.left = rad * Math.sin(ang * i * Math.PI / 180) - 10 + "px";
+    button.style.backgroundColor = "hsla(" + ang * i + ", 50%, 50%, 1)";
+
+    button.style.animation =
+      "osc 2s ease-in-out infinite " + i / (num / 2) + "s, rainbow 8s infinite " + i / (num / 2) + "s";
+
+    spinner.appendChild(button);
+  }
+
+  target.appendChild(spinner);
+}
+
+function removeSpinLoading(target) {
+  $(target).find('.spin_loading').remove();
 }
 
 function loadPhoneButton() {
@@ -3288,6 +3619,51 @@ function loadHolidayButton() {
       $('button.daily_bonus').before(button);
       $('#holidayButton').on('click', function () { getHolidayBonus(loadGrailBox2) });
     }
+  });
+}
+
+function loadSendButton() {
+  getData('event/holiday/check', function (d, s) {
+    if (d.State == 0) {
+      //var holiday = d.Value;
+      var button = `<a href="#" id="sendButton" class="chiiBtn"><span>发送红包</span></a>`;
+      $('.headerContainer .nameSingle .rr').prepend(button);
+      $('#sendButton').on('click', function () { openSendDialog() });
+    }
+  });
+}
+
+function openSendDialog(userName, nickName) {
+  if (!userName)
+    userName = path.split('?')[0].substr(6);
+
+  if (!nickName)
+    nickName = $('.headerContainer .nameSingle .inner a').text();
+
+  var dialog = `<div id="TB_overlay" class="TB_overlayBG TB_overlayActive"></div>
+  <div id="TB_window" class="dialog send_dialog" style="display:block;">
+    <div class="title">发送红包给「${nickName}」</div>
+    <div class="desc">输入祝福留言和红包金额：</div>
+    <div class="trade message"><input class="amount" type="text" placeholder="大吉大利，今晚吃鸡"></div>
+    <div class="trade finance"><input class="amount" type="number" min="1" max="10000" value="10000"><button id="financeButton" class="active">确定</button><button id="cancelDialogButton">取消</button></div>
+    <div class="loading" style="display:none"></div>
+    <a id="TB_closeWindowButton" title="Close">X关闭</a>
+  </div>`;
+  $('body').append(dialog);
+  $('#cancelDialogButton').on('click', closeDialog);
+  $('#TB_closeWindowButton').on('click', closeDialog);
+  $('#financeButton').on('click', function () {
+    var amount = $('.trade.finance input').val();
+    var message = $('.trade.message input').val();
+    $('#TB_window .trade.finance').hide();
+    $('#TB_window .trade.message').hide();
+    postData(`event/send/${userName}/${amount}/${encodeURIComponent(message)}`, null, d => {
+      if (d.State == 0) {
+        $('#TB_window .desc').text('发送成功');
+      } else {
+        $('#TB_window .desc').text(d.Message);
+      }
+    });
   });
 }
 
@@ -3774,7 +4150,10 @@ function renderCharacter2(item, even) {
     tag = renderAuctionTag(item);
   }
 
-  var badge = renderBadge(item);
+  var badge = '';
+  if (!item.Bid)
+    badge = renderBadge(item, false, true, true);
+
   var chara = `<li class="${line} item_list" data-id="${id}"><a href="/rakuen/topic/crt/${cid}?trade=true" class="avatar l" target="right">
                     <span class="avatarNeue avatarReSize32 ll" style="background-image:url('${normalizeAvatar(item.Icon)}')"></span></a><div class="inner">
                       <a href="/rakuen/topic/crt/${cid}?trade=true" class="title avatar l" target="right">${item.Name}${badge}</a> <small class="grey">(+${formatNumber(item.Rate, 2)} / ${formatNumber(item.Total, 0)} / ₵${formatNumber(item.MarketValue, 0)})</small>
@@ -3914,17 +4293,78 @@ function addCloseDialog(id) {
     id = '#' + id;
 
   $(`${id} .close_button`).on('click', () => {
-    $(id).remove();
-    if ($('.new_overlay').length == 0)
-      $('body').css('overflow-y', 'scroll');
+    closeNewDialog(id);
   });
+}
+
+function closeNewDialog(id) {
+  if (!id.startsWith('#'))
+    id = '#' + id;
+
+  $(id).remove();
+  if ($('.new_overlay').length == 0)
+    $('body').css('overflow-y', 'scroll');
+}
+
+function loadTopRecords(callback) {
+  var top = `<div id="topWeekRecords" class="temples">
+  <div class="title">/ 萌王记录</div>
+  <div class="loading"></div>
+  </div>`;
+  $('#grailBox2').after(top);
+
+  getData(`chara/topweek/history`, d => {
+    //var index = 1;
+    $('#topWeekRecords .loading').remove();
+    d.Value.Items.forEach(chara => {
+      var date = new Date(chara.Create);
+      var week = getWeek(date);
+      var year = date.getFullYear();
+
+      if ($(`#topWeekRecords .week${week}`).length == 0) {
+        $(`#topWeekRecords .title`).after(`<div class="week${week} record">
+          <div class="week">${year}年第${week}周</div>
+          <div class="list"></div>
+        </div>`);
+      }
+
+      var name = `${chara.Level} ${chara.Name}`;
+      if (chara.Level > 3)
+        name = chara.Name;
+
+      var avatar = normalizeAvatar(chara.Avatar);
+      var item = `<div class="chara rank${chara.Level}" data-id="${chara.CharacterId}">
+        <div class="avatar" style="background-image:url(${avatar})"></div>
+        <div class="name">${name}</div>
+      </div>`;
+      $(`#topWeekRecords .week${week} .list`).prepend(item);
+    });
+
+    if (callback) callback();
+  });
+
+  $('#topWeekRecords').on('click', '.chara', e => {
+    var id = $(e.currentTarget).data('id');
+    openCharacterDialog(id);
+  });
+}
+
+function getWeek(dt) {
+  let d1 = new Date(dt);
+  let d2 = new Date(dt);
+  d2.setMonth(0);
+  d2.setDate(1);
+  let rq = d1 - d2;
+  let days = Math.ceil(rq / (24 * 60 * 60 * 1000));
+  let num = Math.ceil(days / 7);
+  return num;
 }
 
 function loadTopWeek(callback) {
   var top = `<div id="topWeek" class="temples">
   <div class="title">/ 本周萌王</div>
   <div class="assets"></div></div>`;
-  $('#grailBox2').after(top);
+  $('#topWeekRecords').after(top);
 
   getData(`chara/topweek`, d => {
     var index = 1;
@@ -4041,12 +4481,14 @@ if (path.startsWith('/character/')) {
   });
 
   loadGrailBox2(() => {
-    loadTopWeek(() => {
-      loadLastTemples(1, () => {
-        loadIndexTab();
-        loadIndexPage2();
-        loadNewTab();
-        loadNewBangumi(1);
+    loadTopRecords(() => {
+      loadTopWeek(() => {
+        loadLastTemples(1, () => {
+          loadIndexTab();
+          loadIndexPage2();
+          loadNewTab();
+          loadNewBangumi(1);
+        });
       });
     });
   });
