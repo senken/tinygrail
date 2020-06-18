@@ -11,7 +11,7 @@ html[data-theme='dark'] #grailBox .users, html[data-theme='dark'] #grailBox .ass
     background-color: #2d2e2f;
 }
 
-html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] .temples {
+html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] #lotusland, html[data-theme='dark'] #lotusland .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] .temples {
     border-color: #333!important;
     background-color: #262728;
 }
@@ -81,7 +81,7 @@ a.avatar {
 #grailBox, #phoneBox, #recommendBox, #grailBox2 {
     background-color: #F5F5F5;
     border-radius: 5px;
-    padding: 12px;
+    padding: 12px 12px 7px 12px;
     color: #999;
     margin-bottom: 5px;
 }
@@ -336,17 +336,18 @@ a.avatar {
 
 #grailBox .user .avatar {
     width: 32px;
+    min-width: 32px;
     height: 32px;
     background-size: cover;
     background-position: center;
     border-radius: 5px;
     border: 1px solid #eee;
-    margin-right: 6px;
 }
 
 #grailBox .user:first-of-type .avatar {
     width: 40px;
     height: 40px;
+    min-width: 40px;
     margin-top: -3px;
     box-shadow: 0px 0px 5px #FFEB3B;
     border: 1px solid #FFC107;
@@ -357,9 +358,9 @@ a.avatar {
     border: 1px solid #d2d2d2;
 }
 
-#grailBox .user.banned .avatar, .initial_item.banned .avatar {
+#grailBox .user.banned .avatar, .initial_item.banned .avatar img {
     box-shadow: 0px 0px 5px #d2d2d2;
-    border: 1px solid #f09199;
+    border: 1px solid #f09199!important;
 }
 
 #grailBox .user .name {
@@ -367,6 +368,8 @@ a.avatar {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    font-size: 15px;
+    transform: scale(0.8);
 }
 
 #grailBox .user .tag, .item_list .tag {
@@ -374,12 +377,18 @@ a.avatar {
     text-shadow: 1px 1px 1px #666;
     font-weight: bold;
     border-radius: 5px;
-    transform: scale(0.8);
     padding: 0 5px;
-    margin-left: -5px;
     font-size: 12px;
     border: none;
     width: fit-content;
+}
+
+#grailBox .user .tag {
+    margin-top: 3px;
+}
+
+.item_list .tag {
+    transform: scale(0.8);
 }
 
 #grailBox .user:first-of-type .tag {
@@ -393,7 +402,7 @@ a.avatar {
 #grailBox .user .name .title {
     display: inline;
     color: #bbb;
-    font-size: 15px;
+    font-size: 18px;
     margin-right: 5px;
     border: none;
 }
@@ -495,18 +504,32 @@ a.avatar {
     display: block;
 }
 
+.item_list {
+    position: relative;
+}
+
+.item_list>.tags {
+    display: flex;
+}
+
+.item_list>.tags>.tag {
+    margin-left: -5px;
+}
+
+.item_list>.tags, .item_list>.tag {
+    position: absolute;
+    right: 5px;
+    top: 15px;
+}
+
 .item_list .tag {
-    margin: -28px 5px 0 0;
+    margin: 0;
     padding: 2px 6px;
-    float: right;
+    display: block;
 }
 
 .item_list .badge {
     font-size: 12px;
-}
-
-.item_list .tag.even {
-    margin-right: 5px;
 }
 
 #pageHeader .tag {
@@ -584,6 +607,7 @@ a.avatar {
     display: flex;
     margin: 10px;
     height: 80px;
+    width: 237px;
 }
 
 .initial_item:first-of-type {
@@ -680,7 +704,6 @@ a.avatar {
 
 .initial_item .info {
     margin-left: 12px;
-    width: 160px;
 }
 
 .initial_item .money {
@@ -723,15 +746,25 @@ a.avatar {
     background: transparent;
 }
 
+#grailBox2 {
+    margin-bottom: 0!important;
+}
+
 #grailBox2, #phoneBox, #recommendBox {
     margin: 12px auto 12px auto;
     display: flex;
-    width: 777px;
+    max-width: 777px;
+    flex-wrap: wrap;
+}
+
+#grailBox2 .user_info {
+    flex-grow: 1;
 }
 
 #grailBox2 .bold {
     flex-grow: 1;
     font-size: 13px;
+    margin-bottom: 5px;
 }
 
 #grailBox2 button, #grailBox2 #loginButton, #phoneBox button {
@@ -739,6 +772,7 @@ a.avatar {
     border-radius: 5px;
     height: 27px;
     margin-left: 5px;
+    margin-bottom: 5px;
 }
 
 #grailBox2 .text_button {
@@ -840,6 +874,11 @@ a.avatar {
     color: #999;
 }
 
+.option.left .checkbox {
+    float: left;
+    padding-left: 0;
+}
+
 #reverseButton:focus, .option .checkbox:focus {
     outline: none;
 }
@@ -870,6 +909,8 @@ a.avatar {
     display: flex;
     margin-bottom: 12px;
     flex-wrap: wrap;
+    position: relative;
+    margin-right: -10px;
 }
 
 .trade_box>div {
@@ -895,7 +936,7 @@ a.avatar {
 
 .trade_box .list {
     min-height: 100px;
-    padding-bottom: 45px;
+    padding-bottom: 75px;
 }
 
 .trade_box .list li {
@@ -956,11 +997,22 @@ a.avatar {
     flex-grow: 1;
 }
 
+#grailBox .trade_box input {
+    height: 48px;
+    font-size: 16px;
+}
+
 #grailBox .icon_box {
     margin-top: 10px;
     background: #fff;
     border-radius: 5px;
     overflow: hidden;
+}
+
+#grailBox .loading.trade_loading {
+    position: absolute;
+    bottom: 0;
+    height: 66px;
 }
 
 .icon_box .control {
@@ -1068,17 +1120,37 @@ a.avatar {
     font-size: 12px;
 }
 
+#grailIndexTab2 {
+    max-width: 100vw;
+}
+
 .grail_index_tab {
     display: flex;
     margin: 10px auto;
-    width: 800px;
+    max-width: 800px;
+}
+
+@media (max-width: 800px) {
+    .grail_index_tab {
+        width: fit-content;
+    }
+    .grail_index_tab .tab_button:first-child, .grail_index_tab .tab_button:last-child {
+        border-radius: 0;
+    }
+}
+
+.scroller {
+    overflow-x: auto;
 }
 
 .tab_button {
     border-top: 1px solid #d2d2d2;
     border-bottom: 1px solid #d2d2d2;
+    border-right: 1px solid #d2d2d2;
     font-size: 15px;
     padding: 5px 20px;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .tab_button.active {
@@ -1117,8 +1189,7 @@ a.avatar {
     margin-left: 10px;
 }
 
-#eden_tpc_list .item_log .tag {
-    margin: 7px 5px 0 0;
+.tag.badge.large, #eden_tpc_list .item_log .tag {
     font-size: 14px;
 }
 
@@ -1294,33 +1365,43 @@ a.avatar {
     }
 }
 
-#valhalla {
+#valhalla, #lotusland {
     flex-wrap: wrap;
     border: 1px solid #eee;
     border-radius: 10px;
     padding: 10px 0;
-    width: 800px;
 }
 
-#valhalla .initial_item {
+#valhalla .initial_item, #lotusland .initial_item {
     margin: 0;
     padding: 15px 0 0 29px;
     border-right: 1px solid #f4f4f4;
 }
 
-#valhalla .initial_item:nth-of-type(3n) {
+@media (max-width: 800px) {
+    #valhalla, #lotusland {
+        border-radius: 0;
+    }
+    #valhalla .initial_item, #lotusland .initial_item {
+        border-right: none;
+        width: 210px;
+        padding: 15px 0px 0px 20px;
+    }
+}
+
+#valhalla .initial_item:nth-of-type(3n), #lotusland .initial_item:nth-of-type(3n) {
     border-right: none;
 }
 
-#valhalla .initial_item:first-of-type {
+#valhalla .initial_item:first-of-type, #lotusland .initial_item:first-of-type {
     height: inherit;
 }
 
-#valhalla .initial_item:first-of-type .avatar {
+#valhalla .initial_item:first-of-type .avatar, #lotusland .initial_item:first-of-type .avatar {
     width: 64px;
 }
 
-#valhalla .initial_item:first-of-type img {
+#valhalla .initial_item:first-of-type img, #lotusland .initial_item:first-of-type img {
     width: 64px;
     height: 64px;
 }
@@ -1354,14 +1435,16 @@ a.avatar {
     color: #fff;
 }
 
-#valhalla .page {
+#valhalla .page, #lotusland .page {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .grail_index .page {
     display: flex;
     max-width: 800px;
+    overflow-x: auto;
 }
 
 .grail_index .my_auction, .item_list .my_auction {
@@ -1455,12 +1538,29 @@ a.avatar {
 }
 
 .temples {
-    width: 788px;
-    margin: 10px auto;
+    max-width: 788px;
+    margin: 0 auto 10px auto;
     padding: 7px 0 12px 12px;
     border-radius: 10px;
     background-color: #fff;
     border: 1px solid #eee;
+    position: relative;
+}
+
+@media (max-width: 800px) {
+    #grailBox2 {
+        margin: 0;
+        border-radius: 0;
+    }
+    .temples {
+        border-radius: 0;
+    }
+}
+
+.temples .buttons {
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 
 .auction_button {
@@ -1476,6 +1576,7 @@ a.avatar {
 
 .temples .assets {
     display: flex;
+    width: 788px;
     flex-wrap: wrap;
 }
 
@@ -1806,65 +1907,70 @@ a.avatar {
     }
 }
 
-#topWeekRecords .list {
+#topWeek .list {
     display: flex;
     align-items: center;
 }
 
-#topWeekRecords .chara {
+#topWeek .chara {
     margin-right: 10px;
     max-width: 50px;
 }
 
-#topWeekRecords .record {
-    padding-left: 5px;
-    margin-bottom: 10px;
+#topWeek .record {
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid #f4f4f4;
 }
 
-#topWeekRecords .week {
+#topWeek .record .scroller {
+    padding: 10px;
+}
+
+#topWeek .week {
     font-size: 15px;
     margin: 0 15px 5px 0;
     color: #999;
-    border-bottom: 1px solid #f4f4f4;
     padding-bottom: 5px;
+    padding-top: 10px;
 }
 
-html[data-theme='dark'] #topWeekRecords .week {
-    border-bottom: 1px solid #333;
+html[data-theme='dark'] #topWeek .record {
+    border-top: 1px solid #333;
 }
 
-#topWeekRecords .chara.rank1 {
+#topWeek .chara.rank1 {
     max-width: 72px;
 }
 
-#topWeekRecords .chara.rank1 .avatar {
+#topWeek .chara.rank1 .avatar {
     width: 72px;
     height: 72px;
     border: 1px solid #ffeb3b;
     box-shadow: #fff555 0px 0px 3px 1px;
 }
 
-#topWeekRecords .chara.rank2 {
+#topWeek .chara.rank2 {
     max-width: 68px;
 }
 
-#topWeekRecords .chara.rank2 .avatar {
+#topWeek .chara.rank2 .avatar {
     width: 68px;
     height: 68px;
     border: 1px solid #f4f4f4;
 }
 
-#topWeekRecords .chara.rank3 {
+#topWeek .chara.rank3 {
     max-width: 64px;
 }
 
-#topWeekRecords .chara.rank3 .avatar {
+#topWeek .chara.rank3 .avatar {
     width: 64px;
     height: 64px;
     border: 1px solid #df9c00;
 }
 
-#topWeekRecords .chara .avatar {
+#topWeek .chara .avatar {
     width: 50px;
     height: 50px;
     border: 1px solid #e0e0e0;
@@ -1873,12 +1979,21 @@ html[data-theme='dark'] #topWeekRecords .week {
     position: relative;
 }
 
-#topWeekRecords .chara .name {
+#topWeek .chara .name {
     font-weight: bold;
     margin-top: 5px;
     white-space: nowrap;
     overflow: hidden;
     color: #999;
+}
+
+#topWeek .chara .avatar .level {
+    top: -8px;
+    left: -8px;
+    margin: 0;
+    padding: 0 5px 1px 5px;
+    transform: scale(.9);
+    position: absolute;
 }
 
 #headerProfile .headerAvatar {
@@ -1902,4 +2017,28 @@ html[data-theme='dark'] #topWeekRecords .week {
     text-align: left;
     padding: 0 10px;
     box-shadow: none;
+}
+
+@media (max-width: 640px) {
+    #headerProfile h1 .inner {
+        display: block!important;
+    }
+    #headerProfile h1 .inner>a, #headerProfile h1 .inner>small {
+        margin-left: 5px;
+        display: inline-block;
+    }
+}
+
+#headerProfile div.subjectNav {
+    background: transparent!important;
+}
+
+.subjectNav .navTabsWrapper .navTabs {
+    padding: 0;
+    width: inherit;
+    background: #fbfbfb;
+}
+
+html[data-theme='dark'] .subjectNav .navTabsWrapper .navTabs {
+    background: #262728;
 }
