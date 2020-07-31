@@ -3,7 +3,7 @@ html[data-theme='dark'] body {
     background-color: #2d2e2f!important;
 }
 
-html[data-theme='dark'] #grailBox, html[data-theme='dark'] #grailBox2, html[data-theme='dark'] #phoneBox, html[data-theme='dark'] #recommendBox, html[data-theme='dark'] .new_dialog {
+html[data-theme='dark'] #grailBox, html[data-theme='dark'] #searchBox, html[data-theme='dark'] #grailBox2, html[data-theme='dark'] #phoneBox, html[data-theme='dark'] #recommendBox, html[data-theme='dark'] .new_dialog {
     background-color: #262728;
 }
 
@@ -11,12 +11,12 @@ html[data-theme='dark'] #grailBox .users, html[data-theme='dark'] #grailBox .ass
     background-color: #2d2e2f;
 }
 
-html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] #lotusland, html[data-theme='dark'] #lotusland .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] .temples {
+html[data-theme='dark'] #grailBox .title, html[data-theme='dark'] #searchBox .title, html[data-theme='dark'] .grail_index .index, html[data-theme='dark'] .initial_item img, html[data-theme='dark'] #TB_window .trade, html[data-theme='dark'] #grailBox .user img, html[data-theme='dark'] #valhalla, html[data-theme='dark'] #valhalla .initial_item, html[data-theme='dark'] #lotusland, html[data-theme='dark'] #lotusland .initial_item, html[data-theme='dark'] .tab_button, html[data-theme='dark'] .temples {
     border-color: #333!important;
     background-color: #262728;
 }
 
-html[data-theme='dark'] #grailBox input, html[data-theme='dark'] #phoneBox input, html[data-theme='dark'] #recommendBox input, html[data-theme='dark'] #TB_window .trade input {
+html[data-theme='dark'] #grailBox input, html[data-theme='dark'] #searchBox input, html[data-theme='dark'] #phoneBox input, html[data-theme='dark'] #recommendBox input, html[data-theme='dark'] #TB_window .trade input {
     background-color: #333;
     color: #ddd;
 }
@@ -78,7 +78,7 @@ a.avatar {
     cursor: pointer;
 }
 
-#grailBox, #phoneBox, #recommendBox, #grailBox2 {
+#grailBox, #phoneBox, #recommendBox, #grailBox2, #searchBox {
     background-color: #F5F5F5;
     border-radius: 5px;
     padding: 12px 12px 7px 12px;
@@ -109,7 +109,7 @@ a.avatar {
     text-shadow: 1px 1px 1px #aaa!important;
 }
 
-#grailBox .title {
+#grailBox .title, #searchDialog .title {
     padding-top: 0px;
     display: flex;
     flex-wrap: wrap;
@@ -157,7 +157,7 @@ a.avatar {
     font-size: 14px;
 }
 
-#grailBox input, #phoneBox input, #recommendBox input, #TB_window .trade input, #grailBox2 input {
+#grailBox input, #phoneBox input, #recommendBox input, #TB_window .trade input, #grailBox2 input, #searchBox input {
     border: none;
     border-radius: 0;
     height: 32px;
@@ -892,12 +892,14 @@ a.avatar {
     margin-left: 5px;
 }
 
-.slider .button {
+.slider .button, #grailBox .slider .button {
     border-radius: 10px;
     width: 20px;
     height: 20px;
     display: block;
     background-color: #ccc;
+    padding: 0;
+    margin: 0;
 }
 
 .on .slider .button {
@@ -2041,4 +2043,274 @@ html[data-theme='dark'] #topWeek .record {
 
 html[data-theme='dark'] .subjectNav .navTabsWrapper .navTabs {
     background: #262728;
+}
+
+#searchDialog .new_dialog, #confirmCharacterDialog .new_dialog {
+    margin: 20px auto;
+}
+
+.chara_item {
+    display: flex;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+html[data-theme='dark'] .chara_item {
+    border-color: #333;
+}
+
+.chara_item:hover {
+    background: azure;
+}
+
+html[data-theme='dark'] .chara_item:hover {
+    background: #666;
+}
+
+
+.chara_item .avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.chara_item .avatar .tag {
+    transform: scale(.75);
+    top: -3px;
+    left: -3px;
+}
+
+.chara_item .name {
+    color: #262728;
+    display: flex;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+html[data-theme='dark'] .chara_item .name {
+    color: #d2d2d2;
+}
+
+.chara_item .name .badge {
+    margin: -2px 2px 0px -3px;
+    padding: 1px 7px 1px 7px;
+    transform: scale(.8);
+    display: block;
+}
+
+.chara_item .name .unlinked {
+    background: #ddd;
+    color: white;
+    font-size: 12px;
+    padding: 1px 8px;
+    margin: -2px 0 0 -5px;
+    border-radius: 5px;
+    transform: scale(.8);
+    text-shadow: #aaa 1px 1px 1px;
+}
+
+.chara_item .info {
+    margin-left: 10px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.search_bar {
+    margin: 5px 0;
+    display: flex;
+}
+
+#searchDialog .search_bar input {
+    flex-grow: 1;
+    text-align: left;
+    padding: 0 10px 0 30px;
+    text-align: left;
+    background-image: url('/img/rc2/ico_search.png');
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    background-position: 5px center;
+}
+
+#searchDialog .pager {
+    display: flex;
+    margin: 10px 0;
+    justify-content: center;
+    cursor: pointer;
+    flex-wrap: wrap;
+}
+
+#searchDialog .pager .page {
+    font-size: 12px;
+    padding: 4px 8px;
+    margin: 0 5px 5px 0;
+    color: #555;
+    background: #eee;
+    border-radius: 5px;
+    text-decoration: none;
+    text-shadow: none!important;
+}
+
+#searchDialog .pager .page.active {
+    color: #FFF;
+    background: #F09199;
+}
+
+#confirmCharacterDialog .button {
+    width: fit-content;
+    padding: 5px 20px;
+    margin: 15px auto;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#confirmCharacterDialog .content {
+    font-size: 16px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+#confirmCharacterDialog .content input {
+    width: 75px;
+    height: 30px;
+    margin: 0 10px 0 0;
+}
+
+#confirmCharacterDialog .checkbox {
+    float: inherit;
+}
+
+.chara_link {
+    display: flex;
+    width: 432px;
+    margin-top: 10px;
+    position: relative;
+}
+
+.chara_link .container {
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+
+.chara_link .left {
+    width: 240px;
+    height: 330px;
+    overflow: hidden;
+    transform: skewX(-10deg);
+    transform-origin: top left;
+}
+
+.chara_link .left .container {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-right: none;
+    overflow: hidden;
+    height: 320px;
+    width: 240px;
+    transform: skewX(10deg);
+    transform-origin: top left;
+    border-width: 2px;
+}
+
+.chara_link .right {
+    width: 250px;
+    height: 330px;
+    transform: skewX(-10deg);
+    overflow: hidden;
+    transform-origin: bottom right;
+    position: absolute;
+    left: 188px;
+}
+
+.chara_link .right .container {
+    transform: skewX(10deg);
+    transform-origin: bottom right;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-left: none;
+    overflow: hidden;
+    width: 240px;
+    height: 320px;
+    border-width: 2px;
+}
+
+.chara_convert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.chara_convert .avatar {
+    width: 64px;
+    height: 64px;
+    background-size: cover;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin: 0 auto;
+}
+
+.chara_convert .asset {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.chara_convert .arrow_right {
+    width: 0;
+    height: 0;
+    border-top: 15px solid transparent;
+    border-left: 20px solid lightgray;
+    border-bottom: 15px solid transparent;
+    margin: 0 10px;
+}
+
+.grail_user_tab {
+    cursor: pointer;
+}
+
+.grail_user_tab:hover {
+    text-decoration: none;
+}
+
+.grail_list .link {
+    max-width: 220px;
+}
+
+.link .chara_link { 
+    width: 220px;
+}
+
+.link .content {
+    text-align: center;
+    margin: 7px 20px 0 0;
+    font-size: 14px;
+}
+
+.link .chara_link .container {
+    width: 115px;
+    height: 160px;
+}
+
+.link .chara_link .left {
+    width: 120px;
+    height: 165px;
+}
+
+.link .chara_link .right {
+    width: 120px;
+    height: 165px;
+    left: 93px;
+}
+
+.link_list .grail_list {
+    margin-right: 0;
 }

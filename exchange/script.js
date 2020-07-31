@@ -688,11 +688,12 @@ function showTemple(temple, chara) {
   var action = `<div class="action">
       <button style="display:none" id="changeCoverButton" class="text_button">[修改]</button>
       <button style="display:none" id="resetCoverButton" class="text_button">[重置]</button>
+      <button style="display:none" id="linkButton" class="text_button">[LINK]</button>
       <button style="display:none" id="editLineButton" class="text_button">[台词]</button>
+      <button style="display:none" id="sourceButton" class="text_button">[来源]</button>
       <button style="display:none" id="chaosCubeButton" class="text_button">[混沌魔方]</button>
       <button style="display:none" id="guidePostButton" class="text_button">[虚空道标]</button>
-      <button style="display:none" id="linkButton" class="text_button">[LINK]</button>
-      <button style="display:none" id="sourceButton" class="text_button">[来源]</button>
+      <button style="display:none" id="chargeButton" class="text_button">[星光碎片]</button>
       <input style="display:none" id="picture" type="file" accept="image/*">
     </div>`;
 
@@ -777,7 +778,28 @@ function showTemple(temple, chara) {
         $('#guidePostButton').show();
         $('#linkButton').show();
         $('#sourceButton').show();
+        $('#chargeButton').show();
         $('#TB_window.temple').on('click', '.line .text', showEdit);
+
+        var username = d.Value.Name;
+
+        $('#linkButton').on('click', e => {
+          closeDialog();
+          openSearchCharacterDialog(temple, username, 'link');
+          e.stopPropagation();
+        });
+
+        $('#guidePostButton').on('click', e => {
+          closeDialog();
+          openSearchCharacterDialog(temple, username, 'guidepost');
+          e.stopPropagation();
+        });
+
+        $('#chargeButton').on('click', e => {
+          closeDialog();
+          openSearchCharacterDialog(temple, username, 'stardust');
+          e.stopPropagation();
+        });
       }
       if (d.Value.Type >= 999 || d.Value.Id == 702) {
         $('#resetCoverButton').show();
@@ -2898,26 +2920,31 @@ function loadUserPage(name) {
       <div class="horizontalOptions clearit">
         <ul class="">
           <li class="title"><h2>${title} </h2></li>
-          <li id="templeTab" class="current"><a>0座圣殿</a></li>
-          <li id="charaTab"><a>0个人物</a></li>
-          <li id="initTab"><a>0个ICO</a></li>
+          <li id="linkTab" data-target=".link_list" data-pager="#pager0" class="current grail_user_tab"><a>0组连接</a></li>
+          <li id="templeTab" data-target=".temple_list" data-pager="#pager1" class="grail_user_tab"><a>0座圣殿</a></li>
+          <li id="charaTab" data-target=".chara_list" data-pager="#pager2" class="grail_user_tab"><a>0个人物</a></li>
+          <li id="initTab" data-target=".init_list" data-pager="#pager3" class="grail_user_tab"><a>0个ICO</a></li>
           <li class="total"></li>
         </ul>
       </div>
       <div class="clearit">
-        <div class="temple_list">
+        <div class="link_list grail_user_list">
           <div class="loading"></div>
         </div>
-        <div class="chara_list" style="display:none">
+        <div class="temple_list grail_user_list" style="display:none">
           <div class="loading"></div>
         </div>
-        <div class="init_list" style="display:none">
+        <div class="chara_list grail_user_list" style="display:none">
+          <div class="loading"></div>
+        </div>
+        <div class="init_list grail_user_list" style="display:none">
           <div class="loading"></div>
         </div>
       </div>
       </div>`;
       $('#user_home .user_box').after(box);
 
+      loadUserLinks(1);
       loadUserTemples(1);
       loadUserCharacters(1);
       loadUserInitials(1);
@@ -2929,41 +2956,67 @@ function loadUserPage(name) {
 
       $('#grail .total').text(`总资产：₵${formatNumber(data.Assets, 2)} / ${formatNumber(data.Balance, 2)}`);
 
-      $('#initTab').on('click', function () {
-        $('#templeTab').removeClass('current');
-        $('#initTab').addClass('current');
-        $('#charaTab').removeClass('current');
-        $('.chara_list').hide();
-        $('.temple_list').hide();
-        $('.init_list').show();
-        $('#pager1').hide();
-        $('#pager2').hide();
-        $('#pager3').show();
+      $('.grail_user_tab').on('click', function (e) {
+        switchUserTab(e);
+      });
+    }
+  });
+}
+
+function switchUserTab(e) {
+  $('.grail_user_tab').removeClass('current');
+  $(e.currentTarget).addClass('current');
+
+  var target = $(e.currentTarget).data('target');
+  $('.grail_user_list').hide();
+  $(target).show();
+
+  var pager = $(e.currentTarget).data('pager');
+  $('.grail.page_inner').hide();
+  $(pager).show();
+}
+
+function loadUserLinks(page) {
+  $('#grail .link_list .grail_list').hide();
+
+  var p = $(`#grail .link_list .grail_list.page${page}`);
+  if (p.length > 0) {
+    p.show();
+    $('#pager1 .p').removeClass('p_cur');
+    $(`#pager1 .p[data-page=${page}]`).addClass('p_cur');
+    p.show();
+    return;
+  }
+
+  $('#grail .link_list .loading').show();
+
+  var userId = $('#grail').data('id');
+  var userName = path.split('?')[0].substr(6);
+  var list = `<ul class="grail_list page${page}"></ul>`;
+  $('.link_list').append(list);
+
+  postData(`chara/user/link/${userName}/${page}/24`, null, (data) => {
+    $('#grail .link_list .loading').hide();
+    if (data.State == 0) {
+      $('#linkTab a').text(`${data.Value.TotalItems}组连接`);
+
+      for (i = 0; i < data.Value.Items.length; i++) {
+        var temple = data.Value.Items[i];
+        var item = renderLink(temple, temple.Link);
+        $(`#grail .link_list .page${page}`).append(`<div class="link">${item}</div>`);
+        $(`#grail .link_list .card[data-id="${temple.UserId}#${temple.CharacterId}"]`).data('temple', temple);
+      }
+
+      $(`#grail .link_list .page${page} .item .card`).on('click', (e) => {
+        var temple = $(e.currentTarget).data('temple');
+        showTemple(temple, null);
       });
 
-      $('#charaTab').on('click', function () {
-        $('#templeTab').removeClass('current');
-        $('#initTab').removeClass('current');
-        $('#charaTab').addClass('current');
-        $('.chara_list').show();
-        $('.temple_list').hide();
-        $('.init_list').hide();
-        $('#pager1').hide();
-        $('#pager2').show();
-        $('#pager3').hide();
-      });
-
-      $('#templeTab').on('click', function () {
-        $('#templeTab').addClass('current');
-        $('#initTab').removeClass('current');
-        $('#charaTab').removeClass('current');
-        $('.chara_list').hide();
-        $('.temple_list').show();
-        $('.init_list').hide();
-        $('#pager1').show();
-        $('#pager2').hide();
-        $('#pager3').hide();
-      });
+      if (data.Value.TotalPages > 1) {
+        loadPager(data.Value.TotalPages, page, 'grail', 'pager0', loadUserLinks);
+        if ($('.link_list').css('display') == 'none')
+          $('#pager1').hide();
+      }
     }
   });
 }
@@ -4613,6 +4666,417 @@ function openCharacterDialog(id) {
   });
 
   addCloseDialog('#tradeDialog');
+}
+
+function openSearchCharacterDialog(temple, username, action) {
+  var title = `选择你想要「连接」的圣殿`;
+
+  if (action == 'stardust')
+    title = `选择「星光碎片」消耗的目标`;
+  else if (action == 'guidepost')
+    title = `选择「虚空道标」获取的目标`;
+
+  var dialog = `<div class="new_overlay" id="searchDialog">
+  <div class="new_dialog">
+    <div id="searchBox">
+      <div class="title">${title}</div>
+      <div class="search_bar"><input type="text" placeholder="输入角色名或ID"></input></div>
+      <div class="loading"></div>
+      <div class="chara_list"></div>
+      <div class="pager"></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  if (action == 'link') {
+    getUserTempleList(username, 1, '');
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserTempleList(username, 1, key);
+    });
+  } else {
+    var sort = 'desc';
+    if (action == 'stardust')
+      sort = 'asc';
+
+    getUserCharacterList(username, 1, '', sort);
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserCharacterList(username, 1, key);
+    });
+  }
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item', (e) => {
+    var toChara = $(e.currentTarget).data('chara');
+    if (action == 'stardust')
+      openConfirmCharacterDialog(toChara, temple, action);
+    else
+      openConfirmCharacterDialog(temple, toChara, action);
+  });
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item .name', (e) => {
+    var cid = $(e.currentTarget).parent().parent().data('id');
+    openCharacterDialog(cid);
+    e.stopPropagation();
+  });
+
+  addCloseDialog('#searchDialog');
+}
+
+function getUserTempleList(username, page, keyword) {
+  $('#searchDialog .chara_list').empty();
+  $('#searchDialog .loading').show();
+  $('#searchDialog .pager').empty();
+  $('#searchDialog .pager').hide();
+
+  getData(`https://tinygrail.com/api/chara/user/temple/${username}/${page}/24?keyword=${keyword}`, d => {
+    if (d && d.State === 0) {
+      d.Value.Items.forEach(c => {
+        var item = renderTempleListItem(c);
+        $('#searchDialog .chara_list').append(item);
+        $(`#searchDialog .chara_list .chara_item[data-id=${c.CharacterId}]`).data('chara', c);
+      });
+    }
+    if (d.Value.TotalPages > 1) {
+      for (var i = 0; i < d.Value.TotalPages; i++) {
+        var page = i + 1;
+        var active = '';
+        if (d.Value.CurrentPage == page)
+          active = ' active';
+        var pager = `<div class="page${active}" data-page="${page}">${page}</div>`;
+        $('#searchDialog .pager').append(pager);
+      }
+      $('#searchDialog .pager').show();
+      $('#searchDialog .pager .page').on('click', e => {
+        var p = $(e.currentTarget).data('page');
+        getUserTempleList(username, p, keyword);
+      });
+    }
+    $('#searchDialog .loading').hide();
+  });
+}
+
+function getUserCharacterList(username, page, keyword, sort) {
+  $('#searchDialog .chara_list').empty();
+  $('#searchDialog .loading').show();
+  $('#searchDialog .pager').empty();
+  $('#searchDialog .pager').hide();
+
+  var url = `https://tinygrail.com/api/chara/user/chara/${username}/${page}/24?sort=${sort}`;
+  if (keyword && keyword.length > 0)
+    url = `https://tinygrail.com/api/chara/search/character?keyword=${keyword}`;
+
+  getData(url, d => {
+    if (d && d.State === 0) {
+      var list = d.Value;
+      if (d.Value.Items) {
+        list = d.Value.Items;
+        if (d.Value.TotalPages > 1) {
+          for (var i = 0; i < d.Value.TotalPages; i++) {
+            var page = i + 1;
+            var active = '';
+            if (d.Value.CurrentPage == page)
+              active = ' active';
+            var pager = `<div class="page${active}" data-page="${page}">${page}</div>`;
+            $('#searchDialog .pager').append(pager);
+          }
+          $('#searchDialog .pager').show();
+          $('#searchDialog .pager .page').on('click', e => {
+            var p = $(e.currentTarget).data('page');
+            getUserCharacterList(username, p, keyword, sort);
+          });
+        }
+      }
+      list.forEach(c => {
+        var item = renderCharacterListItem(c);
+        $('#searchDialog .chara_list').append(item);
+        $(`#searchDialog .chara_list .chara_item[data-id=${c.Id}]`).data('chara', c);
+      });
+    }
+    $('#searchDialog .loading').hide();
+  });
+}
+
+function openConfirmCharacterDialog(fromChara, toChara, action) {
+  var title = '';
+  var content = '';
+
+  if (action == 'link') {
+    title = `确定「连接」的圣殿`;
+
+    content = renderLink(fromChara, toChara);
+    content += `<div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
+
+    // var left = fromChara;
+    // var right = toChara;
+    // if (fromChara.Sacrifices < toChara.Sacrifices) {
+    //   right = fromChara;
+    //   left = toChara;
+    // }
+    // var leftCover = getLargeCover(left.Cover);
+    // var rightCover = getLargeCover(right.Cover);
+
+    // var leftColor = 'silver';
+    // if (left.Level == 2)
+    //   leftColor = 'gold';
+    // else if (left.Level == 3)
+    //   leftColor = 'purple';
+
+    // var rightColor = 'silver';
+    // if (right.Level == 2)
+    //   rightColor = 'gold';
+    // else if (right.Level == 3)
+    //   rightColor = 'purple';
+
+    // content = `<div class="chara_link">
+    //   <div class="left item ${leftColor}">
+    //     <div class="container card" style="background-image:url(${leftCover})"></div>
+    //   </div>
+    //   <div class="right item ${rightColor}">
+    //     <div class="container card" style="background-image:url(${rightCover})"></div>
+    //   </div>
+    // </div>
+    // <div class="content">「${left.Name}」×「${right.Name}」</div>
+    // <div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
+  } else if (action == 'stardust') {
+    title = `确定「星光碎片」消耗的目标`;
+
+    var toColor = 'silver';
+    if (toChara.Level == 2)
+      toColor = 'gold';
+    else if (toChara.Level == 3)
+      toColor = 'purple';
+
+    var fromCover = normalizeAvatar(fromChara.Icon);
+    var toCover = getLargeCover(toChara.Cover);
+
+    var assets = `<div class="asset" title="可用数量 / 重组数量">${fromChara.UserAmount} / ${fromChara.Sacrifices}</div>`;
+    var assets2 = `<div class="asset" title="固定资产 / 重组数量">${toChara.Assets} / ${toChara.Sacrifices}</div>`;
+
+    var max = toChara.Sacrifices - toChara.Assets;
+    if (max > fromChara.UserAmount)
+      max = fromChara.UserAmount;
+
+    var option = '<div class="option"><div id="templeButton" class="checkbox">消耗圣殿<span class="slider"><span class="button"></span></span></div></div>';
+
+    if (fromChara.UserAmount == 0 && fromChara.UserTotal == 0 && fromChara.Sacrifices == 0) {
+      content = `<div class="content">所选目标没有资产</div>`;
+    }
+    else {
+      content = `<div class="chara_convert">
+    <div class="left item">
+      <div class="container avatar" style="background-image:url(${fromCover})"></div>
+      ${assets}
+    </div>
+    <div class="arrow_right"></div>
+    <div class="right item ${toColor}">
+      <div class="container card" style="background-image:url(${toCover})"></div>
+      ${assets2}
+    </div>
+  </div>
+  ${option}
+  <div class="content"><span>消耗「${fromChara.Name}」</span><input type="number" min="0" max="${max}" value="${max}"><span>股补充「${toChara.Name}」的固定资产</span></div>
+  <div data-from-id="${fromChara.Id}" data-to-id="${toChara.CharacterId}" class="button active convert_button">CONVERT</div>`;
+    }
+  }
+  else if (action == 'guidepost') {
+    title = `确定「虚空道标」获取的目标`;
+
+    var fromColor = 'silver';
+    if (fromChara.Level == 2)
+      fromColor = 'gold';
+    else if (toChara.Level == 3)
+      fromColor = 'purple';
+
+    var fromCover = normalizeAvatar(fromChara.Cover);
+    var toCover = getLargeCover(toChara.Icon);
+
+    var assets = `<div class="asset" title="固定资产 / 重组数量">${fromChara.Assets} / ${fromChara.Sacrifices}</div>`;
+    var assets2 = `<div class="asset" title="可用数量 / 重组数量">${toChara.UserAmount} / ${toChara.Sacrifices}</div>`;
+
+    var max = toChara.Sacrifices - toChara.Assets;
+    if (max > fromChara.UserAmount)
+      max = fromChara.UserAmount;
+
+    var option = '<div class="option"><div id="templeButton" class="checkbox">消耗圣殿<span class="slider"><span class="button"></span></span></div></div>';
+
+    if (fromChara.UserAmount == 0 && fromChara.UserTotal == 0 && fromChara.Sacrifices == 0) {
+      content = `<div class="content">所选目标没有资产</div>`;
+    }
+    else {
+      content = `<div class="chara_convert">
+    <div class="left item">
+      <div class="container card" style="background-image:url(${fromCover})"></div>
+      ${assets}
+    </div>
+    <div class="arrow_right"></div>
+    <div class="right item ${toColor}">
+      <div class="container avatar" style="background-image:url(${toCover})"></div>
+      ${assets2}
+    </div>
+  </div>
+  <div class="content"><span>消耗「${fromChara.Name}」100固定资产获取「${toChara.Name}」的随机数量（10-100）股份</span></div>
+  <div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.Id}" class="button active guide_button">POST</div>`;
+    }
+  }
+
+  var dialog = `<div class="new_overlay" id="confirmCharacterDialog">
+  <div class="new_dialog">
+    <div id="grailBox">
+      <div class="title">${title}</div>
+      ${content}
+      <div class="loading" style="display:none"></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+
+  $('#confirmCharacterDialog .link_button').on('click', (e) => {
+    var toCharaId = $(e.currentTarget).data('to-id');
+    var fromCharaId = $(e.currentTarget).data('from-id');
+    postData(`chara/link/${fromCharaId}/${toCharaId}`, null, (d) => {
+      if (d.State == 0) {
+        alert('连接成功');
+        window.location.reload();
+      } else {
+        alert(d.Message);
+      }
+    });
+  });
+
+  $('#confirmCharacterDialog .guide_button').on('click', (e) => {
+    var toCharaId = $(e.currentTarget).data('to-id');
+    var fromCharaId = $(e.currentTarget).data('from-id');
+    postData(`magic/guidepost/${fromCharaId}/${toCharaId}`, null, (d) => {
+      if (d.State == 0) {
+        var count = d.Value.Amount;
+        var price = formatNumber(count * d.Value.SellPrice, 0);
+        alert(`成功获取「${toChara.Name}」${count}股，市值₵${price}`);
+        window.location.reload();
+      } else {
+        alert(d.Message);
+      }
+    });
+  });
+
+  $('#confirmCharacterDialog .convert_button').on('click', (e) => {
+    var toCharaId = $(e.currentTarget).data('to-id');
+    var fromCharaId = $(e.currentTarget).data('from-id');
+    var isTemple = $('#templeButton').hasClass('on');
+    var amount = $('.content input').val();
+    postData(`magic/stardust/${fromCharaId}/${toCharaId}/${amount}/${isTemple}`, null, (d) => {
+      if (d.State == 0) {
+        alert('充能完成');
+        window.location.reload();
+      } else {
+        alert(d.Message);
+      }
+    });
+  });
+
+  $('#templeButton').on('click', (e) => {
+    if ($('#templeButton').hasClass('on')) {
+      $('#templeButton').removeClass('on');
+      $('#templeButton .button').animate({ 'margin-left': '0px' });
+      $('#templeButton .button').css('background-color', '#ccc');
+    } else {
+      $('#templeButton').addClass('on');
+      $('#templeButton .button').animate({ 'margin-left': '20px' });
+      $('#templeButton .button').css('background-color', '#7fc3ff');
+      $('.content input').val(amount);
+    }
+  });
+
+  $('body').css('overflow-y', 'hidden');
+  addCloseDialog('#confirmCharacterDialog');
+}
+
+function renderLink(temple1, temple2) {
+  var left = temple1;
+  var right = temple2;
+  if (temple1.Sacrifices < temple2.Sacrifices) {
+    right = temple1;
+    left = temple2;
+  }
+  var leftCover = getLargeCover(left.Cover);
+  var rightCover = getLargeCover(right.Cover);
+
+  var leftColor = 'silver';
+  if (left.Level == 2)
+    leftColor = 'gold';
+  else if (left.Level == 3)
+    leftColor = 'purple';
+
+  var rightColor = 'silver';
+  if (right.Level == 2)
+    rightColor = 'gold';
+  else if (right.Level == 3)
+    rightColor = 'purple';
+
+  var content = `<div class="chara_link">
+    <div class="left item ${leftColor}">
+      <div class="container card" style="background-image:url(${leftCover})"></div>
+    </div>
+    <div class="right item ${rightColor}">
+      <div class="container card" style="background-image:url(${rightCover})"></div>
+    </div>
+  </div>
+  <div class="content">「${left.Name}」×「${right.Name}」</div>`;
+  return content;
+}
+
+function renderTempleListItem(chara) {
+  var cover = chara.Avatar;
+  if (!cover) cover = chara.Cover;
+  cover = getSmallCover(cover);
+
+  var color = 'silver';
+  if (chara.Level == 2)
+    color = 'gold';
+  else if (chara.Level == 3)
+    color = 'purple';
+
+  var badge = `<span class="badge level lv${chara.CharacterLevel}">lv${chara.CharacterLevel}</span>`;
+  var link = `<span class="unlinked">NO LINK</span>`;
+  if (chara.Link) {
+    link = `<span class="link">×「${chara.Link.Name}」</span>`;
+  }
+
+  var item = `<div data-id="${chara.CharacterId}" class="chara_item item ${color}">
+    <div class="avatar card" style="background-image:url(${cover})">
+      <div class="tag">${chara.Level}</div>
+    </div>
+    <div class="info">
+      <div class="name large">${badge}#${chara.CharacterId}「${chara.Name}」${link}</div>
+      <div class="asset">${chara.Assets} / ${chara.Sacrifices}</div>
+    </div>
+  </div>`;
+
+  return item;
+}
+
+function renderCharacterListItem(chara) {
+  var cover = normalizeAvatar(chara.Icon);
+  var badge = `<span class="badge level lv${chara.Level}">lv${chara.Level}</span>`;
+
+  var assets = `<div class="asset" title="可用 / 持股 / 重组">${chara.UserAmount} / ${chara.UserTotal} / ${chara.Sacrifices}</div>`;
+  if (chara.UserAmount == 0 && chara.UserTotal == 0)
+    assets = `<div class="asset"><span class="no_assets">暂无持股</span></div>`;
+
+  var item = `<div data-id="${chara.Id}" class="chara_item">
+    <div class="avatar card" style="background-image:url(${cover})">
+    </div>
+    <div class="info">
+      <div class="name large">${badge}#${chara.Id}「${chara.Name}」</div>
+      ${assets}
+    </div>
+  </div>`;
+
+  return item;
 }
 
 function addCloseDialog(id) {
