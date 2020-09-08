@@ -3812,6 +3812,11 @@ function loadGrailBox2(callback) {
     }
     loadHolidayButton();
     loadPhoneButton();
+
+    var open = localStorage.getItem('openBackgroundDialog');
+    if (!open)
+      openBackgroundDialog();
+
     //loadShareBonusButton();
     if (callback) callback();
   });
@@ -4881,38 +4886,6 @@ function openConfirmCharacterDialog(fromChara, toChara, action) {
     if (content != null) {
       content += `<div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
     }
-
-    // var left = fromChara;
-    // var right = toChara;
-    // if (fromChara.Sacrifices < toChara.Sacrifices) {
-    //   right = fromChara;
-    //   left = toChara;
-    // }
-    // var leftCover = getLargeCover(left.Cover);
-    // var rightCover = getLargeCover(right.Cover);
-
-    // var leftColor = 'silver';
-    // if (left.Level == 2)
-    //   leftColor = 'gold';
-    // else if (left.Level == 3)
-    //   leftColor = 'purple';
-
-    // var rightColor = 'silver';
-    // if (right.Level == 2)
-    //   rightColor = 'gold';
-    // else if (right.Level == 3)
-    //   rightColor = 'purple';
-
-    // content = `<div class="chara_link">
-    //   <div class="left item ${leftColor}">
-    //     <div class="container card" style="background-image:url(${leftCover})"></div>
-    //   </div>
-    //   <div class="right item ${rightColor}">
-    //     <div class="container card" style="background-image:url(${rightCover})"></div>
-    //   </div>
-    // </div>
-    // <div class="content">「${left.Name}」×「${right.Name}」</div>
-    // <div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
   } else if (action == 'stardust') {
     title = `确定「星光碎片」消耗的目标`;
 
@@ -5168,6 +5141,150 @@ function renderCharacterListItem(chara) {
   </div>`;
 
   return item;
+}
+
+function openSearchCharacterDialog(temple, username, action) {
+  var title = `选择你想要「连接」的圣殿`;
+
+  if (action == 'stardust')
+    title = `选择「星光碎片」消耗的目标`;
+  else if (action == 'guidepost')
+    title = `选择「虚空道标」获取的目标`;
+
+  var dialog = `<div class="new_overlay" id="searchDialog">
+  <div class="new_dialog">
+    <div id="searchBox">
+      <div class="title">${title}</div>
+      <div class="search_bar"><input type="text" placeholder="输入角色名或ID"></input></div>
+      <div class="loading"></div>
+      <div class="chara_list"></div>
+      <div class="pager"></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  if (action == 'link') {
+    getUserTempleList(username, 1, '');
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserTempleList(username, 1, key);
+    });
+  } else {
+    var sort = 'desc';
+    if (action == 'stardust')
+      sort = 'asc';
+
+    getUserCharacterList(username, 1, '', sort);
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserCharacterList(username, 1, key);
+    });
+  }
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item', (e) => {
+    var toChara = $(e.currentTarget).data('chara');
+    if (action == 'stardust')
+      openConfirmCharacterDialog(toChara, temple, action);
+    else
+      openConfirmCharacterDialog(temple, toChara, action);
+  });
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item .name', (e) => {
+    var cid = $(e.currentTarget).parent().parent().data('id');
+    openCharacterDialog(cid);
+    e.stopPropagation();
+  });
+
+  addCloseDialog('#searchDialog');
+}
+
+function openSearchCharacterDialog(temple, username, action) {
+  var title = `选择你想要「连接」的圣殿`;
+
+  if (action == 'stardust')
+    title = `选择「星光碎片」消耗的目标`;
+  else if (action == 'guidepost')
+    title = `选择「虚空道标」获取的目标`;
+
+  var dialog = `<div class="new_overlay" id="searchDialog">
+  <div class="new_dialog">
+    <div id="searchBox">
+      <div class="title">${title}</div>
+      <div class="search_bar"><input type="text" placeholder="输入角色名或ID"></input></div>
+      <div class="loading"></div>
+      <div class="chara_list"></div>
+      <div class="pager"></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  if (action == 'link') {
+    getUserTempleList(username, 1, '');
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserTempleList(username, 1, key);
+    });
+  } else {
+    var sort = 'desc';
+    if (action == 'stardust')
+      sort = 'asc';
+
+    getUserCharacterList(username, 1, '', sort);
+    $('#searchDialog .search_bar input').on('change', (e) => {
+      var key = $(e.currentTarget).val();
+      getUserCharacterList(username, 1, key);
+    });
+  }
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item', (e) => {
+    var toChara = $(e.currentTarget).data('chara');
+    if (action == 'stardust')
+      openConfirmCharacterDialog(toChara, temple, action);
+    else
+      openConfirmCharacterDialog(temple, toChara, action);
+  });
+
+  $(`#searchDialog .chara_list`).on('click', '.chara_item .name', (e) => {
+    var cid = $(e.currentTarget).parent().parent().data('id');
+    openCharacterDialog(cid);
+    e.stopPropagation();
+  });
+
+  addCloseDialog('#searchDialog');
+}
+
+function openBackgroundDialog() {
+  var title = `小圣杯「LINK」主题壁纸`;
+
+  var dialog = `<div class="new_overlay" id="backgroundDialog">
+  <div class="new_dialog">
+    <div class="title">${title}</div>
+    <div class="container">
+      <img src="https://tinygrail.mange.cn/senken/tinygrail_wallpaper.png!w960" alt="小圣杯「LINK」主题壁纸" />
+    </div>
+    <div class="action">
+      <div><a href="/rakuen/topic/group/358777" target="right">[讨论]</a></div>
+      <div><a href="https://tinygrail.mange.cn/senken/tinygrail_wallpaper_1440.zip" target="_blank">[下载]</div>
+      <div><a href="#" id="noMoreTip">[不再提醒]</a></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  $('#noMoreTip').on('click', (e) => {
+    localStorage.setItem('openBackgroundDialog', 'false');
+    closeNewDialog('#backgroundDialog');
+  });
+
+  addCloseDialog('#backgroundDialog');
 }
 
 function addCloseDialog(id) {

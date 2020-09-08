@@ -2383,3 +2383,27 @@ html[data-theme='dark'] .chara_item .name {
 #lastLinks .assets .link {
     margin-bottom: 5px;
 }
+
+#backgroundDialog .new_dialog {
+    margin: 20px auto;
+}
+
+#backgroundDialog .container { 
+    overflow: hidden;
+}
+
+#backgroundDialog .title {
+    padding: 20px;
+    font-size: 20px;
+}
+
+#backgroundDialog .action {
+    display: flex;
+    padding: 10px 0 15px 0;
+    justify-content: center;
+}
+
+#backgroundDialog .action div {
+    margin-right: 10px;
+    font-size: 15px;
+}
