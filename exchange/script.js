@@ -218,14 +218,22 @@ function loadTradeBox(chara) {
         }
       });
 
-      var box = `<div class="assets_box"><div class="desc">
-      <div class="bold"><span class="link_count">LINK 0</span><span class="temple_count" style="display:none">固定资产 0</span><span class="sub"> / +${formatNumber(chara.Rate, 2)}</span>
+      var box = `<div class="assets_box">
+      <div class="desc link_desc">
+        <div class="bold">
+          <span class="link_count">LINK 0</span>
+        </div>
       </div>
-      <button id="auctionHistoryButton" class="text_button">[上期公示]</button>
-      <button id="buildButton" class="text_button">[资产重组]</button>
+      <div id="lastLinks" class="assets"></div>
+      <div class="desc temple_desc">
+        <div class="bold">
+          <span class="temple_count">固定资产 0</span>
+          <span class="sub"> / +${formatNumber(chara.Rate, 2)}</span>
+        </div>
+        <button id="auctionHistoryButton" class="text_button">[上期公示]</button>
+        <button id="buildButton" class="text_button">[资产重组]</button>
       </div>
-        <div id="lastLinks" class="assets"></div>
-        <div id="lastTemples" class="assets" style="display:none"></div>
+      <div id="lastTemples" class="assets"></div>
       </div>`;
 
       $(`#grailBox.chara${chara.Id} .grail_box.loading`).before(box);
@@ -238,7 +246,7 @@ function loadTradeBox(chara) {
 
       getGameMaster((result) => {
         if (result) {
-          $('.assets_box .desc').append('<button id="tradeHistoryButton" class="text_button">[交易记录]</button>');
+          $(`#grailBox.chara${chara.Id} .assets_box .temple_desc.desc`).append('<button id="tradeHistoryButton" class="text_button">[交易记录]</button>');
           $('#tradeHistoryButton').on('click', () => {
             openTradeHistoryDialog(chara);
           });
@@ -254,7 +262,7 @@ function loadTradeBox(chara) {
           button = `<button id="auctionButton" class="text_button">[参与竞拍]</button>`;
         }
 
-        $('#buildButton').before(button);
+        $(`#grailBox.chara${chara.Id} #buildButton`).before(button);
         $('#auctionButton').on('click', () => {
           openAuctionDialog(chara);
         });
@@ -277,7 +285,7 @@ function loadTradeBox(chara) {
             getStyle('https://cdn.bootcss.com/cropperjs/1.5.5/cropper.min.css');
             $.getScript('https://cdn.bootcss.com/cropperjs/1.5.5/cropper.min.js', function () {
               $.getScript('https://cdn.jsdelivr.net/gh/emn178/js-md5/build/md5.min.js', function () {
-                $('.board_box .desc').append('<button id="iconButton" class="text_button">[更换头像]</button>');
+                $(`#grailBox.chara${chara.Id} .board_box .desc`).append('<button id="iconButton" class="text_button">[更换头像]</button>');
                 $('#iconButton').on('click', function () {
                   loadIconBox(chara);
                 });
@@ -306,7 +314,7 @@ function loadTradeBox(chara) {
             }
 
             if (ask.Amount != 0)
-              $('.depth .ask_depth').prepend(`<li class="${type}" data-price="${ask.Price}" data-amount="${ask.Amount}"><div style="width:${p}%"></div><span>₵${price} / ${formatNumber(ask.Amount, 0)}</span></li>`);
+              $(`#grailBox.chara${chara.Id} .depth .ask_depth`).prepend(`<li class="${type}" data-price="${ask.Price}" data-amount="${ask.Amount}"><div style="width:${p}%"></div><span>₵${price} / ${formatNumber(ask.Amount, 0)}</span></li>`);
           }
 
           for (i = 0; i < d2.Value.Bids.length; i++) {
@@ -321,7 +329,7 @@ function loadTradeBox(chara) {
             }
 
             if (bid.Amount != 0)
-              $('.depth .bid_depth').append(`<li class="${type}" data-price="${bid.Price}" data-amount="${bid.Amount}"><div style="width:${p}%"></div><span>₵${price} / ${formatNumber(bid.Amount, 0)}</span></li>`);
+              $(`#grailBox.chara${chara.Id} .depth .bid_depth`).append(`<li class="${type}" data-price="${bid.Price}" data-amount="${bid.Amount}"><div style="width:${p}%"></div><span>₵${price} / ${formatNumber(bid.Amount, 0)}</span></li>`);
           }
 
           $('.depth .ask_depth li.normal').on('click', function () {
@@ -488,48 +496,44 @@ function loadCharacterLinks(chara, callback) {
       $(`#grailBox.chara${chara.Id} #lastLinks.assets`).empty();
       if (d.Value.length > 0) {
         $(`#grailBox.chara${chara.Id} .assets_box .link_count`).text(`LINK ${d.Value.length}`);
+        var index = 1;
+        var lastLinkId = 0;
         d.Value.forEach(l => {
           l.CharacterName = chara.Name;
           var link = renderLink(l, l.Link, true);
           if (link != null) {
-            $(`#grailBox.chara${chara.Id} #lastLinks.assets`).append(`<div class="link item">${link}<div class="name"><a target="_blank" title="${l.Nickname}" href="/user/${l.Name}">@${l.Nickname}</a></div></div>`);
+            var sacrifices = Math.min(l.Assets, l.Link.Assets);
+            if (l.LinkId != lastLinkId) {
+              if ($(`#grailBox.chara${chara.Id} #lastLinks.assets .rank_list.rank${index}`).length == 0) {
+                $(`#grailBox.chara${chara.Id} #lastLinks.assets`).append(`<div class="rank_list rank${index}"></div>`);
+              }
+
+              var rank = `<div class="rank item" data-id="${l.Link.CharacterId}">
+                <div class="title">第${index}位</div>
+                <div class="name">「${l.Link.Name}」</div>
+                <div class="count">+${formatNumber(l.LinkedAssets, 0)}</div>
+              </div>`;
+
+              $(`#grailBox.chara${chara.Id} #lastLinks.assets .rank_list.rank${index}`).append(rank);
+              lastLinkId = l.LinkId;
+              index++;
+            }
+
+            $(`#grailBox.chara${chara.Id} #lastLinks.assets .rank_list.rank${index - 1}`).append(`<div class="link item">${link}<div class="name"><a target="_blank" title="${l.Nickname}" href="/user/${l.Name}">@${l.Nickname} +${formatNumber(sacrifices, 0)}</a></div></div>`);
             $(`#grailBox.chara${chara.Id} #lastLinks.assets .item .card[data-id="${l.CharacterId}"]`).data('temple', l);
             $(`#grailBox.chara${chara.Id} #lastLinks.assets .item .card[data-id="${l.Link.CharacterId}"]`).data('temple', l.Link);
           }
         });
       } else {
-        loadFixedAssets(chara, callback);
-        return;
+        $(`#grailBox.chara${chara.Id} .desc.link_desc`).hide();
+        $(`#grailBox.chara${chara.Id} #lastLinks.assets`).hide();
       }
+
       $(`#grailBox.chara${chara.Id} #lastLinks.assets .item .card`).on('click', templeCardClicked);
-      $(`#grailBox.chara${chara.Id} #lastLinks.assets .item .content span`).on('click', characterNameClicked);
+      $(`#grailBox.chara${chara.Id} #lastLinks.assets .rank.item`).on('click', characterNameClicked);
     }
 
-    $(`#grailBox.chara${chara.Id} .assets_box .desc .bold`).append(`<button id="showTempleButton" class="text_button">[显示圣殿]</button>`);
-    $(`#grailBox.chara${chara.Id} .assets_box #showTempleButton`).on('click', (e) => {
-      if (!$(e.currentTarget).data('showTemple')) {
-        $(e.currentTarget).data('showTemple', true);
-        $(e.currentTarget).text('[显示LINK]');
-        $(`#grailBox.chara${chara.Id} .assets_box .link_count`).hide();
-        $(`#grailBox.chara${chara.Id} .assets_box .temple_count`).show();
-        $(`#grailBox.chara${chara.Id} #lastLinks`).hide();
-        $(`#grailBox.chara${chara.Id} #lastTemples`).show();
-        $(`#grailBox.chara${chara.Id} #expandButton`).show();
-
-        if (!$(`#grailBox.chara${chara.Id} #lastTemples`).data('loaded'))
-          loadFixedAssets(chara);
-      } else {
-        $(e.currentTarget).data('showTemple', false);
-        $(e.currentTarget).text('[显示圣殿]');
-        $(`#grailBox.chara${chara.Id} .assets_box .link_count`).show();
-        $(`#grailBox.chara${chara.Id} .assets_box .temple_count`).hide();
-        $(`#grailBox.chara${chara.Id} #lastLinks`).show();
-        $(`#grailBox.chara${chara.Id} #lastTemples`).hide();
-        $(`#grailBox.chara${chara.Id} #expandButton`).hide();
-      }
-    });
-
-    if (callback) callback();
+    loadFixedAssets(chara, callback);
   });
 }
 
@@ -549,12 +553,12 @@ function loadFixedAssets(chara, callback) {
     if (d.State === 0) {
       $(`#grailBox.chara${chara.Id} #lastTemples.assets`).empty();
       $(`#grailBox.chara${chara.Id} .assets_box .temple_count`).text(`固定资产 ${d.Value.length}`);
-      $(`#grailBox.chara${chara.Id} .assets_box .temple_count`).show();
-      $(`#grailBox.chara${chara.Id} .assets_box .link_count`).hide();
+      // $(`#grailBox.chara${chara.Id} .assets_box .temple_count`).show();
+      // $(`#grailBox.chara${chara.Id} .assets_box .link_count`).hide();
       $(`#grailBox.chara${chara.Id} #lastTemples`).data('loaded', true);
 
       if ($(`#grailBox.chara${chara.Id} #expandButton`).length == 0)
-        $(`#grailBox.chara${chara.Id} .assets_box .desc .bold`).append(`<button id="expandButton" data-expanded="false" class="text_button">[+显示全部]</button>`);
+        $(`#grailBox.chara${chara.Id} .assets_box .temple_desc.desc .bold`).append(`<button id="expandButton" data-expanded="false" class="text_button">[+显示全部]</button>`);
 
       var temples = {};
       var visibleTemples = [];
@@ -602,8 +606,8 @@ function loadFixedAssets(chara, callback) {
       });
     }
 
-    $(`#grailBox.chara${chara.Id} #lastLinks`).hide();
-    $(`#grailBox.chara${chara.Id} #lastTemples`).show();
+    // $(`#grailBox.chara${chara.Id} #lastLinks`).hide();
+    // $(`#grailBox.chara${chara.Id} #lastTemples`).show();
     if (callback) callback();
   });
 }
@@ -3071,7 +3075,8 @@ function loadUserLinks(page, callback) {
           var temple = data.Value.Items[i];
           var item = renderLink(temple, temple.Link);
           if (item != null) {
-            $(`#grail .link_list .page${page}`).append(`<div class="link">${item}</div>`);
+            var sacrifices = Math.min(temple.Assets, temple.Link.Assets);
+            $(`#grail .link_list .page${page}`).append(`<div class="link">${item}<div class="name sub">+${formatNumber(sacrifices, 0)}</div></div>`);
             $(`#grail .link_list .item .card[data-id="${temple.CharacterId}"]`).data('temple', temple);
             $(`#grail .link_list .item .card[data-id="${temple.Link.CharacterId}"]`).data('temple', temple.Link);
           }
@@ -3496,7 +3501,7 @@ function loadNewTab() {
       <div id="tabButton0" class="tab_button active">首页</div>
       <div id="tabButton3" class="tab_button">热门排行</div>
       <div id="tabButton4" class="tab_button">英灵殿</div>
-      <div id="tabButton5" class="tab_button">幻想乡(α)</div>
+      <div id="tabButton5" class="tab_button">幻想乡(β)</div>
       <div id="tabButton1" class="tab_button">交易榜单</div>
       <div id="tabButton2" class="tab_button">ICO</div>
     </div>
@@ -3777,7 +3782,7 @@ function loadGrailBox2(callback) {
       if (d.Value.ShowWeekly)
         share = `<button id="shareBonusButton" class="active tag phone_bonus">每周分红</button>`;
 
-      var userBox = `<div id="grailBox2" class="rakuen_home">
+      var userBox = `<div id="grailBox2" class="rakuen_home" data-name="${d.Value.Name}">
                       <div class="user_info">「小圣杯」账户余额：₵${formatNumber(d.Value.Balance, 2)}
                         <button id="logoutButton" class="text_button">[退出登录]</button>
                         <button id="testButton" class="text_button">[股息预测]</button>
@@ -3812,7 +3817,11 @@ function loadGrailBox2(callback) {
     }
     loadHolidayButton();
     loadPhoneButton();
-    //loadShareBonusButton();
+
+    var open = localStorage.getItem('openBackgroundDialog');
+    if (!open)
+      openBackgroundDialog();
+
     if (callback) callback();
   });
 }
@@ -3841,6 +3850,18 @@ function openScratchDialog(templeId) {
   $('body').append(dialog);
   $('body').css('overflow-y', 'hidden');
 
+
+  getData('event/daily/count/10', (d) => {
+    if (d.State == 0) {
+      var count = d.Value * 1;
+      var price = Math.pow(2, count) * 2000;
+      $('#lotusButton').data('count', count);
+      if ($('#lotusButton').hasClass('on')) {
+        $('#scratchDialog .desc').text(`消费₵${formatNumber(price, 0)}购买一张幻想乡彩票？`);
+      }
+    }
+  });
+
   $('#lotusButton').on('click', (e) => {
     if ($('#lotusButton').hasClass('on')) {
       $('#lotusButton').removeClass('on');
@@ -3849,10 +3870,12 @@ function openScratchDialog(templeId) {
       $('#scratchDialog .desc').text('消费₵1,000购买一张环保刮刮乐彩票？');
     } else {
       $('#lotusButton').addClass('on');
+      var count = $('#lotusButton').data('count');
+      var price = Math.pow(2, count) * 2000;
       $('#lotusButton .button').animate({ 'margin-left': '20px' });
       $('#lotusButton .button').css('background-color', '#7fc3ff');
-      $('#scratchDialog .desc').text('消费₵3,000购买一张幻想乡彩票？');
-      $('.trade.finance input').val(amount);
+      $('#scratchDialog .desc').text(`消费₵${formatNumber(price, 0)}购买一张幻想乡彩票？`);
+      //$('.trade.finance input').val(amount);
     }
   });
 
@@ -3900,6 +3923,28 @@ function openScratchDialog(templeId) {
     });
   });
 
+  $('#scratchDialog').on('click', '.charge_button', e => {
+    if ($(e.currentTarget).hasClass('disabled')) return;
+    $(e.currentTarget).addClass('disabled');
+    var id = $(e.currentTarget).data('id');
+    var cname = $(e.currentTarget).data('name');
+    var cover = $(e.currentTarget).data('cover');
+    var name = $('#grailBox2.rakuen_home').data('name');
+    getData(`chara/user/${id}/${name}/false`, (d) => {
+      if (d.State == 0) {
+        var chara = d.Value;
+        chara.Id = chara.CharacterId;
+        chara.Name = cname;
+        chara.Icon = cover;
+        chara.UserTotal = chara.Total;
+        chara.UserAmount = chara.Amount;
+        openSearchCharacterDialog(chara, name, 'charge');
+      } else {
+        alert(d.Message);
+      }
+    });
+  });
+
   $('#scratchDialog #confirmButton').on('click', e => {
     $('#scratchDialog .loading').show();
     $('#scratchDialog .action').hide();
@@ -3934,6 +3979,12 @@ function openScratchDialog(templeId) {
           }
           cards += '</div>';
           $('#scratchDialog .new_dialog').append(cards);
+          if ($('#lotusButton').hasClass('on')) {
+            var count = $('#lotusButton').data('count');
+            var price = Math.pow(2, count + 1) * 2000;
+            $('#lotusButton').data('count', count + 1);
+            $('#scratchDialog .desc').text(`消费₵${formatNumber(price, 0)}购买一张幻想乡彩票？`);
+          }
         } else {
           $('#scratchDialog .desc').show();
           $('#scratchDialog .desc').text(data.Message);
@@ -3986,7 +4037,11 @@ function renderCard(chara) {
                 </div>
               </div>
               <div class="card_name"><span class="name">???</span><span class="badge">×${chara.Amount}</span></div>
-              <div class="action" style="display:none;">${sellButton}<button class="finance_button" data-id="${chara.Id}" data-amount="${chara.Amount}" >融资</button></div>
+              <div class="action" style="display:none;">
+                ${sellButton}
+                <button class="finance_button" data-id="${chara.Id}" data-amount="${chara.Amount}">融资</button>
+                <button class="charge_button" data-id="${chara.Id}" data-name="${chara.Name}" data-cover="${chara.Cover}">充能</button>
+              </div>
             </div>`;
 
   return card;
@@ -4745,6 +4800,8 @@ function openSearchCharacterDialog(temple, username, action) {
     title = `选择「星光碎片」消耗的目标`;
   else if (action == 'guidepost')
     title = `选择「虚空道标」获取的目标`;
+  else if (action == 'charge')
+    title = `选择「星光碎片」充能的目标`;
 
   var dialog = `<div class="new_overlay" id="searchDialog">
   <div class="new_dialog">
@@ -4761,7 +4818,7 @@ function openSearchCharacterDialog(temple, username, action) {
   $('body').append(dialog);
   $('body').css('overflow-y', 'hidden');
 
-  if (action == 'link') {
+  if (action == 'link' || action == 'charge') {
     getUserTempleList(username, 1, '');
     $('#searchDialog .search_bar input').on('change', (e) => {
       var key = $(e.currentTarget).val();
@@ -4783,6 +4840,8 @@ function openSearchCharacterDialog(temple, username, action) {
     var toChara = $(e.currentTarget).data('chara');
     if (action == 'stardust')
       openConfirmCharacterDialog(toChara, temple, action);
+    else if (action == 'charge')
+      openConfirmCharacterDialog(temple, toChara, 'stardust');
     else
       openConfirmCharacterDialog(temple, toChara, action);
   });
@@ -4881,38 +4940,6 @@ function openConfirmCharacterDialog(fromChara, toChara, action) {
     if (content != null) {
       content += `<div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
     }
-
-    // var left = fromChara;
-    // var right = toChara;
-    // if (fromChara.Sacrifices < toChara.Sacrifices) {
-    //   right = fromChara;
-    //   left = toChara;
-    // }
-    // var leftCover = getLargeCover(left.Cover);
-    // var rightCover = getLargeCover(right.Cover);
-
-    // var leftColor = 'silver';
-    // if (left.Level == 2)
-    //   leftColor = 'gold';
-    // else if (left.Level == 3)
-    //   leftColor = 'purple';
-
-    // var rightColor = 'silver';
-    // if (right.Level == 2)
-    //   rightColor = 'gold';
-    // else if (right.Level == 3)
-    //   rightColor = 'purple';
-
-    // content = `<div class="chara_link">
-    //   <div class="left item ${leftColor}">
-    //     <div class="container card" style="background-image:url(${leftCover})"></div>
-    //   </div>
-    //   <div class="right item ${rightColor}">
-    //     <div class="container card" style="background-image:url(${rightCover})"></div>
-    //   </div>
-    // </div>
-    // <div class="content">「${left.Name}」×「${right.Name}」</div>
-    // <div data-from-id="${fromChara.CharacterId}" data-to-id="${toChara.CharacterId}" class="button active link_button">LINK</div>`;
   } else if (action == 'stardust') {
     title = `确定「星光碎片」消耗的目标`;
 
@@ -5013,7 +5040,9 @@ function openConfirmCharacterDialog(fromChara, toChara, action) {
     postData(`chara/link/${fromCharaId}/${toCharaId}`, null, (d) => {
       if (d.State == 0) {
         alert('连接成功');
-        window.location.reload();
+        closeNewDialog('#confirmCharacterDialog');
+        closeNewDialog('#searchDialog');
+        //window.location.reload();
       } else {
         alert(d.Message);
       }
@@ -5028,7 +5057,9 @@ function openConfirmCharacterDialog(fromChara, toChara, action) {
         var count = d.Value.Amount;
         var price = formatNumber(count * d.Value.SellPrice, 0);
         alert(`成功获取「${toChara.Name}」${count}股，市值₵${price}`);
-        window.location.reload();
+        closeNewDialog('#confirmCharacterDialog');
+        closeNewDialog('#searchDialog');
+        //window.location.reload();
       } else {
         alert(d.Message);
       }
@@ -5043,7 +5074,9 @@ function openConfirmCharacterDialog(fromChara, toChara, action) {
     postData(`magic/stardust/${fromCharaId}/${toCharaId}/${amount}/${isTemple}`, null, (d) => {
       if (d.State == 0) {
         alert('充能完成');
-        window.location.reload();
+        closeNewDialog('#confirmCharacterDialog');
+        closeNewDialog('#searchDialog');
+        //window.location.reload();
       } else {
         alert(d.Message);
       }
@@ -5168,6 +5201,34 @@ function renderCharacterListItem(chara) {
   </div>`;
 
   return item;
+}
+
+function openBackgroundDialog() {
+  var title = `小圣杯「LINK」主题壁纸`;
+
+  var dialog = `<div class="new_overlay" id="backgroundDialog">
+  <div class="new_dialog">
+    <div class="title">${title}</div>
+    <div class="container">
+      <img src="https://tinygrail.mange.cn/senken/tinygrail_wallpaper.png!w960" alt="小圣杯「LINK」主题壁纸" />
+    </div>
+    <div class="action">
+      <div><a href="/rakuen/topic/group/358777" target="right">[讨论]</a></div>
+      <div><a href="https://tinygrail.mange.cn/senken/tinygrail_wallpaper_1440.zip" target="_blank">[下载]</div>
+      <div><a href="#" id="noMoreTip">[不再提醒]</a></div>
+    </div>
+    <a class="close_button" title="Close">X关闭</a>
+  </div></div>`;
+
+  $('body').append(dialog);
+  $('body').css('overflow-y', 'hidden');
+
+  $('#noMoreTip').on('click', (e) => {
+    localStorage.setItem('openBackgroundDialog', 'false');
+    closeNewDialog('#backgroundDialog');
+  });
+
+  addCloseDialog('#backgroundDialog');
 }
 
 function addCloseDialog(id) {
@@ -5326,9 +5387,10 @@ function loadLastLinks(page, callback) {
     for (var i = 0; i < d.Value.Items.length; i += 2) {
       var t1 = d.Value.Items[i];
       var t2 = d.Value.Items[i + 1];
+      var assets = Math.min(t1.Assets, t2.Assets);
       var card = renderLink(t1, t2, true);
       if (card != null)
-        $('#lastLinks .assets').append(`<div class="link item">${card}<div class="name"><a target="_blank" title="${t1.Nickname}" href="/user/${t1.Name}">@${t1.Nickname}</a></div></div>`);
+        $('#lastLinks .assets').append(`<div class="link item">${card}<div class="name"><a target="_blank" title="${t1.Nickname}" href="/user/${t1.Name}">@${t1.Nickname} +${formatNumber(assets, 0)}</a></div></div>`);
       $(`#lastLinks .assets .item .card[data-id="${t1.CharacterId}"]`).data('temple', t1);
       $(`#lastLinks .assets .item .card[data-id="${t2.CharacterId}"]`).data('temple', t2);
     }
