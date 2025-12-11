@@ -1,0 +1,24 @@
+{
+  "name": "tampermonkey-rollup-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "rollup -c --silent",
+    "dev:loader": "node scripts/dev/create-dev-loader.mjs",
+    "dev": "npm run dev:loader && rollup -c rollup.config.dev.mjs -w --silent"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-babel": "^6.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-transform-react-jsx": "^7.0.0",
+    "rollup-plugin-postcss": "^4.0.0",
+    "tailwindcss": "^3.0.0",
+    "postcss": "^8.0.0",
+    "autoprefixer": "^10.0.0",
+    "rollup": "^4.0.0",
+    "rollup-plugin-serve": "^2.0.0",
+    "rollup-plugin-userscript-metablock": "^0.4.3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "TinyGrail Exchange Plugin",
+  "namespace": "TinyGrail Exchange Plugin",
+  "version": "1.7.4",
+  "author": "senken",
+  "match": [
+    "*://*.bgm.tv/*",
+    "*://bangumi.tv/*",
+    "*://chii.in/*"
+  ],
+  "grant": "none"
+}
