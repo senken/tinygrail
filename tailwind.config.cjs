@@ -1,9 +1,8 @@
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx}",
-  ],
+  darkMode: ["class", "html[data-theme='dark']"],
+  content: ["./src/**/*.{js,jsx}"],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/container-queries")],
 };

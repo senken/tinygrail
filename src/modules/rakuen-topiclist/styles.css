@@ -1,0 +1,96 @@
+#container {
+  height: 100dvh !important;
+}
+
+/* 超展开Header */
+#rakuenHeader {
+  a.logo {
+    cursor: pointer;
+  }
+
+  .navigator a {
+    margin: 0 5px 0 0;
+  }
+
+  .navigator a::after {
+    content: "|";
+    margin-left: 5px;
+  }
+
+  .navigator a:last-child::after {
+    content: "";
+  }
+
+  .navigator .menu {
+    display: none;
+  }
+}
+
+/* 移动端适配 */
+@media (max-width: 960px) {
+  /* 修改容器为单列布局 */
+  #container {
+    grid-template-columns: 0 auto !important;
+    width: 100vw !important;
+  }
+
+  /* 隐藏子菜单 */
+  #rakuenHeader {
+    ul.rakuen_nav {
+      z-index: -1;
+      margin-left: -160px;
+    }
+
+    ul.rakuen_nav li {
+      display: none;
+    }
+  }
+
+  /* 下拉菜单 */
+  #rakuenHeader {
+    .navigator .link {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      right: 5px;
+      border-radius: 5px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px;
+      width: 100px;
+      text-align: right;
+      z-index: 101;
+    }
+
+    div.navigator a {
+      margin: 8px 0;
+      font-size: 18px;
+    }
+
+    div.navigator a::after {
+      content: "";
+    }
+
+    .navigator .menu {
+      display: block;
+      padding: 3px 0 0 6px;
+    }
+  }
+
+  /* 侧边栏改为绝对定位，默认隐藏在屏幕外 */
+  #listFrameWrapper {
+    position: absolute !important;
+    top: 60px !important;
+    bottom: 0 !important;
+    left: -400px !important;
+    width: 400px !important;
+    z-index: 100;
+    transition: left 0.3s ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* 侧边栏显示状态 */
+  #container.sidebar-visible #listFrameWrapper {
+    left: 0 !important;
+  }
+}

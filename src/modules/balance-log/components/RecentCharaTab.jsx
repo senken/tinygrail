@@ -1,0 +1,122 @@
+import { formatTimeAgo, formatCurrency, formatNumber } from "@src/utils/format.js";
+import { Pagination } from "@src/components/Pagination.jsx";
+import { normalizeAvatar } from "@src/utils/oos.js";
+import { LevelBadge } from "@src/components/LevelBadge.jsx";
+
+/**
+ * 最近活跃Tab组件
+ * @param {Object} props - 组件属性
+ * @param {Object} props.data - 角色数据
+ * @param {Function} props.onPageChange - 分页变化回调
+ * @param {Function} props.onCharacterClick - 角色点击回调
+ */
+export function RecentCharaTab({ data, onPageChange, onCharacterClick }) {
+  if (!data) {
+    return (
+      <div className="tg-bg-content rounded-lg p-8 text-center">
+        <p className="text-lg opacity-60">加载中...</p>
+      </div>
+    );
+  }
+
+  if (!data.items || data.items.length === 0) {
+    return (
+      <div className="tg-bg-content rounded-lg p-8 text-center">
+        <p className="text-lg opacity-60">暂无数据</p>
+      </div>
+    );
+  }
+
+  return (
+    <div id="tg-recent-chara-tab" className="flex w-full flex-col gap-4">
+      <div id="tg-recent-chara-list" className="tg-bg-content rounded-lg">
+        <ul className="divide-y divide-gray-200 dark:divide-gray-700">
+          {data.items.map((item, index) => {
+            const fluctuation = item.Fluctuation || 0;
+            let bgColor = "#d2d2d2";
+            let fluText = "--";
+
+            if (fluctuation > 0) {
+              bgColor = "#ff658d";
+              fluText = `+${formatNumber(fluctuation * 100, 2)}%`;
+            } else if (fluctuation < 0) {
+              bgColor = "#65bcff";
+              fluText = `${formatNumber(fluctuation * 100, 2)}%`;
+            }
+
+            return (
+              <li
+                id="tg-recent-chara-item"
+                data-character-id={item.CharacterId}
+                className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
+                onClick={() => onCharacterClick && onCharacterClick(item.CharacterId)}
+              >
+                {/* 头像 */}
+                {item.Icon && (
+                  <div>
+                    <img
+                      src={normalizeAvatar(item.Icon)}
+                      alt={item.Name || `#${item.CharacterId}`}
+                      className="h-12 w-12 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                    />
+                  </div>
+                )}
+
+                {/* 角色信息 */}
+                <div className="flex-1">
+                  {/* 等级 / 角色名称 / 活跃时间 */}
+                  <div className="flex items-center gap-2">
+                    <LevelBadge level={item.Level} zeroCount={item.ZeroCount} />
+                    <span className="text-base font-bold">
+                      {item.Name || `#${item.CharacterId}`}
+                    </span>
+                    <span className="text-xs opacity-60">{formatTimeAgo(item.LastOrder)}</span>
+                  </div>
+
+                  {/* 股息 / 流通量 / 市值 */}
+                  <div className="mt-1 text-xs opacity-60" title="股息 / 流通量 / 市值">
+                    +{formatNumber(item.Rate || 0, 2)} / {formatNumber(item.Total || 0, 0)} /{" "}
+                    {formatCurrency(item.MarketValue || 0, "₵", 0, false)}
+                  </div>
+
+                  {/* 固定资产 / 买入 / 卖出 / 成交 */}
+                  <div className="mt-1 flex gap-2 text-xs" title="固定资产 / 买入 / 卖出 / 成交">
+                    <span className="opacity-60">{formatNumber(item.Sacrifices || 0, 0)}</span>
+                    <span style={{ color: "#ffa7cc" }}>+{formatNumber(item.Bids || 0, 0)}</span>
+                    <span style={{ color: "#a7e3ff" }}>-{formatNumber(item.Asks || 0, 0)}</span>
+                    <span style={{ color: "#d2d2d2" }}>{formatNumber(item.Deals || 0, 0)}</span>
+                  </div>
+                </div>
+
+                {/* 标签 */}
+                <div>
+                  <span
+                    className="rounded px-2 py-0.5 text-xs font-bold"
+                    style={{
+                      backgroundColor: bgColor,
+                      color: "#fff",
+                    }}
+                    title={`₵${formatNumber(item.MarketValue || 0, 0)} / ${formatNumber(item.Total || 0, 0)}`}
+                  >
+                    {formatCurrency(item.Current || 0, "₵", 2, false)} {fluText}
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      {/* 分页 */}
+      {data.totalPages && data.totalPages >= 1 && (
+        <div className="flex w-full justify-center">
+          <Pagination
+            current={Number(data.currentPage) || 1}
+            total={Number(data.totalPages)}
+            onChange={(page) => onPageChange && onPageChange(page)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
