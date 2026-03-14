@@ -23,7 +23,7 @@
     "postcss-discard-comments": "^7.0.5",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "rollup": "^4.0.0",
+    "rollup": "^4.59.0",
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-serve": "^2.0.0",
     "rollup-plugin-userscript-metablock": "^0.4.3",
