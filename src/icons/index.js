@@ -10,6 +10,7 @@ export { LoaderCircleIcon } from "./LoaderCircleIcon.js";
 export { MoonIcon } from "./MoonIcon.js";
 export { QuestionIcon } from "./QuestionIcon.js";
 export { RefreshCwIcon } from "./RefreshCwIcon.js";
+export { SearchIcon } from "./SearchIcon.js";
 export { SparklesIcon } from "./SparklesIcon.js";
 export { SquareArrowOutUpRightIcon } from "./SquareArrowOutUpRightIcon.js";
 export { StarIcon } from "./StarIcon.js";

@@ -63,7 +63,7 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
     };
 
     // 内容容器
-    const contentDiv = <div className="flex w-96 flex-col gap-4" />;
+    const contentDiv = <div className="flex w-96 flex-col gap-2" />;
 
     // 搜索框区域
     const searchDiv = (
@@ -98,7 +98,10 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
     // 角色列表
     if (!loading && characters && characters.length > 0) {
       const listDiv = (
-        <div id="tg-character-search-list" className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700" />
+        <div
+          id="tg-character-search-list"
+          className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+        />
       );
 
       characters.forEach((character) => {

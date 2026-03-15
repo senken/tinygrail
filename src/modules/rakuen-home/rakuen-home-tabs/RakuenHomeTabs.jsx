@@ -9,7 +9,7 @@ import { STTab } from "./components/STTab.jsx";
 /**
  * 超展开首页Tabs容器组件
  */
-export function RakuenHomeTabs() {
+export function RakuenHomeTabs({ searchIcon, onSearchClick }) {
   const container = <div id="tg-rakuen-home-tabs" />;
 
   let activeTab = 0;
@@ -94,6 +94,8 @@ export function RakuenHomeTabs() {
         }}
         sticky={true}
         size={size}
+        icon={searchIcon}
+        onIconClick={onSearchClick}
       />
     );
     container.appendChild(tabs);
