@@ -1008,6 +1008,33 @@
     return svg;
   }
 
+  function SearchIcon({
+    className = "w-6 h-6"
+  } = {}) {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("xmlns", svgNS);
+    svg.setAttribute("width", "24");
+    svg.setAttribute("height", "24");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("fill", "none");
+    svg.setAttribute("stroke", "currentColor");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke-linecap", "round");
+    svg.setAttribute("stroke-linejoin", "round");
+    if (className) svg.setAttribute("class", className);
+    svg.setAttribute("aria-hidden", "true");
+    const path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", "m21 21-4.34-4.34");
+    svg.appendChild(path);
+    const circle = document.createElementNS(svgNS, "circle");
+    circle.setAttribute("cx", "11");
+    circle.setAttribute("cy", "11");
+    circle.setAttribute("r", "8");
+    svg.appendChild(circle);
+    return svg;
+  }
+
   function SparklesIcon({
     className = "w-6 h-6"
   } = {}) {
@@ -2722,7 +2749,9 @@
     sticky = false,
     stickyTop = "0",
     size = "large",
-    padding = "px-1 py-3"
+    padding = "px-1 py-3",
+    icon = null,
+    onIconClick = null
   }) {
     const activeItem = items[activeTab];
     const TabComponent = activeItem?.component;
@@ -2743,7 +2772,9 @@
       className: `${stickyClass} tg-bg-content border-b border-gray-200 dark:border-gray-600`,
       style: stickyStyle
     }, h("div", {
-      className: "mx-auto flex overflow-x-auto"
+      className: "mx-auto flex"
+    }, h("div", {
+      className: "flex flex-1 overflow-x-auto"
     }, items.map((item, index) => h("button", {
       className: `flex-shrink-0 whitespace-nowrap border-b-2 ${tabClass} font-medium transition-colors ${activeTab === index ? "bgm-border-color bgm-color" : "border-transparent opacity-60 hover:opacity-100"}`,
       onClick: () => {
@@ -2751,7 +2782,12 @@
           onTabChange(index);
         }
       }
-    }, item.label)))), h("div", {
+    }, item.label))), icon && h("div", {
+      className: "flex flex-shrink-0 items-center"
+    }, h("button", {
+      className: `${tabClass} border-b-2 border-transparent opacity-60 transition-colors hover:opacity-100`,
+      onClick: onIconClick
+    }, icon)))), h("div", {
       id: "tg-tabs-content",
       className: `mx-auto ${padding}`
     }, TabComponent && h(TabComponent, null)));
@@ -6967,7 +7003,7 @@
         }
       };
       const contentDiv = h("div", {
-        className: "flex w-96 flex-col gap-4"
+        className: "flex w-96 flex-col gap-2"
       });
       const searchDiv = h("div", {
         id: "tg-character-search-input",
@@ -13935,7 +13971,10 @@
     return container;
   }
 
-  function RakuenHomeTabs() {
+  function RakuenHomeTabs({
+    searchIcon,
+    onSearchClick
+  }) {
     const container = h("div", {
       id: "tg-rakuen-home-tabs"
     });
@@ -14007,7 +14046,9 @@
           render();
         },
         sticky: true,
-        size: size
+        size: size,
+        icon: searchIcon,
+        onIconClick: onSearchClick
       });
       container.appendChild(tabs);
     };
@@ -14032,6 +14073,31 @@
   }
 
   function RakuenHome() {
+    const handleCharacterSearchClick = () => {
+      const userAssets = getCachedUserAssets();
+      if (!userAssets) {
+        return;
+      }
+      const username = userAssets.name || "";
+      const characterSearchModal = h(Modal, {
+        visible: true,
+        title: "搜索角色",
+        maxWidth: 640
+      }, h(CharacterSearch, {
+        username: username,
+        onCharacterClick: character => {
+          const characterModal = h(Modal, {
+            visible: true
+          }, h(CharacterBox, {
+            characterId: character.Id,
+            sticky: true,
+            stickyTop: -16
+          }));
+          document.body.appendChild(characterModal);
+        }
+      }));
+      document.body.appendChild(characterSearchModal);
+    };
     const container = h("div", {
       id: "tg-rakuen-home",
       className: "tinygrail"
@@ -14039,7 +14105,12 @@
       className: "mx-auto max-w-screen-xl"
     }, h("div", {
       className: "space-y-3"
-    }, h(UserCard, null), h(RakuenHomeTabs, null))));
+    }, h(UserCard, null), h(RakuenHomeTabs, {
+      searchIcon: h(SearchIcon, {
+        className: "size-4"
+      }),
+      onSearchClick: handleCharacterSearchClick
+    }))));
     $("body").empty().append(container);
   }
 
