@@ -51,7 +51,6 @@ export async function loadFireworks() {
       }
       
       fireworksInstance = Fireworks;
-      console.log("Fireworks加载成功");
       return Fireworks;
       
     } catch (error) {

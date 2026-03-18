@@ -51,7 +51,6 @@ export async function loadSignalR() {
       }
       
       signalRInstance = signalR;
-      console.log("SignalR加载成功");
       return signalR;
       
     } catch (error) {
