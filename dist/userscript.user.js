@@ -3336,36 +3336,6 @@
     const paginationDiv = h("div", {
       className: "flex w-full justify-center"
     });
-    const renderItems = cols => {
-      gridDiv.innerHTML = "";
-      gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      data.items.forEach(item => {
-        const itemContainer = h("div", {
-          className: "flex w-full min-w-0 flex-col gap-1"
-        }, h(Temple, {
-          temple: item,
-          bottomText: `+${formatNumber(item.Rate)}`,
-          onClick: temple => {
-            if (onTempleClick) {
-              onTempleClick(temple);
-            }
-          }
-        }), h("div", {
-          className: "flex min-w-0 items-center justify-start gap-1 text-sm"
-        }, h(LevelBadge, {
-          level: item.CharacterLevel,
-          zeroCount: item.ZeroCount
-        }), h("span", {
-          className: "tg-link min-w-0 cursor-pointer truncate opacity-80 hover:opacity-100",
-          onClick: () => {
-            if (onCharacterClick) {
-              onCharacterClick(item.CharacterId);
-            }
-          }
-        }, item.Name)));
-        gridDiv.appendChild(itemContainer);
-      });
-    };
     const calculateColumns = width => {
       const minCellWidth = 120;
       const gap = 16;
@@ -3378,8 +3348,32 @@
       }
       return 1;
     };
-    const initialCols = calculateColumns(container.offsetWidth || 800);
-    renderItems(initialCols);
+    data.items.forEach(item => {
+      const itemContainer = h("div", {
+        className: "flex w-full min-w-0 flex-col gap-1"
+      }, h(Temple, {
+        temple: item,
+        bottomText: `+${formatNumber(item.Rate)}`,
+        onClick: temple => {
+          if (onTempleClick) {
+            onTempleClick(temple);
+          }
+        }
+      }), h("div", {
+        className: "flex min-w-0 items-center justify-start gap-1 text-sm"
+      }, h(LevelBadge, {
+        level: item.CharacterLevel,
+        zeroCount: item.ZeroCount
+      }), h("span", {
+        className: "tg-link min-w-0 cursor-pointer truncate opacity-80 hover:opacity-100",
+        onClick: () => {
+          if (onCharacterClick) {
+            onCharacterClick(item.CharacterId);
+          }
+        }
+      }, item.Name)));
+      gridDiv.appendChild(itemContainer);
+    });
     container.appendChild(gridDiv);
     if (data.totalPages && data.totalPages >= 1) {
       const pagination = h(Pagination, {
@@ -3394,7 +3388,7 @@
       for (const entry of entries) {
         const width = entry.contentRect.width;
         const newCols = calculateColumns(width);
-        renderItems(newCols);
+        gridDiv.style.gridTemplateColumns = `repeat(${newCols}, 1fr)`;
       }
     });
     observer.observe(container);
@@ -10389,7 +10383,6 @@
           throw new Error("SignalR对象无效");
         }
         signalRInstance = signalR;
-        console.log("SignalR加载成功");
         return signalR;
       } catch (error) {
         signalRLoadPromise = null;
@@ -10438,7 +10431,6 @@
           throw new Error("Fireworks对象无效");
         }
         fireworksInstance = Fireworks;
-        console.log("Fireworks加载成功");
         return Fireworks;
       } catch (error) {
         fireworksLoadPromise = null;
@@ -14044,6 +14036,10 @@
         onTabChange: index => {
           activeTab = index;
           render();
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
         },
         sticky: true,
         size: size,
@@ -14072,7 +14068,20 @@
     return container;
   }
 
+  var stylesCSS$1 = "/* html 滚动条样式 */\r\nhtml {\r\n  scrollbar-width: thin;\r\n  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;\r\n}\r\n\r\nhtml[data-theme=\"dark\"] {\r\n  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;\r\n}\r\n\r\nhtml::-webkit-scrollbar {\r\n  width: 6px;\r\n  height: 6px;\r\n}\r\n\r\nhtml::-webkit-scrollbar-track {\r\n  background: transparent;\r\n}\r\n\r\nhtml::-webkit-scrollbar-thumb {\r\n  background-color: rgba(0, 0, 0, 0.2);\r\n  border-radius: 3px;\r\n}\r\n\r\nhtml::-webkit-scrollbar-thumb:hover {\r\n  background-color: rgba(0, 0, 0, 0.3);\r\n}\r\n\r\nhtml[data-theme=\"dark\"]::-webkit-scrollbar-thumb {\r\n  background-color: rgba(255, 255, 255, 0.2);\r\n}\r\n\r\nhtml[data-theme=\"dark\"]::-webkit-scrollbar-thumb:hover {\r\n  background-color: rgba(255, 255, 255, 0.3);\r\n}\r\n";
+
+  function loadStyles$1() {
+    const styleId = "tg-rakuen-home-styles";
+    if (document.getElementById(styleId)) {
+      return;
+    }
+    const styleElement = document.createElement("style");
+    styleElement.id = styleId;
+    styleElement.textContent = stylesCSS$1;
+    document.head.appendChild(styleElement);
+  }
   function RakuenHome() {
+    loadStyles$1();
     const handleCharacterSearchClick = () => {
       const userAssets = getCachedUserAssets();
       if (!userAssets) {
