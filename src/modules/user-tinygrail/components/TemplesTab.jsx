@@ -21,52 +21,13 @@ export function TemplesTab({ data, onPageChange, onCharacterClick, onTempleClick
   }
 
   const container = <div className="flex w-full flex-col gap-4" />;
-
   const gridDiv = <div className="grid w-full gap-4" />;
   const paginationDiv = <div className="flex w-full justify-center" />;
-
-  // 渲染函数
-  const renderItems = (cols) => {
-    gridDiv.innerHTML = "";
-    gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-
-    data.items.forEach((item) => {
-      const itemContainer = (
-        <div className="flex w-full min-w-0 flex-col gap-1">
-          <Temple
-            temple={item}
-            bottomText={`+${formatNumber(item.Rate)}`}
-            onClick={(temple) => {
-              if (onTempleClick) {
-                onTempleClick(temple);
-              }
-            }}
-          />
-          <div className="flex min-w-0 items-center justify-start gap-1 text-sm">
-            <LevelBadge level={item.CharacterLevel} zeroCount={item.ZeroCount} />
-            <span
-              className="tg-link min-w-0 cursor-pointer truncate opacity-80 hover:opacity-100"
-              onClick={() => {
-                if (onCharacterClick) {
-                  onCharacterClick(item.CharacterId);
-                }
-              }}
-            >
-              {item.Name}
-            </span>
-          </div>
-        </div>
-      );
-      gridDiv.appendChild(itemContainer);
-    });
-  };
 
   // 计算列数
   const calculateColumns = (width) => {
     const minCellWidth = 120;
     const gap = 16;
-
-    // 计算可以容纳的最大列数
     let cols = Math.floor((width + gap) / (minCellWidth + gap));
 
     // 确保列数是24的因数
@@ -79,9 +40,36 @@ export function TemplesTab({ data, onPageChange, onCharacterClick, onTempleClick
     return 1;
   };
 
-  // 初始渲染
-  const initialCols = calculateColumns(container.offsetWidth || 800);
-  renderItems(initialCols);
+  // 渲染子元素
+  data.items.forEach((item) => {
+    const itemContainer = (
+      <div className="flex w-full min-w-0 flex-col gap-1">
+        <Temple
+          temple={item}
+          bottomText={`+${formatNumber(item.Rate)}`}
+          onClick={(temple) => {
+            if (onTempleClick) {
+              onTempleClick(temple);
+            }
+          }}
+        />
+        <div className="flex min-w-0 items-center justify-start gap-1 text-sm">
+          <LevelBadge level={item.CharacterLevel} zeroCount={item.ZeroCount} />
+          <span
+            className="tg-link min-w-0 cursor-pointer truncate opacity-80 hover:opacity-100"
+            onClick={() => {
+              if (onCharacterClick) {
+                onCharacterClick(item.CharacterId);
+              }
+            }}
+          >
+            {item.Name}
+          </span>
+        </div>
+      </div>
+    );
+    gridDiv.appendChild(itemContainer);
+  });
 
   container.appendChild(gridDiv);
 
@@ -103,7 +91,7 @@ export function TemplesTab({ data, onPageChange, onCharacterClick, onTempleClick
     for (const entry of entries) {
       const width = entry.contentRect.width;
       const newCols = calculateColumns(width);
-      renderItems(newCols);
+      gridDiv.style.gridTemplateColumns = `repeat(${newCols}, 1fr)`;
     }
   });
 
