@@ -5,11 +5,30 @@ import { CharacterSearch } from "@src/modules/character-search/CharacterSearch.j
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { SearchIcon } from "@src/icons";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import stylesCSS from "./styles.css?inline";
+
+/**
+ * 加载样式
+ */
+function loadStyles() {
+  const styleId = "tg-rakuen-home-styles";
+
+  // 检查是否已经加载过
+  if (document.getElementById(styleId)) {
+    return;
+  }
+
+  const styleElement = document.createElement("style");
+  styleElement.id = styleId;
+  styleElement.textContent = stylesCSS;
+  document.head.appendChild(styleElement);
+}
 
 /**
  * 超展开首页组件
  */
 export function RakuenHome() {
+  loadStyles();
   // 角色搜索点击处理
   const handleCharacterSearchClick = () => {
     const userAssets = getCachedUserAssets();

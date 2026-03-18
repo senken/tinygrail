@@ -91,6 +91,7 @@ export function RakuenHomeTabs({ searchIcon, onSearchClick }) {
         onTabChange={(index) => {
           activeTab = index;
           render();
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }}
         sticky={true}
         size={size}
