@@ -63,7 +63,7 @@ export function ScratchCardItem({
         }}
       >
         <div
-          className="h-full w-full rounded-lg bg-cover bg-center"
+          className="h-full w-full rounded-lg bg-cover bg-top"
           style={{ backgroundImage: `url(${cover})` }}
         >
           {/* 等级徽章 */}
