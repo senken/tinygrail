@@ -3290,7 +3290,8 @@
       if (lv === 6) return "#ff5555";
       if (lv === 7) return "#e9ea54";
       if (lv === 8) return "#4293e4";
-      if (lv >= 9) return "#ffb851";
+      if (lv === 9) return "#ffb851";
+      if (lv >= 9) return "#ffc107";
       return "#d2d2d2";
     };
     const bgColor = getLevelColor(level);
@@ -7480,7 +7481,7 @@
         WebkitTransform: "rotateY(180deg) translateZ(1px)"
       }
     }, h("div", {
-      className: "h-full w-full rounded-lg bg-cover bg-center",
+      className: "h-full w-full rounded-lg bg-cover bg-top",
       style: {
         backgroundImage: `url(${cover})`
       }
@@ -9517,7 +9518,7 @@
         className: "text-xs opacity-60"
       }, formatTimeAgo(item.LastOrder))), h("div", {
         className: "mt-1 text-xs opacity-60"
-      }, "买单数量：", item.State || 0)), h("div", null, h("span", {
+      }, "买单数量：", formatNumber(item.State || 0, 0))), h("div", null, h("span", {
         className: "rounded px-2 py-0.5 text-xs font-bold",
         style: {
           backgroundColor: bgColor,
@@ -9594,7 +9595,7 @@
         className: "text-xs opacity-60"
       }, formatTimeAgo(item.LastOrder))), h("div", {
         className: "mt-1 text-xs opacity-60"
-      }, "卖单数量：", item.State || 0)), h("div", null, h("span", {
+      }, "卖单数量：", formatNumber(item.State || 0, 0))), h("div", null, h("span", {
         className: "rounded px-2 py-0.5 text-xs font-bold",
         style: {
           backgroundColor: bgColor,
