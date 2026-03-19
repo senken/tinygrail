@@ -18,7 +18,8 @@ export function LevelBadge({ level, zeroCount = 0, size = "sm", className = "" }
     if (lv === 6) return "#ff5555";
     if (lv === 7) return "#e9ea54";
     if (lv === 8) return "#4293e4";
-    if (lv >= 9) return "#ffb851";
+    if (lv === 9) return "#ffb851";
+    if (lv >= 9) return "#ffc107";
     return "#d2d2d2";
   };
 
