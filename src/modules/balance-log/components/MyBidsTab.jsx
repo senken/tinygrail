@@ -1,7 +1,7 @@
-import { formatTimeAgo, formatCurrency, formatNumber } from "@src/utils/format.js";
-import { Pagination } from "@src/components/Pagination.jsx";
-import { normalizeAvatar } from "@src/utils/oos.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { Pagination } from "@src/components/Pagination.jsx";
+import { formatCurrency, formatNumber, formatTimeAgo } from "@src/utils/format.js";
+import { normalizeAvatar } from "@src/utils/oos.js";
 
 /**
  * 我的买单Tab组件
@@ -74,7 +74,9 @@ export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
                   </div>
 
                   {/* 买单数量 */}
-                  <div className="mt-1 text-xs opacity-60">买单数量：{item.State || 0}</div>
+                  <div className="mt-1 text-xs opacity-60">
+                    买单数量：{formatNumber(item.State || 0, 0)}
+                  </div>
                 </div>
 
                 {/* 价格标签 */}
