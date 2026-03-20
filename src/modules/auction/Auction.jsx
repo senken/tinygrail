@@ -168,6 +168,13 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
             </div>
           );
           auctionInfoContainer.appendChild(myInfo);
+
+          // 设置输入框默认值为我的出价和数量
+          price = auction.Price;
+          amount = auction.Amount;
+          priceInput.value = price;
+          amountInput.value = amount;
+          updateTotal();
         }
 
         // 只有在有信息时才显示容器
