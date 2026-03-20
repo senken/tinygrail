@@ -78,6 +78,38 @@ export function CharacterBox(props) {
     );
   };
 
+  // 从 localStorage 读取所有折叠状态
+  const getCollapsedStates = () => {
+    try {
+      const stored = localStorage.getItem("tinygrail:character-box-trade-collapsed-states");
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.warn("读取折叠状态失败:", e);
+    }
+    return {
+      link: false,
+      section: false,
+      temple: false,
+      user: false,
+    };
+  };
+
+  // 保存所有折叠状态到 localStorage
+  const saveCollapsedStates = (states) => {
+    try {
+      localStorage.setItem(
+        "tinygrail:character-box-trade-collapsed-states",
+        JSON.stringify(states)
+      );
+    } catch (e) {
+      console.warn("保存折叠状态失败:", e);
+    }
+  };
+
+  const initialCollapsedStates = getCollapsedStates();
+
   const { setState } = createMountedComponent(container, (state) => {
     const {
       characterData,
@@ -107,6 +139,10 @@ export function CharacterBox(props) {
       templeModalData,
       canChangeAvatar,
       hideDuplicates = true,
+      isLinkCollapsed = initialCollapsedStates.link,
+      isSectionCollapsed = initialCollapsedStates.section,
+      isTempleCollapsed = initialCollapsedStates.temple,
+      isUserCollapsed = initialCollapsedStates.user,
     } = state || {};
 
     if (error) {
@@ -237,6 +273,38 @@ export function CharacterBox(props) {
             canChangeAvatar={canChangeAvatar}
             hideDuplicates={hideDuplicates}
             onToggleDuplicates={() => setState({ hideDuplicates: !hideDuplicates })}
+            isLinkCollapsed={isLinkCollapsed}
+            onToggleLinkCollapse={() => {
+              const newValue = !isLinkCollapsed;
+              setState({ isLinkCollapsed: newValue });
+              const states = getCollapsedStates();
+              states.link = newValue;
+              saveCollapsedStates(states);
+            }}
+            isSectionCollapsed={isSectionCollapsed}
+            onToggleSectionCollapse={() => {
+              const newValue = !isSectionCollapsed;
+              setState({ isSectionCollapsed: newValue });
+              const states = getCollapsedStates();
+              states.section = newValue;
+              saveCollapsedStates(states);
+            }}
+            isTempleCollapsed={isTempleCollapsed}
+            onToggleTempleCollapse={() => {
+              const newValue = !isTempleCollapsed;
+              setState({ isTempleCollapsed: newValue });
+              const states = getCollapsedStates();
+              states.temple = newValue;
+              saveCollapsedStates(states);
+            }}
+            isUserCollapsed={isUserCollapsed}
+            onToggleUserCollapse={() => {
+              const newValue = !isUserCollapsed;
+              setState({ isUserCollapsed: newValue });
+              const states = getCollapsedStates();
+              states.user = newValue;
+              saveCollapsedStates(states);
+            }}
             sticky={sticky}
             stickyTop={stickyTop}
           />

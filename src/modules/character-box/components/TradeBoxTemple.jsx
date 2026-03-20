@@ -1,5 +1,6 @@
 import { Temple } from "@src/components/Temple.jsx";
 import { unescapeHtml } from "@src/utils/escape";
+import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * 根据圣殿等级获取加成文本
@@ -27,6 +28,8 @@ function getTempleLevelBonus(level) {
  * @param {Function} props.onToggleDuplicates - 切换显示/隐藏重复的回调
  * @param {boolean} props.sticky - 是否启用粘性布局
  * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {boolean} props.isCollapsed - 是否折叠
+ * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
  */
 export function TradeBoxTemple({
   characterData,
@@ -38,6 +41,8 @@ export function TradeBoxTemple({
   onToggleDuplicates,
   sticky = false,
   stickyTop = 0,
+  isCollapsed = false,
+  onToggleCollapse,
 }) {
   const stickyClass = sticky ? "sticky" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
@@ -105,20 +110,34 @@ export function TradeBoxTemple({
         className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
-        <span className="bgm-color text-sm font-semibold">固定资产 {temples.length}</span>
-        <span
-          className="tg-link mr-2 cursor-pointer text-sm"
-          onClick={() => onToggleDuplicates && onToggleDuplicates()}
+        <div className="flex items-center">
+          <span className="bgm-color text-sm font-semibold">固定资产 {temples.length}</span>
+          <span
+            className="tg-link ml-2 cursor-pointer text-sm opacity-60"
+            onClick={() => onToggleDuplicates && onToggleDuplicates()}
+          >
+            {hideDuplicates ? "[显示重复]" : "[隐藏重复]"}
+          </span>
+        </div>
+        <button
+          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          onClick={onToggleCollapse}
+          style={{
+            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+          aria-label={isCollapsed ? "展开" : "折叠"}
         >
-          {hideDuplicates ? "[显示重复]" : "[隐藏重复]"}
-        </span>
+          <ChevronDownIcon className="h-5 w-5" />
+        </button>
       </div>
 
       {/* 内容区域 */}
-      <div
-        id="tg-trade-box-temple-list"
-        className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] justify-items-center gap-2 p-2"
-      >
+      {!isCollapsed && (
+        <div
+          id="tg-trade-box-temple-list"
+          className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] justify-items-center gap-2 p-2"
+        >
         {displayTemples.map((temple, index) => {
           const coverKey = temple.Cover || "empty";
           const count = hideDuplicates ? templeCounts[coverKey] : 1;
@@ -148,6 +167,7 @@ export function TradeBoxTemple({
           );
         })}
       </div>
+      )}
     </div>
   );
 }

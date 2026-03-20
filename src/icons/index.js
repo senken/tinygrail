@@ -1,5 +1,6 @@
 export { ArrowBigRightIcon } from "./ArrowBigRightIcon.js";
 export { ArrowRightLeftIcon } from "./ArrowRightLeftIcon.js";
+export { ChevronDownIcon } from "./ChevronDownIcon.js";
 export { ChevronLeftIcon } from "./ChevronLeftIcon.js";
 export { ChevronRightIcon } from "./ChevronRightIcon.js";
 export { ChevronsLeftIcon } from "./ChevronsLeftIcon.js";

@@ -33,6 +33,14 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {number} props.stickyTop - 粘性布局的top值
  * @param {boolean} props.hideDuplicates - 是否隐藏重复圣殿
  * @param {Function} props.onToggleDuplicates - 切换隐藏重复圣殿的回调函数
+ * @param {boolean} props.isLinkCollapsed - LINK区域是否折叠
+ * @param {Function} props.onToggleLinkCollapse - 切换LINK折叠状态的回调函数
+ * @param {boolean} props.isSectionCollapsed - 交易区域是否折叠
+ * @param {Function} props.onToggleSectionCollapse - 切换交易区域折叠状态的回调函数
+ * @param {boolean} props.isTempleCollapsed - 圣殿区域是否折叠
+ * @param {Function} props.onToggleTempleCollapse - 切换圣殿区域折叠状态的回调函数
+ * @param {boolean} props.isUserCollapsed - 用户区域是否折叠
+ * @param {Function} props.onToggleUserCollapse - 切换用户区域折叠状态的回调函数
  */
 export function TradeBox(props) {
   const {
@@ -62,6 +70,14 @@ export function TradeBox(props) {
     stickyTop = 0,
     hideDuplicates = true,
     onToggleDuplicates,
+    isLinkCollapsed = false,
+    onToggleLinkCollapse,
+    isSectionCollapsed = false,
+    onToggleSectionCollapse,
+    isTempleCollapsed = false,
+    onToggleTempleCollapse,
+    isUserCollapsed = false,
+    onToggleUserCollapse,
   } = props || {};
 
   if (!characterData) {
@@ -92,6 +108,8 @@ export function TradeBox(props) {
         stickyTop={stickyTop}
         onRefresh={onRefresh}
         setLoading={setLoading}
+        isCollapsed={isSectionCollapsed}
+        onToggleCollapse={onToggleSectionCollapse}
       />
       {links && links.length > 0 && (
         <TradeBoxLink
@@ -102,6 +120,8 @@ export function TradeBox(props) {
           openTempleModal={openTempleModal}
           sticky={sticky}
           stickyTop={stickyTop}
+          isCollapsed={isLinkCollapsed}
+          onToggleCollapse={onToggleLinkCollapse}
         />
       )}
       {temples && temples.length > 0 && (
@@ -115,6 +135,8 @@ export function TradeBox(props) {
           stickyTop={stickyTop}
           hideDuplicates={hideDuplicates}
           onToggleDuplicates={onToggleDuplicates}
+          isCollapsed={isTempleCollapsed}
+          onToggleCollapse={onToggleTempleCollapse}
         />
       )}
       {users && (
@@ -125,6 +147,8 @@ export function TradeBox(props) {
           openUserModal={openUserModal}
           sticky={sticky}
           stickyTop={stickyTop}
+          isCollapsed={isUserCollapsed}
+          onToggleCollapse={onToggleUserCollapse}
         />
       )}
     </div>

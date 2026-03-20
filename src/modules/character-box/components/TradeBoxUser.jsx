@@ -3,6 +3,7 @@ import { Pagination } from "@src/components/Pagination.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber, getTimeDiff } from "@src/utils/format.js";
 import { unescapeHtml } from "@src/utils/escape";
+import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * 持股用户区域组件
@@ -13,6 +14,8 @@ import { unescapeHtml } from "@src/utils/escape";
  * @param {Function} props.openUserModal - 打开用户信息Modal的函数
  * @param {boolean} props.sticky - 是否启用粘性布局
  * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {boolean} props.isCollapsed - 是否折叠
+ * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
  */
 export function TradeBoxUser({
   characterData,
@@ -21,6 +24,8 @@ export function TradeBoxUser({
   openUserModal,
   sticky = false,
   stickyTop = 0,
+  isCollapsed = false,
+  onToggleCollapse,
 }) {
   const stickyClass = sticky ? "sticky" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
@@ -181,10 +186,21 @@ export function TradeBoxUser({
         style={stickyStyle}
       >
         <span className="bgm-color text-sm font-semibold">董事会 {totalItems}</span>
+        <button
+          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          onClick={onToggleCollapse}
+          style={{
+            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+          aria-label={isCollapsed ? "展开" : "折叠"}
+        >
+          <ChevronDownIcon className="h-5 w-5" />
+        </button>
       </div>
 
       {/* 用户列表 */}
-      {items.length > 0 && contentDiv}
+      {!isCollapsed && items.length > 0 && contentDiv}
     </div>
   );
 

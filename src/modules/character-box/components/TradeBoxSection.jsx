@@ -1,5 +1,6 @@
 import { formatCurrency, formatDateTime, formatNumber, formatTimeAgo } from "@src/utils/format.js";
 import { bidCharacter, askCharacter, cancelBid, cancelAsk } from "@src/api/chara.js";
+import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * 交易区域组件
@@ -12,6 +13,8 @@ import { bidCharacter, askCharacter, cancelBid, cancelAsk } from "@src/api/chara
  * @param {number} props.stickyTop - 粘性布局的top值
  * @param {Function} props.onRefresh - 刷新数据的回调函数
  * @param {Function} props.setLoading - 设置全局加载状态的函数
+ * @param {boolean} props.isCollapsed - 是否折叠
+ * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
  */
 export function TradeBoxSection({
   characterData,
@@ -22,6 +25,8 @@ export function TradeBoxSection({
   stickyTop = 0,
   onRefresh,
   setLoading,
+  isCollapsed = false,
+  onToggleCollapse,
 }) {
   const stickyClass = sticky ? "sticky" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
@@ -236,16 +241,30 @@ export function TradeBoxSection({
         className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
-        <span className="bgm-color text-sm font-semibold">交易</span>
-        <span className="text-xs opacity-60 mr-2">
-          余额：{userAssets ? formatCurrency(userAssets.balance) : "..."}
-        </span>
+        <div className="flex items-center">
+          <span className="bgm-color text-sm font-semibold">交易</span>
+          <span className="ml-2 text-xs opacity-60">
+            余额：{userAssets ? formatCurrency(userAssets.balance) : "..."}
+          </span>
+        </div>
+        <button
+          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          onClick={onToggleCollapse}
+          style={{
+            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+          aria-label={isCollapsed ? "展开" : "折叠"}
+        >
+          <ChevronDownIcon className="h-5 w-5" />
+        </button>
       </div>
 
       {/* 主区域 */}
-      <div id="trade-section" className="flex flex-wrap gap-1">
-        {/* 买入委托 */}
-        <div id="tg-trade-bid-section" className="relative mb-2 min-w-[200px] flex-1">
+      {!isCollapsed && (
+        <div id="trade-section" className="flex flex-wrap gap-1">
+          {/* 买入委托 */}
+          <div id="tg-trade-bid-section" className="relative mb-2 min-w-[200px] flex-1">
           <div
             id="tg-trade-bid-header"
             className="mb-1 flex items-center justify-between p-2 pt-0 text-xs opacity-60"
@@ -521,7 +540,8 @@ export function TradeBoxSection({
               })}
           </div>
         </div>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

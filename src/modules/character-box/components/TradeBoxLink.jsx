@@ -1,6 +1,7 @@
 import { TempleLink } from "@src/components/TempleLink.jsx";
 import { unescapeHtml } from "@src/utils/escape";
 import { formatNumber } from "@src/utils/format";
+import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * LINK区域组件
@@ -12,6 +13,8 @@ import { formatNumber } from "@src/utils/format";
  * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
  * @param {boolean} props.sticky - 是否启用粘性布局
  * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {boolean} props.isCollapsed - 是否折叠
+ * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
  */
 export function TradeBoxLink({
   characterData,
@@ -21,6 +24,8 @@ export function TradeBoxLink({
   openTempleModal,
   sticky = false,
   stickyTop = 0,
+  isCollapsed = false,
+  onToggleCollapse,
 }) {
   const stickyClass = sticky ? "sticky" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
@@ -55,53 +60,66 @@ export function TradeBoxLink({
         style={stickyStyle}
       >
         <span className="bgm-color text-sm font-semibold">LINK {links.length}</span>
+        <button
+          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          onClick={onToggleCollapse}
+          style={{
+            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+            transition: "transform 0.2s ease",
+          }}
+          aria-label={isCollapsed ? "展开" : "折叠"}
+        >
+          <ChevronDownIcon className="h-5 w-5" />
+        </button>
       </div>
 
       {/* 内容区域 */}
-      <div id="tg-trade-box-link-content" className="space-y-4 p-2">
-        {sortedGroups.map((group, index) => (
-          <div id="tg-trade-box-link-group" data-link-id={group.linkId} className="space-y-2">
-            {/* 排名标题 */}
-            <div className="text-sm font-semibold">
-              第{index + 1}位
-              <span
-                className="tg-link cursor-pointer"
-                onClick={() => openCharacterModal(group.linkInfo.CharacterId)}
-              >
-                「{group.linkInfo.Name}」
-              </span>
-            </div>
+      {!isCollapsed && (
+        <div id="tg-trade-box-link-content" className="space-y-4 p-2">
+          {sortedGroups.map((group, index) => (
+            <div id="tg-trade-box-link-group" data-link-id={group.linkId} className="space-y-2">
+              {/* 排名标题 */}
+              <div className="text-sm font-semibold">
+                第{index + 1}位
+                <span
+                  className="tg-link cursor-pointer"
+                  onClick={() => openCharacterModal(group.linkInfo.CharacterId)}
+                >
+                  「{group.linkInfo.Name}」
+                </span>
+              </div>
 
-            {/* 渲染 TempleLink 组件 */}
-            <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(188px,1fr))] justify-items-center gap-2">
-              {group.items.map((item, itemIndex) => {
-                const sacrifices = Math.min(item.Assets, item.Link.Assets);
-                return (
-                  <div className="flex flex-col">
-                    <TempleLink
-                      temple1={item}
-                      temple2={item.Link}
-                      size="mini"
-                      showCharaName={false}
-                      onCoverClick={(temple) => {
-                        if (openTempleModal) {
-                          openTempleModal(temple);
-                        }
-                      }}
-                    />
-                    <div
-                      className="tg-link cursor-pointer text-left text-xs opacity-80"
-                      onClick={() => openUserModal(item.Name)}
-                    >
-                      @{unescapeHtml(item.Nickname)} +{formatNumber(sacrifices, 0)}
+              {/* 渲染 TempleLink 组件 */}
+              <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(188px,1fr))] justify-items-center gap-2">
+                {group.items.map((item, itemIndex) => {
+                  const sacrifices = Math.min(item.Assets, item.Link.Assets);
+                  return (
+                    <div className="flex flex-col">
+                      <TempleLink
+                        temple1={item}
+                        temple2={item.Link}
+                        size="mini"
+                        showCharaName={false}
+                        onCoverClick={(temple) => {
+                          if (openTempleModal) {
+                            openTempleModal(temple);
+                          }
+                        }}
+                      />
+                      <div
+                        className="tg-link cursor-pointer text-left text-xs opacity-80"
+                        onClick={() => openUserModal(item.Name)}
+                      >
+                        @{unescapeHtml(item.Nickname)} +{formatNumber(sacrifices, 0)}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -71,12 +71,21 @@ export function User() {
     const tinygrailDiv = container.querySelector(".tinygrail");
     const toggleBtn = container.querySelector("#tinygrail-toggle");
 
+    // 从 localStorage 读取折叠状态
+    const storageKey = "tinygrail:user-collapsed";
+    let isCollapsed = localStorage.getItem(storageKey) === "true";
+
+    // 初始化状态
+    tinygrailDiv.style.display = isCollapsed ? "none" : "block";
+    toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
+
     // 折叠功能
-    let isCollapsed = false;
     toggleBtn.addEventListener("click", () => {
       isCollapsed = !isCollapsed;
       tinygrailDiv.style.display = isCollapsed ? "none" : "block";
       toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
+      // 保存到 localStorage
+      localStorage.setItem(storageKey, isCollapsed);
     });
 
     const userTinygrail = (
