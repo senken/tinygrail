@@ -8,7 +8,7 @@ import { ScratchConfirm } from "./components/ScratchConfirm.jsx";
 import { Modal, closeModalById } from "@src/components/Modal.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 import { ScratchCard } from "@src/modules/scratch-card";
-import { BalanceLog } from "@src/modules/balance-log";
+import { UserAssetsLog } from "@src/modules/user-assets-log";
 
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
@@ -141,7 +141,7 @@ export function UserCard() {
             padding="p-4 pt-0"
             maxWidth={960}
           >
-            <BalanceLog />
+            <UserAssetsLog />
           </Modal>
         )}
       </div>

@@ -4,17 +4,17 @@ import { formatCurrency, formatNumber, formatTimeAgo } from "@src/utils/format.j
 import { normalizeAvatar } from "@src/utils/oos.js";
 
 /**
- * 我的买单Tab组件
+ * 我的卖单Tab组件
  * @param {Object} props - 组件属性
- * @param {Object} props.data - 买单数据
+ * @param {Object} props.data - 卖单数据
  * @param {Function} props.onPageChange - 分页变化回调
  * @param {Function} props.onCharacterClick - 角色点击回调
  */
-export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
+export function MyAsks({ data, onPageChange, onCharacterClick }) {
   if (!data) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">加载中...</p>
+        <p className="text-sm opacity-60">加载中...</p>
       </div>
     );
   }
@@ -22,14 +22,14 @@ export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
   if (!data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">暂无数据</p>
+        <p className="text-sm opacity-60">暂无数据</p>
       </div>
     );
   }
 
   return (
-    <div id="tg-my-bids-tab" className="flex w-full flex-col gap-4">
-      <div id="tg-my-bids-list" className="tg-bg-content rounded-lg">
+    <div id="tg-my-asks-tab" className="flex w-full flex-col gap-4">
+      <div id="tg-my-asks-list" className="tg-bg-content rounded-lg">
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {data.items.map((item, index) => {
             const fluctuation = item.Fluctuation || 0;
@@ -46,9 +46,9 @@ export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
 
             return (
               <li
-                id="tg-my-bids-item"
+                id="tg-my-asks-item"
                 data-character-id={item.CharacterId}
-                className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
+                className="flex cursor-pointer items-center justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
                 onClick={() => onCharacterClick && onCharacterClick(item.CharacterId)}
               >
                 {/* 头像 */}
@@ -57,7 +57,7 @@ export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
                     <img
                       src={normalizeAvatar(item.Icon)}
                       alt={item.Name || `#${item.CharacterId}`}
-                      className="h-12 w-12 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                      className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
                     />
                   </div>
                 )}
@@ -73,9 +73,9 @@ export function MyBidsTab({ data, onPageChange, onCharacterClick }) {
                     <span className="text-xs opacity-60">{formatTimeAgo(item.LastOrder)}</span>
                   </div>
 
-                  {/* 买单数量 */}
+                  {/* 卖单数量 */}
                   <div className="mt-1 text-xs opacity-60">
-                    买单数量：{formatNumber(item.State || 0, 0)}
+                    卖单数量：{formatNumber(item.State || 0, 0)}
                   </div>
                 </div>
 

@@ -1,46 +1,33 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { cancelAuction, getAsksList, getAuctionList, getBidsList } from "@src/api/chara.js";
+import { getUserAuctions, getUserBalanceLog } from "@src/api/user.js";
+import { Modal } from "@src/components/Modal.jsx";
 import { Tabs } from "@src/components/Tabs.jsx";
-import { getUserBalanceLog, getUserAuctions } from "@src/api/user.js";
-import {
-  getAuctionList,
-  cancelAuction,
-  getBidsList,
-  getAsksList,
-  getUserItems,
-  getRecentCharacters,
-} from "@src/api/chara.js";
+import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { createRequestManager } from "@src/utils/requestManager.js";
 import { scrollToTop } from "@src/utils/scroll.js";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { BalanceLogTab } from "./components/BalanceLogTab.jsx";
-import { MyAuctionsTab } from "./components/MyAuctionsTab.jsx";
-import { MyBidsTab } from "./components/MyBidsTab.jsx";
-import { MyAsksTab } from "./components/MyAsksTab.jsx";
-import { MyItemsTab } from "./components/MyItemsTab.jsx";
-import { RecentCharaTab } from "./components/RecentCharaTab.jsx";
+import { BalanceLog } from "./components/BalanceLog.jsx";
+import { MyAsks } from "./components/MyAsks.jsx";
+import { MyAuctions } from "./components/MyAuctions.jsx";
+import { MyBids } from "./components/MyBids.jsx";
 
 /**
- * 资金日志组件
+ * 用户资产记录组件
  */
-export function BalanceLog() {
-  const container = <div id="tg-balance-log" className="mx-auto max-w-4xl" />;
+export function UserAssetsLog() {
+  const container = <div id="tg-user-assets-log" className="mx-auto max-w-4xl" />;
 
   // 创建请求管理器
   const balanceLogRequestManager = createRequestManager();
   const myAuctionsRequestManager = createRequestManager();
   const myBidsRequestManager = createRequestManager();
   const myAsksRequestManager = createRequestManager();
-  const myItemsRequestManager = createRequestManager();
-  const recentCharaRequestManager = createRequestManager();
 
   // 存储当前页数
   let currentBalanceLogPage = 1;
   let currentMyAuctionsPage = 1;
   let currentMyBidsPage = 1;
   let currentMyAsksPage = 1;
-  let currentMyItemsPage = 1;
-  let currentRecentCharaPage = 1;
 
   // 存储Modal生成的ID
   let generatedCharacterModalId = null;
@@ -96,8 +83,6 @@ export function BalanceLog() {
         myAuctionsData = null,
         myBidsData = null,
         myAsksData = null,
-        myItemsData = null,
-        recentCharaData = null,
         showCharacterModal = false,
         characterModalId = null,
       } = state || {};
@@ -209,50 +194,12 @@ export function BalanceLog() {
         );
       };
 
-      /**
-       * 我的道具分页变化处理
-       * @param {number} page - 页码
-       */
-      const handleMyItemsPageChange = async (page) => {
-        currentMyItemsPage = page;
-        myItemsRequestManager.execute(
-          async () => {
-            return await getUserItems(page, 50);
-          },
-          (result) => {
-            if (result.success) {
-              setState({ myItemsData: result.data });
-              scrollToTop(container);
-            }
-          }
-        );
-      };
-
-      /**
-       * 最近活跃分页变化处理
-       * @param {number} page - 页码
-       */
-      const handleRecentCharaPageChange = async (page) => {
-        currentRecentCharaPage = page;
-        recentCharaRequestManager.execute(
-          async () => {
-            return await getRecentCharacters(page, 50);
-          },
-          (result) => {
-            if (result.success) {
-              setState({ recentCharaData: result.data });
-              scrollToTop(container);
-            }
-          }
-        );
-      };
-
       const tabItems = [
         {
           key: "balance-log",
           label: "资金日志",
           component: () => (
-            <BalanceLogTab
+            <BalanceLog
               data={balanceLogData}
               onPageChange={handleBalanceLogPageChange}
               onCharacterClick={handleCharacterClick}
@@ -263,7 +210,7 @@ export function BalanceLog() {
           key: "my-auctions",
           label: "我的拍卖",
           component: () => (
-            <MyAuctionsTab
+            <MyAuctions
               data={myAuctionsData}
               onPageChange={handleMyAuctionsPageChange}
               onCharacterClick={handleCharacterClick}
@@ -275,7 +222,7 @@ export function BalanceLog() {
           key: "my-bids",
           label: "我的买单",
           component: () => (
-            <MyBidsTab
+            <MyBids
               data={myBidsData}
               onPageChange={handleMyBidsPageChange}
               onCharacterClick={handleCharacterClick}
@@ -286,25 +233,9 @@ export function BalanceLog() {
           key: "my-asks",
           label: "我的卖单",
           component: () => (
-            <MyAsksTab
+            <MyAsks
               data={myAsksData}
               onPageChange={handleMyAsksPageChange}
-              onCharacterClick={handleCharacterClick}
-            />
-          ),
-        },
-        {
-          key: "my-items",
-          label: "我的道具",
-          component: () => <MyItemsTab data={myItemsData} onPageChange={handleMyItemsPageChange} />,
-        },
-        {
-          key: "recent-chara",
-          label: "最近活跃",
-          component: () => (
-            <RecentCharaTab
-              data={recentCharaData}
-              onPageChange={handleRecentCharaPageChange}
               onCharacterClick={handleCharacterClick}
             />
           ),
@@ -393,30 +324,6 @@ export function BalanceLog() {
           setState({ myAsksData: asksResult.data });
         } else {
           setState({ myAsksData: { items: [], currentPage: 1, totalPages: 0, totalItems: 0 } });
-        }
-        break;
-      }
-
-      case 4: {
-        // 加载我的道具数据
-        const itemsResult = await getUserItems(1, 50);
-        if (itemsResult.success) {
-          setState({ myItemsData: itemsResult.data });
-        } else {
-          setState({ myItemsData: { items: [], currentPage: 1, totalPages: 0, totalItems: 0 } });
-        }
-        break;
-      }
-
-      case 5: {
-        // 加载最近活跃数据
-        const recentResult = await getRecentCharacters(1, 50);
-        if (recentResult.success) {
-          setState({ recentCharaData: recentResult.data });
-        } else {
-          setState({
-            recentCharaData: { items: [], currentPage: 1, totalPages: 0, totalItems: 0 },
-          });
         }
         break;
       }

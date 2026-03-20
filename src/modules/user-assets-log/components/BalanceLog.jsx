@@ -2,13 +2,13 @@ import { formatCurrency, formatTimeAgo } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
 
 /**
- * 资金日志Tab组件
+ * 资金日志组件
  * @param {Object} props - 组件属性
  * @param {Object} props.data - 资金日志数据
  * @param {Function} props.onPageChange - 分页变化回调
  * @param {Function} props.onCharacterClick - 角色点击回调
  */
-export function BalanceLogTab({ data, onPageChange, onCharacterClick }) {
+export function BalanceLog({ data, onPageChange, onCharacterClick }) {
   /**
    * 解析Description文本，将#数字转换为可点击的链接
    * @param {string} text - 原始文本
@@ -59,7 +59,7 @@ export function BalanceLogTab({ data, onPageChange, onCharacterClick }) {
   if (!data) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">加载中...</p>
+        <p className="text-sm opacity-60">加载中...</p>
       </div>
     );
   }
@@ -67,7 +67,7 @@ export function BalanceLogTab({ data, onPageChange, onCharacterClick }) {
   if (!data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">暂无数据</p>
+        <p className="text-sm opacity-60">暂无数据</p>
       </div>
     );
   }
@@ -80,17 +80,17 @@ export function BalanceLogTab({ data, onPageChange, onCharacterClick }) {
             return (
               <li
                 id="tg-balance-log-item"
-                className="flex items-center justify-between gap-2 px-4 py-3 transition-colors even:bg-gray-50/50 dark:even:bg-gray-800/30"
+                className="flex items-center justify-between gap-2 px-3 py-1 transition-colors even:bg-gray-50/50 dark:even:bg-gray-800/30"
               >
                 <div className="flex flex-1 items-center gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-bold">
+                      <span className="text-sm font-bold">
                         {formatCurrency(item.Balance, "₵", 2, false)}
                       </span>
                       <span className="text-xs opacity-60">{formatTimeAgo(item.LogTime)}</span>
                     </div>
-                    <div className="mt-1 text-sm">{parseDescription(item.Description)}</div>
+                    <div className="mt-1 text-xs">{parseDescription(item.Description)}</div>
                   </div>
                 </div>
 

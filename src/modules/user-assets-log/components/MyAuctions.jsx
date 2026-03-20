@@ -10,11 +10,11 @@ import { normalizeAvatar } from "@src/utils/oos.js";
  * @param {Function} props.onCharacterClick - 角色点击回调
  * @param {Function} props.onCancelAuction - 取消竞拍回调
  */
-export function MyAuctionsTab({ data, onPageChange, onCharacterClick, onCancelAuction }) {
+export function MyAuctions({ data, onPageChange, onCharacterClick, onCancelAuction }) {
   if (!data) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">加载中...</p>
+        <p className="text-sm opacity-60">加载中...</p>
       </div>
     );
   }
@@ -22,7 +22,7 @@ export function MyAuctionsTab({ data, onPageChange, onCharacterClick, onCancelAu
   if (!data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
-        <p className="text-lg opacity-60">暂无数据</p>
+        <p className="text-sm opacity-60">暂无数据</p>
       </div>
     );
   }
@@ -57,7 +57,7 @@ export function MyAuctionsTab({ data, onPageChange, onCharacterClick, onCancelAu
               <li
                 id="tg-my-auctions-item"
                 data-character-id={item.CharacterId}
-                className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
+                className="flex cursor-pointer items-center justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
                 onClick={() => onCharacterClick && onCharacterClick(item.CharacterId)}
               >
                 {/* 头像 */}
@@ -66,7 +66,7 @@ export function MyAuctionsTab({ data, onPageChange, onCharacterClick, onCancelAu
                     <img
                       src={normalizeAvatar(item.Icon)}
                       alt={item.Name || `#${item.CharacterId}`}
-                      className="h-12 w-12 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                      className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
                     />
                   </div>
                 )}
