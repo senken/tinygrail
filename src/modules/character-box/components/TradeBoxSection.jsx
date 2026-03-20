@@ -122,7 +122,6 @@ export function TradeBoxSection({
     if (setLoading) setLoading(false);
 
     if (result.success) {
-      alert(result.data);
       // 清空输入框
       priceInput.value = "";
       amountInput.value = "";
@@ -170,7 +169,6 @@ export function TradeBoxSection({
     if (setLoading) setLoading(false);
 
     if (result.success) {
-      alert(result.data);
       // 清空输入框
       priceInput.value = "";
       amountInput.value = "";
@@ -206,7 +204,6 @@ export function TradeBoxSection({
     if (setLoading) setLoading(false);
 
     if (result.success) {
-      alert(result.data);
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
@@ -225,7 +222,6 @@ export function TradeBoxSection({
     if (setLoading) setLoading(false);
 
     if (result.success) {
-      alert(result.data);
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
