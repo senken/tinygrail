@@ -53,7 +53,7 @@ export function performBangumiAuth(onSuccess) {
 }
 
 /**
- * 判断当前用户是否为GM(GameMaster)
+ * 判断当前用户是否为GM
  * @returns {boolean} 如果是GM返回true，否则返回false
  */
 export function isGameMaster() {
@@ -61,5 +61,6 @@ export function isGameMaster() {
   if (!userAssets) {
     return false;
   }
-  return userAssets.Type >= 999 || userAssets.Id === 702;
+  
+  return userAssets.type >= 999 || userAssets.id === 702;
 }

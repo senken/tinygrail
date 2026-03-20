@@ -5,6 +5,7 @@ import { UserHeader } from "./components/UserHeader.jsx";
 import { UserTinygrailTabs } from "./components/UserTinygrailTabs.jsx";
 import { RedPacketLog } from "./components/RedPacketLog.jsx";
 import { SendRedPacket } from "./components/SendRedPacket.jsx";
+import { GMTradeHistory } from "@src/modules/gm-trade-history/GMTradeHistory.jsx";
 import { createRequestManager } from "@src/utils/requestManager.js";
 import { scrollToTop } from "@src/utils/scroll.js";
 import { Modal, closeModalById } from "@src/components/Modal.jsx";
@@ -35,6 +36,11 @@ export function UserTinygrail(props) {
   let generatedTempleModalId = null;
   let generatedRedPacketLogModalId = null;
   let generatedSendRedPacketModalId = null;
+  let generatedTradeHistoryModalId = null;
+  let generatedUserModalId = null;
+
+  // 存储用户ID
+  let userId = null;
 
   // 检查Modal是否已存在
   const isModalExist = (modalId) => {
@@ -52,12 +58,14 @@ export function UserTinygrail(props) {
 
   const { setState } = createMountedComponent(container, (state) => {
     const {
+      id,
       name,
       nickname,
       balance,
       lastIndex,
       assets,
       avatar,
+      state: userState,
       activeTab = 0,
       charaLinks,
       temples,
@@ -69,8 +77,16 @@ export function UserTinygrail(props) {
       templeModalData = null,
       showRedPacketLogModal = false,
       showSendRedPacketModal = false,
+      showTradeHistoryModal = false,
+      showUserModal = false,
+      userModalUsername = null,
       abbreviateBalance = true,
     } = state || {};
+
+    // 更新userId
+    if (id) {
+      userId = id;
+    }
 
     if (!nickname) {
       return <div className="p-4 text-center">加载中...</div>;
@@ -85,10 +101,12 @@ export function UserTinygrail(props) {
           lastIndex={lastIndex}
           assets={assets}
           avatar={avatar}
+          state={userState}
           abbreviateBalance={abbreviateBalance}
           onToggleAbbreviate={() => setState({ abbreviateBalance: !abbreviateBalance })}
           onRedPacketLogClick={handleRedPacketLogClick}
           onSendRedPacketClick={handleSendRedPacketClick}
+          onTradeHistoryClick={handleTradeHistoryClick}
           onBanClick={handleBanClick}
           onUnbanClick={handleUnbanClick}
         />
@@ -178,6 +196,37 @@ export function UserTinygrail(props) {
                 }
               }}
             />
+          </Modal>
+        )}
+        {showTradeHistoryModal && userId && !isModalExist(generatedTradeHistoryModalId) && (
+          <Modal
+            visible={showTradeHistoryModal}
+            onClose={() => setState({ showTradeHistoryModal: false })}
+            title={`「${nickname}」的交易记录`}
+            position="center"
+            maxWidth={896}
+            modalId={generatedTradeHistoryModalId}
+            getModalId={(id) => {
+              generatedTradeHistoryModalId = id;
+            }}
+          >
+            <GMTradeHistory
+              userId={userId}
+              onUserClick={handleUserClick}
+              onCharacterClick={handleCharacterClick}
+            />
+          </Modal>
+        )}
+        {showUserModal && userModalUsername && !isModalExist(generatedUserModalId) && (
+          <Modal
+            visible={showUserModal}
+            onClose={() => setState({ showUserModal: false })}
+            modalId={generatedUserModalId}
+            getModalId={(id) => {
+              generatedUserModalId = id;
+            }}
+          >
+            <UserTinygrail username={userModalUsername} stickyTop="-16px" />
           </Modal>
         )}
       </div>
@@ -293,6 +342,19 @@ export function UserTinygrail(props) {
   // 发送红包点击处理
   const handleSendRedPacketClick = () => {
     setState({ showSendRedPacketModal: true });
+  };
+
+  // 交易记录点击处理
+  const handleTradeHistoryClick = () => {
+    setState({ showTradeHistoryModal: true });
+  };
+
+  // 用户点击处理
+  const handleUserClick = (username) => {
+    setState({
+      showUserModal: true,
+      userModalUsername: username,
+    });
   };
 
   // 关闭发送红包Modal

@@ -1749,3 +1749,41 @@ export async function getMostRecentICO(page = 1, pageSize = 24) {
     };
   }
 }
+
+/**
+ * 获取角色交易记录
+ * @param {number} characterId - 角色ID
+ * @param {number} [page=1] - 页数
+ * @param {number} [pageSize=48] - 每页数量
+ * @returns {Promise<Object>} 交易记录
+ */
+export async function getCharacterTradeHistory(characterId, page = 1, pageSize = 48) {
+  try {
+    const url = `chara/history/${characterId}/${page}/${pageSize}`;
+    const data = await get(url);
+
+    if (!data || data.State !== 0 || !data.Value) {
+      return {
+        success: false,
+        message: data?.Message || "获取角色交易记录失败",
+      };
+    }
+
+    return {
+      success: true,
+      data: {
+        items: data.Value.Items || [],
+        currentPage: data.Value.CurrentPage,
+        totalPages: data.Value.TotalPages,
+        totalItems: data.Value.TotalItems,
+        itemsPerPage: data.Value.ItemsPerPage,
+      },
+    };
+  } catch (error) {
+    console.error("获取角色交易记录失败:", error);
+    return {
+      success: false,
+      message: "获取角色交易记录失败",
+    };
+  }
+}

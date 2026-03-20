@@ -26,6 +26,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Function} props.openAuctionHistoryModal - 打开往期拍卖Modal的函数
  * @param {Function} props.openChangeAvatarModal - 打开更换头像Modal的函数
  * @param {Function} props.openTradeHistoryModal - 打开交易记录Modal的函数
+ * @param {Function} props.openGMTradeHistoryModal - 打开GM交易记录Modal的函数
  * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
  * @param {boolean} props.canChangeAvatar - 是否可以更换头像
  * @param {boolean} props.sticky - 是否启用粘性布局
@@ -54,6 +55,7 @@ export function TradeBox(props) {
     openAuctionHistoryModal,
     openChangeAvatarModal,
     openTradeHistoryModal,
+    openGMTradeHistoryModal,
     openTempleModal,
     canChangeAvatar,
     sticky = false,
@@ -79,6 +81,7 @@ export function TradeBox(props) {
         onAuctionHistoryClick={openAuctionHistoryModal}
         onChangeAvatarClick={openChangeAvatarModal}
         onTradeHistoryClick={openTradeHistoryModal}
+        onGMTradeHistoryClick={openGMTradeHistoryModal}
       />
       <TradeBoxSection
         characterData={characterData}

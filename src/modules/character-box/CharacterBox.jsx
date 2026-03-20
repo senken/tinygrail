@@ -31,6 +31,7 @@ import { Sacrifice } from "@src/modules/sacrifice/index.js";
 import { Auction } from "@src/modules/auction/index.js";
 import { AuctionHistory } from "@src/modules/auction-history/index.js";
 import { TradeHistory } from "@src/modules/trade-history/index.js";
+import { GMTradeHistory } from "@src/modules/gm-trade-history/GMTradeHistory.jsx";
 import { ImageCropper } from "@src/components/ImageCropper.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 
@@ -66,6 +67,7 @@ export function CharacterBox(props) {
   let generatedAuctionHistoryModalId = null;
   let generatedChangeAvatarModalId = null;
   let generatedTradeHistoryModalId = null;
+  let generatedGMTradeHistoryModalId = null;
   let generatedTempleModalId = null;
 
   // 检查Modal是否已存在
@@ -100,6 +102,7 @@ export function CharacterBox(props) {
       showAuctionHistoryModal,
       showChangeAvatarModal,
       showTradeHistoryModal,
+      showGMTradeHistoryModal,
       showTempleModal,
       templeModalData,
       canChangeAvatar,
@@ -182,6 +185,16 @@ export function CharacterBox(props) {
       setState({ showTradeHistoryModal: false });
     };
 
+    // 打开GM交易记录Modal
+    const openGMTradeHistoryModal = () => {
+      setState({ showGMTradeHistoryModal: true });
+    };
+
+    // 关闭GM交易记录Modal
+    const closeGMTradeHistoryModal = () => {
+      setState({ showGMTradeHistoryModal: false });
+    };
+
     // 打开圣殿Modal
     const openTempleModal = (temple) => {
       setState({ showTempleModal: true, templeModalData: temple });
@@ -219,6 +232,7 @@ export function CharacterBox(props) {
             openAuctionHistoryModal={openAuctionHistoryModal}
             openChangeAvatarModal={openChangeAvatarModal}
             openTradeHistoryModal={openTradeHistoryModal}
+            openGMTradeHistoryModal={openGMTradeHistoryModal}
             openTempleModal={openTempleModal}
             canChangeAvatar={canChangeAvatar}
             hideDuplicates={hideDuplicates}
@@ -462,6 +476,26 @@ export function CharacterBox(props) {
             }}
           >
             <TradeHistory characterId={characterId} />
+          </Modal>
+        )}
+        {/* GM交易记录Modal */}
+        {showGMTradeHistoryModal && !isModalExist(generatedGMTradeHistoryModalId) && (
+          <Modal
+            visible={showGMTradeHistoryModal}
+            onClose={closeGMTradeHistoryModal}
+            title={`交易记录(GM) - #${characterData?.CharacterId ?? ""}「${characterData?.Name ?? ""}」`}
+            position="center"
+            maxWidth={896}
+            modalId={generatedGMTradeHistoryModalId}
+            getModalId={(id) => {
+              generatedGMTradeHistoryModalId = id;
+            }}
+          >
+            <GMTradeHistory
+              characterId={characterId}
+              onUserClick={openUserModal}
+              onCharacterClick={openCharacterModal}
+            />
           </Modal>
         )}
         {/* 圣殿Modal */}

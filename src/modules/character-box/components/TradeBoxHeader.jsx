@@ -23,6 +23,7 @@ import { Tooltip } from "@src/components/Tooltip.jsx";
  * @param {Function} props.onAuctionHistoryClick - 点击往期拍卖按钮的回调
  * @param {Function} props.onChangeAvatarClick - 点击更换头像按钮的回调
  * @param {Function} props.onTradeHistoryClick - 点击交易记录按钮的回调
+ * @param {Function} props.onGMTradeHistoryClick - 点击GM交易记录按钮的回调
  */
 export function TradeBoxHeader(props) {
   const {
@@ -36,6 +37,7 @@ export function TradeBoxHeader(props) {
     onAuctionHistoryClick,
     onChangeAvatarClick,
     onTradeHistoryClick,
+    onGMTradeHistoryClick,
   } = props || {};
 
   if (!characterData) {
@@ -145,7 +147,7 @@ export function TradeBoxHeader(props) {
         <Button onClick={onAuctionHistoryClick}>往期拍卖</Button>
         <Button onClick={onTradeHistoryClick}>交易记录</Button>
         {canChangeAvatar && <Button onClick={onChangeAvatarClick}>更换头像</Button>}
-        {isGameMaster() && <Button>交易记录(gm)</Button>}
+        {isGameMaster() && <Button onClick={onGMTradeHistoryClick}>交易记录(gm)</Button>}
       </div>
     </div>
   );

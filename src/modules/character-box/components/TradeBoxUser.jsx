@@ -55,6 +55,9 @@ export function TradeBoxUser({
       const serialNumber = (currentPage - 1) * itemsPerPage + index + 1;
       const displayNumber = serialNumber === 1 ? "主席" : serialNumber;
 
+      // 检查用户是否被封禁
+      const isBanned = user.State === 666;
+
       // Balance为0显示"--"
       const displayBalance = user.Balance > 0 ? formatNumber(user.Balance, 0) : "--";
 
@@ -97,13 +100,15 @@ export function TradeBoxUser({
           data-rank={serialNumber}
         >
           {/* 头像 */}
-          <Avatar
-            src={normalizeAvatar(user.Avatar)}
-            alt={user.Nickname}
-            size="sm"
-            rank={user.LastIndex}
-            onClick={() => openUserModal && openUserModal(user.Name)}
-          />
+          <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
+            <Avatar
+              src={normalizeAvatar(user.Avatar)}
+              alt={user.Nickname}
+              size="sm"
+              rank={user.LastIndex}
+              onClick={() => openUserModal && openUserModal(user.Name)}
+            />
+          </div>
 
           {/* 用户信息 */}
           <div className="min-w-0 flex-1">
@@ -115,7 +120,7 @@ export function TradeBoxUser({
               <a
                 href={`/user/${user.Name}`}
                 target="_blank"
-                className="tg-link flex min-w-0 items-center gap-1 text-sm"
+                className={`tg-link flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}

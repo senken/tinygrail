@@ -22,7 +22,9 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
 
   const container = <div id="tg-rakuen-home-user-rank" className="flex w-full flex-col gap-4" />;
   const gridDiv = <div id="tg-rakuen-home-user-rank-list" className="grid w-full gap-4" />;
-  const paginationDiv = <div id="tg-rakuen-home-user-rank-pagination" className="flex w-full justify-center" />;
+  const paginationDiv = (
+    <div id="tg-rakuen-home-user-rank-pagination" className="flex w-full justify-center" />
+  );
 
   /**
    * 获取排名变化信息
@@ -57,6 +59,7 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
       const currentRank = (currentPage - 1) * pageSize + index + 1;
       const rankChange = getRankChange(item, currentRank);
       const nickname = unescapeHtml(item.Nickname);
+      const isBanned = item.State === 666;
 
       const userItem = (
         <div
@@ -69,10 +72,15 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
           data-user-name={item.Name}
           data-rank={currentRank}
         >
-          <Avatar src={item.Avatar} alt={nickname} size="lg" rank={currentRank} />
+          <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
+            <Avatar src={item.Avatar} alt={nickname} size="lg" rank={currentRank} />
+          </div>
           <div className="flex w-full min-w-0 flex-col items-center gap-2">
             <div className="flex w-full min-w-0 items-center justify-center gap-2 px-2">
-              <span className="min-w-0 truncate text-sm font-semibold" title={nickname}>
+              <span
+                className={`min-w-0 truncate text-sm font-semibold ${isBanned ? "text-red-500" : ""}`}
+                title={nickname}
+              >
                 {nickname}
               </span>
               <span
