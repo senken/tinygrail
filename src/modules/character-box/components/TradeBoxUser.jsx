@@ -2,7 +2,6 @@ import { Avatar } from "@src/components/Avatar.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber, getTimeDiff } from "@src/utils/format.js";
-import { SquareArrowOutUpRightIcon } from "@src/icons/index.js";
 import { unescapeHtml } from "@src/utils/escape";
 
 /**
@@ -94,10 +93,11 @@ export function TradeBoxUser({
       const itemContainer = (
         <div
           id="tg-trade-box-user-item"
-          className="flex min-w-0 items-center gap-2"
+          className="flex min-w-0 cursor-pointer items-center gap-2"
           data-user-name={user.Name}
           data-balance={user.Balance}
           data-rank={serialNumber}
+          onClick={() => openUserModal && openUserModal(user.Name)}
         >
           {/* 头像 */}
           <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
@@ -106,7 +106,6 @@ export function TradeBoxUser({
               alt={user.Nickname}
               size="sm"
               rank={user.LastIndex}
-              onClick={() => openUserModal && openUserModal(user.Name)}
             />
           </div>
 
@@ -117,17 +116,9 @@ export function TradeBoxUser({
               <span className="flex-shrink-0 text-sm font-semibold text-gray-400 dark:text-gray-500">
                 {displayNumber}
               </span>
-              <a
-                href={`/user/${user.Name}`}
-                target="_blank"
-                className={`tg-link flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
+              <span className={`flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}>
                 <span className="min-w-0 truncate">{unescapeHtml(user.Nickname)}</span>
-                <SquareArrowOutUpRightIcon className="h-3 w-3 flex-shrink-0" />
-              </a>
+              </span>
             </div>
 
             {/* 持股数 */}
@@ -148,7 +139,7 @@ export function TradeBoxUser({
 
   // 计算列数
   const calculateColumns = (width) => {
-    const minCellWidth = 200;
+    const minCellWidth = 160;
     const gap = 8;
 
     // 计算可以容纳的最大列数

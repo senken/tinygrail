@@ -2,7 +2,6 @@ import { Avatar } from "@src/components/Avatar.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
-import { SquareArrowOutUpRightIcon } from "@src/icons/index.js";
 import { unescapeHtml } from "@src/utils/escape";
 
 /**
@@ -72,10 +71,11 @@ export function IcoBoxUser({
 
       const itemContainer = (
         <div
-          className="flex min-w-0 items-center gap-2"
+          className="flex min-w-0 cursor-pointer items-center gap-2"
           data-user-name={user.Name}
           data-amount={user.Amount}
           data-rank={serialNumber}
+          onClick={() => openUserModal && openUserModal(user.Name)}
         >
           {/* 头像 */}
           <Avatar
@@ -83,7 +83,6 @@ export function IcoBoxUser({
             alt={user.Nickname}
             size="sm"
             rank={user.LastIndex}
-            onClick={() => openUserModal && openUserModal(user.Name)}
           />
 
           {/* 用户信息 */}
@@ -93,17 +92,9 @@ export function IcoBoxUser({
               <span className="flex-shrink-0 text-sm font-semibold text-gray-400 dark:text-gray-500">
                 {serialNumber}
               </span>
-              <a
-                href={`/user/${user.Name}`}
-                target="_blank"
-                className="tg-link flex min-w-0 items-center gap-1 text-sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
+              <span className="flex min-w-0 items-center gap-1 text-sm">
                 <span className="min-w-0 truncate">{unescapeHtml(user.NickName)}</span>
-                <SquareArrowOutUpRightIcon className="h-3 w-3 flex-shrink-0" />
-              </a>
+              </span>
             </div>
 
             {/* 投入金额 */}
@@ -123,7 +114,7 @@ export function IcoBoxUser({
 
   // 计算列数
   const calculateColumns = (width) => {
-    const minCellWidth = 200;
+    const minCellWidth = 160;
     const gap = 8;
 
     // 计算可以容纳的最大列数

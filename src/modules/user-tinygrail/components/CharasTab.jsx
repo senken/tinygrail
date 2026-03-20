@@ -1,7 +1,6 @@
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
-import { SquareArrowOutUpRightIcon } from "@src/icons/index.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 
 /**
@@ -45,42 +44,40 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
 
       const itemDiv = (
         <div
-          className={`flex items-center gap-3 ${isMobile ? "tg-bg-content border-b border-gray-200 p-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700" : "tg-bg-content"}`}
+          className={`flex min-w-0 cursor-pointer items-center gap-3 ${isMobile ? "tg-bg-content border-b border-gray-200 p-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700" : "tg-bg-content"}`}
+          onClick={() => {
+            if (onCharacterClick) {
+              onCharacterClick(item.CharacterId);
+            }
+          }}
         >
           {/* 头像 */}
           <div
-            className={`flex-shrink-0 cursor-pointer rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600 ${isMobile ? "h-12 w-12" : "h-16 w-16"}`}
+            className="size-12 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
             style={{ backgroundImage: `url(${avatarUrl})` }}
-            onClick={() => {
-              if (onCharacterClick) {
-                onCharacterClick(item.CharacterId);
-              }
-            }}
           />
 
           {/* 信息 */}
-          <div className="flex flex-1 flex-col gap-1">
-            <a
-              href={`https://bgm.tv/character/${item.CharacterId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tg-link flex items-center gap-1 text-base font-medium hover:opacity-100"
-            >
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            <div className="flex min-w-0 items-center gap-1 text-sm font-medium">
               <LevelBadge level={item.Level} zeroCount={item.ZeroCount} />
-              <span>{item.Name}</span>
-              <SquareArrowOutUpRightIcon className="h-4 w-4 flex-shrink-0" />
-            </a>
+              <span className="min-w-0 truncate">{item.Name}</span>
+            </div>
             {isMobile ? (
-              <div className="text-sm opacity-60">
-                <span>持股：{item.UserTotal === 0 ? '--' : formatNumber(item.UserTotal, 0)}</span>
+              <div className="text-xs opacity-60">
+                <span>持股：{item.UserTotal === 0 ? "--" : formatNumber(item.UserTotal, 0)}</span>
                 <span className="mx-2">•</span>
-                <span>固定资产：{item.Sacrifices === 0 ? '--' : formatNumber(item.Sacrifices, 0)}</span>
+                <span>
+                  固定资产：{item.Sacrifices === 0 ? "--" : formatNumber(item.Sacrifices, 0)}
+                </span>
               </div>
             ) : (
               <div className="flex flex-col gap-0.5">
-                <div className="text-sm opacity-60">持股：{item.UserTotal === 0 ? '--' : formatNumber(item.UserTotal, 0)}</div>
-                <div className="text-sm opacity-60">
-                  固定资产：{item.Sacrifices === 0 ? '--' : formatNumber(item.Sacrifices, 0)}
+                <div className="text-xs opacity-60">
+                  持股：{item.UserTotal === 0 ? "--" : formatNumber(item.UserTotal, 0)}
+                </div>
+                <div className="text-xs opacity-60">
+                  固定资产：{item.Sacrifices === 0 ? "--" : formatNumber(item.Sacrifices, 0)}
                 </div>
               </div>
             )}
@@ -100,7 +97,7 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
       return { cols: 1, isMobile: true };
     }
 
-    const minCellWidth = 240;
+    const minCellWidth = 160;
     const gap = 12;
 
     // 计算可以容纳的最大列数
