@@ -17,14 +17,12 @@ import { Modal, closeModalById } from "@src/components/Modal.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 import { ScratchCard } from "@src/modules/scratch-card";
 import { UserAssetsLog } from "@src/modules/user-assets-log";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
 
   let generatedScratchModalId = null;
   let generatedScratchResultModalId = null;
-  let generatedCharacterModalId = null;
 
   const { setState } = createMountedComponent(container, (state, setState) => {
     const {
@@ -43,8 +41,6 @@ export function UserCard() {
       showScratchModal = false,
       showScratchResultModal = false,
       showBalanceLogModal = false,
-      showCharacterModal = false,
-      characterModalId = null,
       scratchResultData = null,
       isLotus = false,
       lotusCount = 0,
@@ -157,19 +153,6 @@ export function UserCard() {
             maxWidth={960}
           >
             <UserAssetsLog />
-          </Modal>
-        )}
-
-        {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
-          <Modal
-            visible={showCharacterModal}
-            onClose={() => setState({ showCharacterModal: false })}
-            modalId={generatedCharacterModalId}
-            getModalId={(id) => {
-              generatedCharacterModalId = id;
-            }}
-          >
-            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
           </Modal>
         )}
       </div>
@@ -325,33 +308,6 @@ export function UserCard() {
 
   // 组件加载时请求用户资产信息
   loadUserAssets();
-
-  // 监听来自超展开侧边栏iframe的消息
-  let currentCharacterModalId = null;
-
-  window.addEventListener("message", (event) => {
-    if (event.data.type === "openCharacterModal") {
-      const newCharacterId = event.data.characterId;
-
-      // 如果角色ID不同，则更新
-      if (currentCharacterModalId !== newCharacterId) {
-        currentCharacterModalId = newCharacterId;
-
-        // 先关闭弹窗
-        if (generatedCharacterModalId) {
-          closeModalById(generatedCharacterModalId);
-        }
-
-        // 短暂延迟后重新打开，确保组件重新渲染
-        setTimeout(() => {
-          setState({
-            showCharacterModal: true,
-            characterModalId: newCharacterId,
-          });
-        }, 50);
-      }
-    }
-  });
 
   return container;
 }
