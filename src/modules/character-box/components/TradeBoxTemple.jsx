@@ -120,13 +120,12 @@ export function TradeBoxTemple({
           </span>
         </div>
         <button
-          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
           onClick={onToggleCollapse}
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
           }}
-          aria-label={isCollapsed ? "展开" : "折叠"}
         >
           <ChevronDownIcon className="h-5 w-5" />
         </button>
@@ -138,35 +137,35 @@ export function TradeBoxTemple({
           id="tg-trade-box-temple-list"
           className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] justify-items-center gap-2 p-2"
         >
-        {displayTemples.map((temple, index) => {
-          const coverKey = temple.Cover || "empty";
-          const count = hideDuplicates ? templeCounts[coverKey] : 1;
+          {displayTemples.map((temple, index) => {
+            const coverKey = temple.Cover || "empty";
+            const count = hideDuplicates ? templeCounts[coverKey] : 1;
 
-          return (
-            <div
-              className="flex w-full flex-col gap-1"
-              data-character-id={temple.CharacterId}
-              data-user-name={temple.Name}
-            >
-              <Temple
-                temple={temple}
-                bottomText={getTempleLevelBonus(temple.Level)}
-                onClick={(templeData) => {
-                  if (openTempleModal) {
-                    openTempleModal(templeData);
-                  }
-                }}
-              />
+            return (
               <div
-                className="tg-link w-full cursor-pointer truncate text-left text-xs opacity-80"
-                onClick={() => openUserModal(temple.Name)}
+                className="flex w-full flex-col gap-1"
+                data-character-id={temple.CharacterId}
+                data-user-name={temple.Name}
               >
-                @{unescapeHtml(temple.Nickname)} {hideDuplicates && count > 1 ? `×${count}` : ""}
+                <Temple
+                  temple={temple}
+                  bottomText={getTempleLevelBonus(temple.Level)}
+                  onClick={(templeData) => {
+                    if (openTempleModal) {
+                      openTempleModal(templeData);
+                    }
+                  }}
+                />
+                <div
+                  className="tg-link w-full cursor-pointer truncate text-left text-xs opacity-80"
+                  onClick={() => openUserModal(temple.Name)}
+                >
+                  @{unescapeHtml(temple.Nickname)} {hideDuplicates && count > 1 ? `×${count}` : ""}
+                </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

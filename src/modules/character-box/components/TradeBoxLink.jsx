@@ -61,13 +61,12 @@ export function TradeBoxLink({
       >
         <span className="bgm-color text-sm font-semibold">LINK {links.length}</span>
         <button
-          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
           onClick={onToggleCollapse}
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
           }}
-          aria-label={isCollapsed ? "展开" : "折叠"}
         >
           <ChevronDownIcon className="h-5 w-5" />
         </button>

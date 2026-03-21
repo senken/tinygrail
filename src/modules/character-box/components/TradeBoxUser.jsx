@@ -121,7 +121,9 @@ export function TradeBoxUser({
               <span className="flex-shrink-0 text-sm font-semibold text-gray-400 dark:text-gray-500">
                 {displayNumber}
               </span>
-              <span className={`flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}>
+              <span
+                className={`flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}
+              >
                 <span className="min-w-0 truncate">{unescapeHtml(user.Nickname)}</span>
               </span>
             </div>
@@ -187,13 +189,12 @@ export function TradeBoxUser({
       >
         <span className="bgm-color text-sm font-semibold">董事会 {totalItems}</span>
         <button
-          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
           onClick={onToggleCollapse}
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
           }}
-          aria-label={isCollapsed ? "展开" : "折叠"}
         >
           <ChevronDownIcon className="h-5 w-5" />
         </button>
