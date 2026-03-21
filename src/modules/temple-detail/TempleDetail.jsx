@@ -103,9 +103,6 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
     container.style.width = `${containerWidth}px`;
     container.style.maxWidth = "100%";
 
-    // 存储选中的圣殿，用于确认LINK时访问
-    let currentSelectedTemple = null;
-
     // 图片加载完成回调
     const handleImageLoad = (width) => {
       if (!hasSetWidth && width !== minWidth) {
@@ -457,7 +454,6 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
 
     // 选择圣殿进行LINK
     const handleTempleSelect = (selectedTemple) => {
-      currentSelectedTemple = selectedTemple;
       setState({
         selectedTemple,
         showLinkConfirmModal: true,
@@ -472,10 +468,10 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
 
     // 确认LINK
     const handleConfirmLink = async () => {
-      if (!currentSelectedTemple) return;
+      if (!selectedTemple) return;
 
       try {
-        const result = await linkTemples(templeData.CharacterId, currentSelectedTemple.CharacterId);
+        const result = await linkTemples(templeData.CharacterId, selectedTemple.CharacterId);
         if (!result.success) {
           alert(result.message);
           return;
