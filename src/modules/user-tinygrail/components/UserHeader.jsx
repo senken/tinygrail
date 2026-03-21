@@ -48,7 +48,7 @@ export function UserHeader({
   const isBanned = state === 666;
 
   return (
-    <div id="tg-user-tinygrail-header" className="tg-bg-content p-2 pt-0">
+    <div id="tg-user-tinygrail-header" className="tg-bg-content px-2">
       <div className="mx-auto">
         {/* 头像 */}
         <div className="flex items-center justify-between gap-3">
@@ -96,13 +96,11 @@ export function UserHeader({
         </div>
 
         {/* GM按钮组 */}
-        {isGameMaster() && (
-          <div className="mt-2 flex flex-wrap gap-2">
-            <Button onClick={onTradeHistoryClick}>交易记录</Button>
-            <Button onClick={onBanClick}>封禁</Button>
-            <Button onClick={onUnbanClick}>解封</Button>
-          </div>
-        )}
+        <div id="tg-user-tinygrail-actions" className={`flex flex-wrap gap-2 ${isGameMaster() ? "mt-2" : ""}`}>
+          {isGameMaster() && <Button onClick={onTradeHistoryClick}>交易记录</Button>}
+          {isGameMaster() && <Button onClick={onBanClick}>封禁</Button>}
+          {isGameMaster() && <Button onClick={onUnbanClick}>解封</Button>}
+        </div>
       </div>
     </div>
   );
