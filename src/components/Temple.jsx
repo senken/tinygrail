@@ -129,7 +129,7 @@ export function Temple({ temple, bottomText, onClick, showProgress = true }) {
             <div className="text-xs opacity-60">
               {formatNumber(temple.Assets ?? 0, 0)} / {formatNumber(temple.Sacrifices ?? 0, 0)}
             </div>
-            {temple.Sacrifices >= 10000 && (
+            {temple.starForces >= 10000 && (
               <StarIcon className="h-3 w-3 text-yellow-400" filled={true} />
             )}
           </div>
