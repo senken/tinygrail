@@ -3,6 +3,10 @@
   @tailwind components;
   @tailwind utilities;
 
+  /* 防止iOS自动调整字体大小 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+
   @layer components {
     .bgm-color {
       color: var(--primary-color, #f09199);

@@ -97,12 +97,12 @@ export function TradeBoxHeader(props) {
           <div className="flex flex-col gap-px">
             <div className="text-xs text-gray-600 dark:text-gray-400">
               <span>现价：{formatCurrency(Current)}</span>
-              <span class="mx-2">•</span>
+              <span className="mx-2">•</span>
               <span>流通：{formatNumber(Total, 0)}</span>
             </div>
             <div className="text-xs text-gray-600 dark:text-gray-400">
               <span>奖池：{pool !== undefined ? formatNumber(pool, 0) : "..."}</span>
-              <span class="mx-2">•</span>
+              <span className="mx-2">•</span>
               <span className="inline-flex items-center gap-1">
                 股息：{formatCurrency(dividend)}
                 <Tooltip content={dividendFormula} trigger="click">
@@ -134,7 +134,7 @@ export function TradeBoxHeader(props) {
       {/* 用户持股 */}
       <div id="tg-trade-box-header-user" className="text-xs opacity-60">
         <span>持股：{userCharacter ? formatNumber(userCharacter.Amount, 0) : "..."}股</span>
-        <span class="mx-2">•</span>
+        <span className="mx-2">•</span>
         <span>固定资产：{userCharacter ? formatNumber(userCharacter.Sacrifices, 0) : "..."}</span>
       </div>
 
