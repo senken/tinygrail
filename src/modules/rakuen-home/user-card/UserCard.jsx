@@ -1,6 +1,14 @@
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getUserAssets, logout } from "@src/api/user.js";
-import { checkHolidayBonus, claimHolidayBonus, claimDailyBonus, claimWeeklyBonus, getShareBonusTest, getDailyEventCount, scratchBonus } from "@src/api/event.js";
+import {
+  checkHolidayBonus,
+  claimHolidayBonus,
+  claimDailyBonus,
+  claimWeeklyBonus,
+  getShareBonusTest,
+  getDailyEventCount,
+  scratchBonus,
+} from "@src/api/event.js";
 import { formatNumber } from "@src/utils/format.js";
 import { UserInfoBox } from "./components/UserInfoBox.jsx";
 import { LoginBox } from "./components/LoginBox.jsx";
@@ -9,12 +17,14 @@ import { Modal, closeModalById } from "@src/components/Modal.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 import { ScratchCard } from "@src/modules/scratch-card";
 import { UserAssetsLog } from "@src/modules/user-assets-log";
+import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
 
   let generatedScratchModalId = null;
   let generatedScratchResultModalId = null;
+  let generatedCharacterModalId = null;
 
   const { setState } = createMountedComponent(container, (state, setState) => {
     const {
@@ -33,6 +43,8 @@ export function UserCard() {
       showScratchModal = false,
       showScratchResultModal = false,
       showBalanceLogModal = false,
+      showCharacterModal = false,
+      characterModalId = null,
       scratchResultData = null,
       isLotus = false,
       lotusCount = 0,
@@ -54,7 +66,8 @@ export function UserCard() {
     const isModalExist = (modalId) => {
       return (
         modalId &&
-        document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
+        document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode ===
+          document.body
       );
     };
 
@@ -115,22 +128,24 @@ export function UserCard() {
           </Modal>
         )}
 
-        {showScratchResultModal && scratchResultData && !isModalExist(generatedScratchResultModalId) && (
-          <Modal
-            visible={showScratchResultModal}
-            onClose={closeScratchResultModal}
-            title="彩票抽奖"
-            position="center"
-            maxWidth={800}
-            padding=""
-            modalId={generatedScratchResultModalId}
-            getModalId={(id) => {
-              generatedScratchResultModalId = id;
-            }}
-          >
-            <ScratchCard charas={scratchResultData} />
-          </Modal>
-        )}
+        {showScratchResultModal &&
+          scratchResultData &&
+          !isModalExist(generatedScratchResultModalId) && (
+            <Modal
+              visible={showScratchResultModal}
+              onClose={closeScratchResultModal}
+              title="彩票抽奖"
+              position="center"
+              maxWidth={800}
+              padding=""
+              modalId={generatedScratchResultModalId}
+              getModalId={(id) => {
+                generatedScratchResultModalId = id;
+              }}
+            >
+              <ScratchCard charas={scratchResultData} />
+            </Modal>
+          )}
 
         {showBalanceLogModal && (
           <Modal
@@ -142,6 +157,19 @@ export function UserCard() {
             maxWidth={960}
           >
             <UserAssetsLog />
+          </Modal>
+        )}
+
+        {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
+          <Modal
+            visible={showCharacterModal}
+            onClose={() => setState({ showCharacterModal: false })}
+            modalId={generatedCharacterModalId}
+            getModalId={(id) => {
+              generatedCharacterModalId = id;
+            }}
+          >
+            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
           </Modal>
         )}
       </div>
@@ -211,7 +239,7 @@ export function UserCard() {
   // 领取节日奖励
   const handleHolidayBonus = async () => {
     const result = await claimHolidayBonus();
-    
+
     if (result.success) {
       alert(result.data);
       setState({ showHoliday: false });
@@ -224,7 +252,7 @@ export function UserCard() {
   // 领取每日签到奖励
   const handleDailyBonus = async () => {
     const result = await claimDailyBonus();
-    
+
     if (result.success) {
       alert(result.data);
       setState({ showDaily: false });
@@ -237,7 +265,7 @@ export function UserCard() {
   // 领取每周分红
   const handleWeeklyBonus = async () => {
     const result = await claimWeeklyBonus();
-    
+
     if (result.success) {
       alert(result.data);
       setState({ showWeekly: false });
@@ -252,11 +280,11 @@ export function UserCard() {
     // 获取幻想乡彩票次数
     const result = await getDailyEventCount();
     const count = result.success ? result.data : 0;
-    
-    setState({ 
+
+    setState({
       showScratchModal: true,
       lotusCount: count,
-      isLotus: false
+      isLotus: false,
     });
   };
 
@@ -297,6 +325,33 @@ export function UserCard() {
 
   // 组件加载时请求用户资产信息
   loadUserAssets();
+
+  // 监听来自超展开侧边栏iframe的消息
+  let currentCharacterModalId = null;
+
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "openCharacterModal") {
+      const newCharacterId = event.data.characterId;
+
+      // 如果角色ID不同，则更新
+      if (currentCharacterModalId !== newCharacterId) {
+        currentCharacterModalId = newCharacterId;
+
+        // 先关闭弹窗
+        if (generatedCharacterModalId) {
+          closeModalById(generatedCharacterModalId);
+        }
+
+        // 短暂延迟后重新打开，确保组件重新渲染
+        setTimeout(() => {
+          setState({
+            showCharacterModal: true,
+            characterModalId: newCharacterId,
+          });
+        }, 50);
+      }
+    }
+  });
 
   return container;
 }

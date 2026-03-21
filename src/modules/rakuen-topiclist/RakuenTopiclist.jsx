@@ -115,7 +115,6 @@ function loadGrailMenu() {
   // 创建容器
   const contentContainer = $("#eden_tpc_list ul")[0];
 
-  // 使用createMountedComponent管理状态和渲染
   const { setState } = createMountedComponent(contentContainer, (state) => {
     const {
       recentCharaData = null,
@@ -133,7 +132,17 @@ function loadGrailMenu() {
      * @param {number} characterId - 角色ID
      */
     const handleCharacterClick = (characterId) => {
-      window.open(`/rakuen/topic/crt/${characterId}`, "right");
+      // 发送消息到右侧iframe
+      const rightFrame = window.parent.frames['right'];
+      if (rightFrame) {
+        rightFrame.postMessage({
+          type: 'openCharacterModal',
+          characterId: characterId
+        }, '*');
+      }
+      
+      // 收起移动端侧边栏
+      collapseSidebarOnMobile();
     };
 
     /**
@@ -456,6 +465,20 @@ function loadGrailMenu() {
 }
 
 /**
+ * 收起移动端侧边栏
+ */
+function collapseSidebarOnMobile() {
+  const parentBody = $(parent.document.body);
+  const isMobile = parent.window.matchMedia("(max-width: 960px)").matches;
+  if (isMobile) {
+    const container = parentBody.find("#container")[0];
+    if (container) {
+      container.classList.remove("sidebar-visible");
+    }
+  }
+}
+
+/**
  * 为话题列表项添加点击事件
  */
 function setupTopicListClick() {
@@ -479,13 +502,7 @@ function setupTopicListClick() {
       }
 
       // 在小屏幕下收起侧边栏
-      const isMobile = parent.window.matchMedia("(max-width: 960px)").matches;
-      if (isMobile) {
-        const container = parentBody.find("#container")[0];
-        if (container) {
-          container.classList.remove("sidebar-visible");
-        }
-      }
+      collapseSidebarOnMobile();
 
       // 在右侧框架中打开链接
       window.open(item.dataset.link, "right");
