@@ -108,7 +108,7 @@ function adaptMobileLayout() {
  */
 function loadGrailMenu() {
   // 检查是否已经添加过菜单
-  if ($("#tinygrail-menu").length > 0) {
+  if ($("#recentMenu").length > 0) {
     return;
   }
 
