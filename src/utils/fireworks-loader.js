@@ -2,7 +2,7 @@
  * Fireworks动态加载器
  */
 
-const FIREWORKS_CDN_URL = "https://cdn.jsdelivr.net/npm/fireworks-js@2.10.8/dist/index.umd.js";
+const FIREWORKS_CDN_URL = "https://unpkg.com/fireworks-js@2.10.8/dist/index.umd.js";
 
 let fireworksLoadPromise = null;
 let fireworksInstance = null;
