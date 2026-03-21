@@ -25,13 +25,13 @@ export function TinygrailMenu({
   const menuItemClicked = (callback) => {
     $(".timelineTabs a").removeClass("focus");
     $(".timelineTabs a").removeClass("top_focus");
-    $("#tinygrail-menu > a").addClass("focus");
+    $("#recentMenu > a").addClass("focus");
     if (callback) callback();
   };
 
   // 返回菜单DOM
   return (
-    <li id="tinygrail-menu">
+    <li id="recentMenu">
       <a
         href="#"
         class="top"

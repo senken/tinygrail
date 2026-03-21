@@ -82,8 +82,8 @@
     position: absolute !important;
     top: 60px !important;
     bottom: 0 !important;
-    left: -400px !important;
-    width: 400px !important;
+    left: -460px !important;
+    width: 460px !important;
     z-index: 100;
     transition: left 0.3s ease;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
