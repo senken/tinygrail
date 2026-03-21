@@ -29,29 +29,22 @@ function loadStyles() {
  */
 export function RakuenHome() {
   loadStyles();
-  
-  let currentCharacterModalId = null;
-  
+
   // 监听来自侧边栏iframe的消息
   window.addEventListener("message", (event) => {
     if (event.data.type === "openCharacterModal") {
-      const newCharacterId = event.data.characterId;
+      const characterId = event.data.characterId;
 
-      // 如果角色ID不同，则打开弹窗
-      if (currentCharacterModalId !== newCharacterId) {
-        currentCharacterModalId = newCharacterId;
-
-        // 创建角色弹窗
-        const characterModal = (
-          <Modal visible={true}>
-            <CharacterBox characterId={newCharacterId} sticky={true} stickyTop={-16} />
-          </Modal>
-        );
-        document.body.appendChild(characterModal);
-      }
+      // 创建角色弹窗
+      const characterModal = (
+        <Modal visible={true}>
+          <CharacterBox characterId={characterId} sticky={true} stickyTop={-16} />
+        </Modal>
+      );
+      document.body.appendChild(characterModal);
     }
   });
-  
+
   // 角色搜索点击处理
   const handleCharacterSearchClick = () => {
     const userAssets = getCachedUserAssets();
