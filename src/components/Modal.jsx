@@ -9,9 +9,15 @@ export function closeModalById(modalId) {
   modals.forEach((modal) => {
     if (modal.dataset.modalId === modalId && modal.parentNode === document.body) {
       document.body.removeChild(modal);
-      document.body.style.overflow = "";
     }
   });
+
+  // 检查是否还有其他弹窗存在
+  const remainingModals = document.querySelectorAll("#tg-modal");
+  if (remainingModals.length === 0) {
+    // 只有当没有其他弹窗时才恢复滚动条
+    document.body.style.overflow = "";
+  }
 }
 
 /**
@@ -54,9 +60,15 @@ export function Modal({
     modals.forEach((modal) => {
       if (modal.dataset.modalId === generatedModalId && modal.parentNode === document.body) {
         document.body.removeChild(modal);
-        document.body.style.overflow = "";
       }
     });
+
+    // 检查是否还有其他弹窗存在
+    const remainingModals = document.querySelectorAll("#tg-modal");
+    if (remainingModals.length === 0) {
+      // 只有当没有其他弹窗时才恢复滚动条
+      document.body.style.overflow = "";
+    }
 
     // 调用onClose回调
     if (onClose) {

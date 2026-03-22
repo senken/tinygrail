@@ -553,7 +553,7 @@ export function CharacterBox(props) {
             onClose={closeGMTradeHistoryModal}
             title={`交易记录(GM) - #${characterData?.CharacterId ?? ""}「${characterData?.Name ?? ""}」`}
             position="center"
-            maxWidth={896}
+            maxWidth={480}
             modalId={generatedGMTradeHistoryModalId}
             getModalId={(id) => {
               generatedGMTradeHistoryModalId = id;

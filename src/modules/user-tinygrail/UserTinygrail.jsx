@@ -204,7 +204,7 @@ export function UserTinygrail(props) {
             onClose={() => setState({ showTradeHistoryModal: false })}
             title={`「${nickname}」的交易记录`}
             position="center"
-            maxWidth={896}
+            maxWidth={480}
             modalId={generatedTradeHistoryModalId}
             getModalId={(id) => {
               generatedTradeHistoryModalId = id;
