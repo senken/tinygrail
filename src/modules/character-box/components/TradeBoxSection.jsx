@@ -237,22 +237,22 @@ export function TradeBoxSection({
         className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
-        <div className="flex items-center">
-          <span className="bgm-color text-sm font-semibold">交易</span>
-          <span className="ml-2 text-xs opacity-60">
-            余额：{userAssets ? formatCurrency(userAssets.balance) : "..."}
+        <span className="bgm-color text-sm font-semibold">交易</span>
+        <div className="flex items-center gap-3">
+          <span className="text-xs opacity-60">
+            余额：{userAssets ? formatCurrency(userAssets.balance, "₵", 2, false) : "..."}
           </span>
+          <button
+            className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+            onClick={onToggleCollapse}
+            style={{
+              transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+              transition: "transform 0.2s ease",
+            }}
+          >
+            <ChevronDownIcon className="h-5 w-5" />
+          </button>
         </div>
-        <button
-          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-          onClick={onToggleCollapse}
-          style={{
-            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-            transition: "transform 0.2s ease",
-          }}
-        >
-          <ChevronDownIcon className="h-5 w-5" />
-        </button>
       </div>
 
       {/* 主区域 */}

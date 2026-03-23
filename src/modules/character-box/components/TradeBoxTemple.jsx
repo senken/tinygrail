@@ -47,6 +47,36 @@ export function TradeBoxTemple({
   const stickyClass = sticky ? "sticky" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
 
+  // Switch 按钮样式
+  const baseTrackClass = "relative inline-block h-4 w-8 rounded-full transition-colors";
+  const trackClass = hideDuplicates
+    ? `${baseTrackClass} bgm-bg`
+    : `${baseTrackClass} bg-gray-300 dark:bg-gray-600`;
+
+  const switchTrack = <div className={trackClass} />;
+  const switchThumb = (
+    <div
+      className="absolute left-0.5 top-0.5 h-3 w-3 rounded-full bg-white shadow-sm transition-transform"
+      style={{ transform: hideDuplicates ? "translateX(16px)" : "translateX(0)" }}
+    />
+  );
+
+  switchTrack.appendChild(switchThumb);
+
+  const switchButton = (
+    <button
+      type="button"
+      className="flex items-center gap-2 outline-none"
+      onClick={() => {
+        if (onToggleDuplicates) {
+          onToggleDuplicates();
+        }
+      }}
+    >
+      {switchTrack}
+    </button>
+  );
+
   // 找到自己的圣殿
   const userTempleName = userAssets?.name;
   const userTempleIndex = temples.findIndex((temple) => temple.Name === userTempleName);
@@ -110,25 +140,23 @@ export function TradeBoxTemple({
         className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
-        <div className="flex items-center">
-          <span className="bgm-color text-sm font-semibold">固定资产 {temples.length}</span>
-          <span
-            className="tg-link ml-2 cursor-pointer text-sm opacity-60"
-            onClick={() => onToggleDuplicates && onToggleDuplicates()}
+        <span className="bgm-color text-sm font-semibold">固定资产 {temples.length}</span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {switchButton}
+            <span className="text-xs opacity-60">隐藏重复</span>
+          </div>
+          <button
+            className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+            onClick={onToggleCollapse}
+            style={{
+              transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+              transition: "transform 0.2s ease",
+            }}
           >
-            {hideDuplicates ? "[显示重复]" : "[隐藏重复]"}
-          </span>
+            <ChevronDownIcon className="h-5 w-5" />
+          </button>
         </div>
-        <button
-          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-          onClick={onToggleCollapse}
-          style={{
-            transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-            transition: "transform 0.2s ease",
-          }}
-        >
-          <ChevronDownIcon className="h-5 w-5" />
-        </button>
       </div>
 
       {/* 内容区域 */}

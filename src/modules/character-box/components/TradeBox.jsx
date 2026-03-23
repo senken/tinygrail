@@ -1,4 +1,6 @@
-import { TradeBoxHeader } from "./TradeBoxHeader.jsx";
+import { TradeBoxHeaderInfo } from "./TradeBoxHeaderInfo.jsx";
+import { TradeBoxHeaderDetails } from "./TradeBoxHeaderDetails.jsx";
+import { TradeBoxHeaderActions } from "./TradeBoxHeaderActions.jsx";
 import { TradeBoxSection } from "./TradeBoxSection.jsx";
 import { TradeBoxLink } from "./TradeBoxLink.jsx";
 import { TradeBoxTemple } from "./TradeBoxTemple.jsx";
@@ -84,13 +86,23 @@ export function TradeBox(props) {
     return null;
   }
 
+  const stickyClass = sticky ? "sticky" : "";
+  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
+  
+  // 其他区域的stickyTop需要加上TradeBoxHeaderInfo的高度
+  const otherStickyTop = stickyTop + 56;
+
   return (
     <div id="tg-trade-box" data-character-id={characterData.CharacterId}>
-      <TradeBoxHeader
-        characterData={characterData}
-        userCharacter={userCharacter}
+      <div 
+        className={`tg-bg-content z-20 ${stickyClass}`}
+        style={stickyStyle}
+      >
+        <TradeBoxHeaderInfo characterData={characterData} userCharacter={userCharacter} />
+      </div>
+      <TradeBoxHeaderDetails characterData={characterData} pool={pool} />
+      <TradeBoxHeaderActions
         tinygrailCharacter={tinygrailCharacter}
-        pool={pool}
         canChangeAvatar={canChangeAvatar}
         onSacrificeClick={openSacrificeModal}
         onAuctionClick={openAuctionModal}
@@ -105,7 +117,7 @@ export function TradeBox(props) {
         userCharacter={userCharacter}
         depth={depth}
         sticky={sticky}
-        stickyTop={stickyTop}
+        stickyTop={otherStickyTop}
         onRefresh={onRefresh}
         setLoading={setLoading}
         isCollapsed={isSectionCollapsed}
@@ -119,7 +131,7 @@ export function TradeBox(props) {
           openCharacterModal={openCharacterModal}
           openTempleModal={openTempleModal}
           sticky={sticky}
-          stickyTop={stickyTop}
+          stickyTop={otherStickyTop}
           isCollapsed={isLinkCollapsed}
           onToggleCollapse={onToggleLinkCollapse}
         />
@@ -132,7 +144,7 @@ export function TradeBox(props) {
           openUserModal={openUserModal}
           openTempleModal={openTempleModal}
           sticky={sticky}
-          stickyTop={stickyTop}
+          stickyTop={otherStickyTop}
           hideDuplicates={hideDuplicates}
           onToggleDuplicates={onToggleDuplicates}
           isCollapsed={isTempleCollapsed}
@@ -146,7 +158,7 @@ export function TradeBox(props) {
           loadUsersPage={loadUsersPage}
           openUserModal={openUserModal}
           sticky={sticky}
-          stickyTop={stickyTop}
+          stickyTop={otherStickyTop}
           isCollapsed={isUserCollapsed}
           onToggleCollapse={onToggleUserCollapse}
         />

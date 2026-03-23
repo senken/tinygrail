@@ -189,7 +189,7 @@ export function TradeBoxUser({
       >
         <span className="bgm-color text-sm font-semibold">董事会 {totalItems}</span>
         <button
-          className="mr-2 flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
+          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
           onClick={onToggleCollapse}
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",

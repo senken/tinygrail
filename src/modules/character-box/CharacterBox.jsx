@@ -45,7 +45,7 @@ import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 export function CharacterBox(props) {
   const { characterId, sticky = false, stickyTop = 0 } = props || {};
 
-  const container = <div id="tg-character-box" className="relative" />;
+  const container = <div id="tg-character-box" className="relative tg-bg-content" />;
 
   // 在外部作用域存储蒙版引用和唯一ID
   let overlayRef = null;
