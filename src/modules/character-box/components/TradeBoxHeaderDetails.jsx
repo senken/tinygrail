@@ -93,7 +93,7 @@ export function TradeBoxHeaderDetails(props) {
           奖池：{pool !== undefined ? formatNumber(pool, 0) : "..."}
         </span>
         <span
-          id="valhalla"
+          id="tinygrail"
           data-amount={tinygrailCharacter?.Amount}
           className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
         >
