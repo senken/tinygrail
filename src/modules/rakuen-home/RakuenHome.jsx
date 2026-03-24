@@ -37,8 +37,8 @@ export function RakuenHome() {
 
       // 创建角色弹窗
       const characterModal = (
-        <Modal visible={true}>
-          <CharacterBox characterId={characterId} sticky={true} stickyTop={-16} />
+        <Modal visible={true} padding="p-6">
+          <CharacterBox characterId={characterId} sticky={true} />
         </Modal>
       );
       document.body.appendChild(characterModal);
@@ -59,8 +59,8 @@ export function RakuenHome() {
           username={username}
           onCharacterClick={(character) => {
             const characterModal = (
-              <Modal visible={true}>
-                <CharacterBox characterId={character.Id} sticky={true} stickyTop={-16} />
+              <Modal visible={true} padding="p-6">
+                <CharacterBox characterId={character.Id} sticky={true} />
               </Modal>
             );
             document.body.appendChild(characterModal);

@@ -56,25 +56,25 @@ export function TradeBoxLink({
       {/* 标题 */}
       <div
         id="tg-trade-box-link-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
+        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
+        onClick={onToggleCollapse}
       >
         <span className="bgm-color text-sm font-semibold">LINK {links.length}</span>
-        <button
-          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-          onClick={onToggleCollapse}
+        <div
+          className="flex items-center justify-center opacity-60 transition-all"
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
           }}
         >
           <ChevronDownIcon className="h-5 w-5" />
-        </button>
+        </div>
       </div>
 
       {/* 内容区域 */}
       {!isCollapsed && (
-        <div id="tg-trade-box-link-content" className="space-y-4 p-2">
+        <div id="tg-trade-box-link-content" className="space-y-4 py-2">
           {sortedGroups.map((group, index) => (
             <div id="tg-trade-box-link-group" data-link-id={group.linkId} className="space-y-2">
               {/* 排名标题 */}

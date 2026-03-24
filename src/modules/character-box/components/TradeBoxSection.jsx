@@ -234,41 +234,41 @@ export function TradeBoxSection({
       {/* 标题 */}
       <div
         id="tg-trade-box-section-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
+        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
+        onClick={onToggleCollapse}
       >
         <span className="bgm-color text-sm font-semibold">交易</span>
         <div className="flex items-center gap-3">
           <span className="text-xs opacity-60">
             余额：{userAssets ? formatCurrency(userAssets.balance, "₵", 2, false) : "..."}
           </span>
-          <button
-            className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-            onClick={onToggleCollapse}
+          <div
+            className="flex items-center justify-center opacity-60 transition-all"
             style={{
               transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
               transition: "transform 0.2s ease",
             }}
           >
             <ChevronDownIcon className="h-5 w-5" />
-          </button>
+          </div>
         </div>
       </div>
 
       {/* 主区域 */}
       {!isCollapsed && (
-        <div id="trade-section" className="flex flex-wrap gap-1">
+        <div id="trade-section" className="flex flex-wrap gap-2">
           {/* 买入委托 */}
           <div id="tg-trade-bid-section" className="relative mb-2 min-w-[200px] flex-1">
             <div
               id="tg-trade-bid-header"
-              className="mb-1 flex items-center justify-between p-2 pt-0 text-xs opacity-60"
+              className="mb-1 flex items-center justify-between py-2 pt-0 text-xs opacity-60"
               style={{ borderBottom: "1px solid rgba(0, 0, 0, 0.1)" }}
             >
               <span>价格 / 数量 / 总计</span>
               <span>买入委托</span>
             </div>
-            <div id="tg-trade-bid-list" className="space-y-0.5 px-2 pb-28">
+            <div id="tg-trade-bid-list" className="space-y-0.5 pb-28">
               {/* 历史买入记录 */}
               <div id="tg-trade-bid-history" className="space-y-0.5 opacity-60">
                 {userCharacter?.BidHistory &&
@@ -322,7 +322,7 @@ export function TradeBoxSection({
             </div>
 
             {/* 买入委托输入区域 */}
-            <div id="tg-trade-bid-input" className="absolute bottom-0 mt-2 flex w-full px-2">
+            <div id="tg-trade-bid-input" className="absolute bottom-0 mt-2 flex w-full">
               <div className="w-full space-y-1">
                 <input
                   id="bid-price-input"
@@ -363,13 +363,13 @@ export function TradeBoxSection({
           <div id="tg-trade-ask-section" className="relative mb-2 min-w-[200px] flex-1">
             <div
               id="tg-trade-ask-header"
-              className="mb-1 flex items-center justify-between p-2 pt-0 text-xs opacity-60"
+              className="mb-1 flex items-center justify-between py-2 pt-0 text-xs opacity-60"
               style={{ borderBottom: "1px solid rgba(0, 0, 0, 0.1)" }}
             >
               <span>价格 / 数量 / 总计</span>
               <span>卖出委托</span>
             </div>
-            <div id="tg-trade-ask-list" className="space-y-0.5 px-2 pb-28">
+            <div id="tg-trade-ask-list" className="space-y-0.5 pb-28">
               {/* 历史卖出记录 */}
               <div id="tg-trade-ask-history" className="space-y-0.5 opacity-60">
                 {userCharacter?.AskHistory &&
@@ -423,7 +423,7 @@ export function TradeBoxSection({
             </div>
 
             {/* 卖出委托输入区域 */}
-            <div id="tg-trade-ask-input" className="absolute bottom-0 mt-2 flex w-full px-2">
+            <div id="tg-trade-ask-input" className="absolute bottom-0 mt-2 flex w-full">
               <div className="w-full space-y-1">
                 <input
                   id="ask-price-input"
@@ -464,7 +464,7 @@ export function TradeBoxSection({
           <div id="tg-trade-depth-section" className="mb-2 min-w-[200px] flex-1">
             <div
               id="tg-trade-depth-header"
-              className="mb-1 flex items-center justify-between border-b border-gray-200 p-2 pt-0 text-xs opacity-60 dark:border-gray-700"
+              className="mb-1 flex items-center justify-between border-b border-gray-200 px-2 pt-0 text-xs opacity-60 dark:border-gray-700"
             >
               <span>
                 <span title={lastOrder ? `最新成交 ${formatDateTime(lastOrder)}` : ""}>
@@ -477,7 +477,7 @@ export function TradeBoxSection({
               </span>
               <span>深度信息</span>
             </div>
-            <div id="tg-trade-depth-list" className="px-2">
+            <div id="tg-trade-depth-list">
               {/* 卖单深度 */}
               {depth?.Asks &&
                 depth.Asks.length > 0 &&

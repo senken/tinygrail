@@ -18,7 +18,7 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
   // 计算下一级所需金额
   const nextLevelAmount = predicted.Next - characterData.Total;
 
-  const container = <div id="tg-ico-box-invest" data-character-id={characterData.CharacterId} className="p-2" />;
+  const container = <div id="tg-ico-box-invest" data-character-id={characterData.CharacterId} className="py-2" />;
   const input = (
     <input
       id="tg-ico-box-invest-input"

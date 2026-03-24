@@ -90,7 +90,7 @@ export function TradeBox(props) {
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
   
   // 其他区域的stickyTop需要加上TradeBoxHeaderInfo的高度
-  const otherStickyTop = stickyTop + 56;
+  const otherStickyTop = stickyTop + 48;
 
   return (
     <div id="tg-trade-box" data-character-id={characterData.CharacterId}>

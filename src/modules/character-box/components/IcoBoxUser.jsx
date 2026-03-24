@@ -44,7 +44,7 @@ export function IcoBoxUser({
   };
 
   const container = <div id="tg-ico-box-user" />;
-  const gridDiv = <div id="tg-ico-box-user-list" className="grid gap-3" />;
+  const gridDiv = <div id="tg-ico-box-user-list" className="grid gap-1" />;
   const paginationDiv = <div id="tg-ico-box-user-pagination" className="mt-4" />;
 
   // 渲染用户列表
@@ -71,7 +71,7 @@ export function IcoBoxUser({
 
       const itemContainer = (
         <div
-          className="flex min-w-0 cursor-pointer items-center gap-2"
+          className="flex min-w-0 cursor-pointer items-center gap-2 px-2 py-1"
           data-user-name={user.Name}
           data-amount={user.Amount}
           data-rank={serialNumber}
@@ -135,7 +135,7 @@ export function IcoBoxUser({
   renderItems(initialCols);
 
   // 组装容器
-  const contentDiv = <div className="px-2" />;
+  const contentDiv = <div />;
   contentDiv.appendChild(gridDiv);
 
   // 添加分页
@@ -152,7 +152,7 @@ export function IcoBoxUser({
       {/* 标题 */}
       <div
         id="tg-ico-box-user-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
+        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
         <span className="bgm-color text-sm font-semibold">

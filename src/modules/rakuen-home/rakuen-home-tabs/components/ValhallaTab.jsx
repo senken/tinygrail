@@ -13,7 +13,10 @@ import { getUserCharas, getAuctionList } from "@src/api/chara.js";
  */
 export function ValhallaTab() {
   const container = (
-    <div id="tg-rakuen-home-valhalla-tab" className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md" />
+    <div
+      id="tg-rakuen-home-valhalla-tab"
+      className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md"
+    />
   );
 
   // 英灵殿类型选项
@@ -59,7 +62,10 @@ export function ValhallaTab() {
 
     // 标题栏
     const headerDiv = (
-      <div id="tg-rakuen-home-valhalla-header" className="mb-3 flex items-center justify-between gap-2">
+      <div
+        id="tg-rakuen-home-valhalla-header"
+        className="mb-3 flex items-center justify-between gap-2"
+      >
         <div className="flex items-center gap-2">
           <div className="text-sm font-semibold">/ {getValhallaTitle(activeValhallaType)}</div>
         </div>
@@ -157,9 +163,13 @@ export function ValhallaTab() {
       }
 
       // 网格布局
-      const gridContainer = <div id="tg-rakuen-home-valhalla-content" className="flex w-full flex-col gap-4" />;
+      const gridContainer = (
+        <div id="tg-rakuen-home-valhalla-content" className="flex w-full flex-col gap-4" />
+      );
       const gridDiv = <div id="tg-rakuen-home-valhalla-list" className="grid w-full gap-4" />;
-      const paginationDiv = <div id="tg-rakuen-home-valhalla-pagination" className="flex w-full justify-center" />;
+      const paginationDiv = (
+        <div id="tg-rakuen-home-valhalla-pagination" className="flex w-full justify-center" />
+      );
 
       // 渲染函数
       const renderItems = (cols) => {
@@ -254,8 +264,9 @@ export function ValhallaTab() {
           getModalId={(id) => {
             generatedCharacterModalId = id;
           }}
+          padding="p-6"
         >
-          <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+          <CharacterBox characterId={characterModalId} sticky={true} />
         </Modal>
       );
       wrapper.appendChild(modal);

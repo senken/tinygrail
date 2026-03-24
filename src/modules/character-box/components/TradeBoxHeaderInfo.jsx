@@ -19,7 +19,7 @@ export function TradeBoxHeaderInfo(props) {
   const avatarUrl = normalizeAvatar(Icon);
 
   return (
-    <div id="tg-trade-box-header-info" className="flex gap-3 p-2">
+    <div id="tg-trade-box-header-info" className="flex gap-3 pb-2">
       {/* 头像 */}
       <div
         id="tg-trade-box-header-avatar"

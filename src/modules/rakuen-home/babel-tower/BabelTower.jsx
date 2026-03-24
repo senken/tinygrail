@@ -9,13 +9,17 @@ import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
 import { BabelTowerMain } from "./components/BabelTowerMain.jsx";
 import { BabelTowerLog } from "./components/BabelTowerLog.jsx";
+import { scrollToTop } from "@src/utils/scroll.js";
 
 /**
  * 通天塔组件
  */
 export function BabelTower() {
   const container = (
-    <div id="tg-rakuen-home-babel-tower" className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md" />
+    <div
+      id="tg-rakuen-home-babel-tower"
+      className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md"
+    />
   );
 
   // 存储Modal生成的ID
@@ -25,7 +29,10 @@ export function BabelTower() {
 
   // 检查Modal是否已存在
   const isModalExist = (modalId) => {
-    return modalId && document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body;
+    return (
+      modalId &&
+      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
+    );
   };
 
   // 数据量选项
@@ -76,11 +83,20 @@ export function BabelTower() {
     } = state || {};
 
     // 标题栏
-    const headerDiv = <div id="tg-rakuen-home-babel-tower-header" className="mb-3 flex items-center justify-between gap-2" />;
+    const headerDiv = (
+      <div
+        id="tg-rakuen-home-babel-tower-header"
+        className="mb-3 flex items-center justify-between gap-2"
+      />
+    );
 
     // 标题和日志按钮
     const leftDiv = <div className="flex items-center gap-2" />;
-    const titleDiv = <div id="tg-rakuen-home-babel-tower-title" className="text-sm font-semibold">/ 通天塔(β)</div>;
+    const titleDiv = (
+      <div id="tg-rakuen-home-babel-tower-title" className="text-sm font-semibold">
+        / 通天塔(β)
+      </div>
+    );
     leftDiv.appendChild(titleDiv);
 
     // 小屏幕时添加日志按钮
@@ -116,7 +132,12 @@ export function BabelTower() {
     headerDiv.appendChild(segmentedControl);
 
     // 内容区域
-    const contentDiv = <div id="tg-rakuen-home-babel-tower-content" className="grid auto-rows-min grid-cols-[2fr_1fr] gap-4" />;
+    const contentDiv = (
+      <div
+        id="tg-rakuen-home-babel-tower-content"
+        className="grid auto-rows-min grid-cols-[2fr_1fr] gap-4"
+      />
+    );
 
     // 主体部分
     const mainDiv = <div />;
@@ -157,8 +178,9 @@ export function BabelTower() {
           getModalId={(id) => {
             generatedCharacterModalId = id;
           }}
+          padding="p-6"
         >
-          <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+          <CharacterBox characterId={characterModalId} sticky={true} />
         </Modal>
       );
       wrapper.appendChild(modal);
@@ -175,7 +197,7 @@ export function BabelTower() {
             generatedUserModalId = id;
           }}
         >
-          <UserTinygrail username={userModalName} />
+          <UserTinygrail username={userModalName} stickyTop="-8px" />
         </Modal>
       );
       wrapper.appendChild(userModal);
@@ -188,7 +210,6 @@ export function BabelTower() {
           visible={showLogModal}
           onClose={() => setState({ showLogModal: false })}
           title="通天塔日志"
-          padding="p-4 pt-0"
           modalId={generatedLogModalId}
           getModalId={(id) => {
             generatedLogModalId = id;
@@ -237,12 +258,14 @@ export function BabelTower() {
     if (result.success) {
       const newLogData = result.data;
       setState({ logData: newLogData });
-      
+
       // 如果日志Modal是打开的，手动更新Modal内容
       if (currentState.showLogModal && generatedLogModalId) {
-        const modalBody = document.querySelector(`#tg-modal[data-modal-id="${generatedLogModalId}"] #tg-modal-body`);
-        if (modalBody) {
-          modalBody.innerHTML = "";
+        const modalContent = document.querySelector(
+          `#tg-modal[data-modal-id="${generatedLogModalId}"] #tg-modal-content`
+        );
+        if (modalContent) {
+          modalContent.innerHTML = "";
           const newLogComponent = (
             <BabelTowerLog
               logData={newLogData}
@@ -251,7 +274,8 @@ export function BabelTower() {
               onPageChange={(page) => loadBabelTowerLogData(page)}
             />
           );
-          modalBody.appendChild(newLogComponent);
+          modalContent.appendChild(newLogComponent);
+          scrollToTop(modalContent);
         }
       }
     }

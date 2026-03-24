@@ -67,7 +67,7 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
 
     // 搜索框区域
     const searchDiv = (
-      <div id="tg-character-search-input" className="flex gap-2">
+      <div id="tg-character-search-input" className="flex gap-1 px-1">
         <input
           type="text"
           className="tg-input flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 dark:border-gray-600"
@@ -116,10 +116,10 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
             <img
               src={normalizeAvatar(character.Icon)}
               alt={character.Name}
-              className="h-16 w-16 rounded-md object-cover object-top"
+              className="size-12 rounded-md object-cover object-top"
             />
             {/* 角色信息 */}
-            <div className="flex flex-1 flex-col gap-1">
+            <div className="flex flex-1 flex-col gap-0.5">
               {/* 等级徽章、ID和名称 */}
               <div className="flex items-center gap-2">
                 <LevelBadge level={character.Level} zeroCount={character.ZeroCount} />

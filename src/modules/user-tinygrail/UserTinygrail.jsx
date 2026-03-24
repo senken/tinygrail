@@ -136,8 +136,9 @@ export function UserTinygrail(props) {
             getModalId={(id) => {
               generatedCharacterModalId = id;
             }}
+            padding="p-6"
           >
-            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+            <CharacterBox characterId={characterModalId} sticky={true} />
           </Modal>
         )}
         {showTempleModal && templeModalData && !isModalExist(generatedTempleModalId) && (
@@ -226,7 +227,7 @@ export function UserTinygrail(props) {
               generatedUserModalId = id;
             }}
           >
-            <UserTinygrail username={userModalUsername} stickyTop="-16px" />
+            <UserTinygrail username={userModalUsername} stickyTop="-8px" />
           </Modal>
         )}
       </div>

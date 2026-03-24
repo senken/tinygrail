@@ -145,7 +145,7 @@ export function RedPacketLog({ username, nickname = "" }) {
         {/* 用户弹窗 */}
         {showUserModal && userModalUsername && (
           <Modal visible={showUserModal} onClose={() => setState({ showUserModal: false })}>
-            <UserTinygrail username={userModalUsername} stickyTop="-16px" />
+            <UserTinygrail username={userModalUsername} stickyTop="-8px" />
           </Modal>
         )}
       </div>

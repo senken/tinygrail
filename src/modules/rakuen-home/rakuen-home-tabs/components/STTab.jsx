@@ -10,7 +10,10 @@ import { getDelistCharas } from "@src/api/chara.js";
  */
 export function STTab() {
   const container = (
-    <div id="tg-rakuen-home-st-tab" className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md" />
+    <div
+      id="tg-rakuen-home-st-tab"
+      className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md"
+    />
   );
 
   // 存储Modal生成的ID
@@ -72,9 +75,13 @@ export function STTab() {
       }
 
       // 网格布局
-      const gridContainer = <div id="tg-rakuen-home-st-content" className="flex w-full flex-col gap-4" />;
+      const gridContainer = (
+        <div id="tg-rakuen-home-st-content" className="flex w-full flex-col gap-4" />
+      );
       const gridDiv = <div id="tg-rakuen-home-st-list" className="grid w-full gap-4" />;
-      const paginationDiv = <div id="tg-rakuen-home-st-pagination" className="flex w-full justify-center" />;
+      const paginationDiv = (
+        <div id="tg-rakuen-home-st-pagination" className="flex w-full justify-center" />
+      );
 
       // 渲染函数
       const renderItems = (cols) => {
@@ -172,8 +179,9 @@ export function STTab() {
           getModalId={(id) => {
             generatedCharacterModalId = id;
           }}
+          padding="p-6"
         >
-          <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+          <CharacterBox characterId={characterModalId} sticky={true} />
         </Modal>
       );
       wrapper.appendChild(modal);

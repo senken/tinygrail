@@ -26,7 +26,7 @@ export function TradeBoxHeaderActions(props) {
   } = props || {};
 
   return (
-    <div id="tg-trade-box-header-actions" className="flex flex-wrap gap-2 p-2">
+    <div id="tg-trade-box-header-actions" className="flex flex-wrap gap-2 py-2">
       <Button onClick={onSacrificeClick}>资产重组</Button>
       <Button onClick={onAuctionClick}>
         {tinygrailCharacter?.Amount > 0 ? "参与竞拍" : "萌王投票"}

@@ -268,8 +268,9 @@ export function UserAssetsLog() {
               getModalId={(id) => {
                 generatedCharacterModalId = id;
               }}
+              padding="p-6"
             >
-              <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+              <CharacterBox characterId={characterModalId} sticky={true} />
             </Modal>
           )}
         </div>

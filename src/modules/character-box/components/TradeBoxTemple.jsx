@@ -67,7 +67,8 @@ export function TradeBoxTemple({
     <button
       type="button"
       className="flex items-center gap-2 outline-none"
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation(); // 阻止事件冒泡
         if (onToggleDuplicates) {
           onToggleDuplicates();
         }
@@ -137,25 +138,25 @@ export function TradeBoxTemple({
       {/* 标题 */}
       <div
         id="tg-trade-box-temple-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
+        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
+        onClick={onToggleCollapse}
       >
         <span className="bgm-color text-sm font-semibold">固定资产 {temples.length}</span>
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
             {switchButton}
             <span className="text-xs opacity-60">隐藏重复</span>
           </div>
-          <button
-            className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-            onClick={onToggleCollapse}
+          <div
+            className="flex items-center justify-center opacity-60 transition-all"
             style={{
               transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
               transition: "transform 0.2s ease",
             }}
           >
             <ChevronDownIcon className="h-5 w-5" />
-          </button>
+          </div>
         </div>
       </div>
 
@@ -163,7 +164,7 @@ export function TradeBoxTemple({
       {!isCollapsed && (
         <div
           id="tg-trade-box-temple-list"
-          className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] justify-items-center gap-2 p-2"
+          className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] justify-items-center gap-2 py-2"
         >
           {displayTemples.map((temple, index) => {
             const coverKey = temple.Cover || "empty";

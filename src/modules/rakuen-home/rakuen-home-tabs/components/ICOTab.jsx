@@ -15,7 +15,10 @@ import { normalizeAvatar } from "@src/utils/oos.js";
  */
 export function ICOTab() {
   const container = (
-    <div id="tg-rakuen-home-ico-tab" className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md" />
+    <div
+      id="tg-rakuen-home-ico-tab"
+      className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md"
+    />
   );
 
   // ICO类型选项
@@ -54,9 +57,14 @@ export function ICOTab() {
 
     // 标题栏
     const headerDiv = (
-      <div id="tg-rakuen-home-ico-tab-header" className="mb-3 flex items-center justify-between gap-2">
+      <div
+        id="tg-rakuen-home-ico-tab-header"
+        className="mb-3 flex items-center justify-between gap-2"
+      >
         <div className="flex items-center gap-2">
-          <div id="tg-rakuen-home-ico-tab-title" className="text-sm font-semibold">/ {getICOTitle(activeICOType)}</div>
+          <div id="tg-rakuen-home-ico-tab-title" className="text-sm font-semibold">
+            / {getICOTitle(activeICOType)}
+          </div>
         </div>
         <SegmentedControl
           options={icoOptions}
@@ -309,7 +317,11 @@ export function ICOTab() {
     };
 
     // 内容区域
-    const contentDiv = <div id="tg-rakuen-home-ico-tab-content" className="mt-3">{renderICOContent(activeICOType)}</div>;
+    const contentDiv = (
+      <div id="tg-rakuen-home-ico-tab-content" className="mt-3">
+        {renderICOContent(activeICOType)}
+      </div>
+    );
 
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
@@ -325,8 +337,9 @@ export function ICOTab() {
           getModalId={(id) => {
             generatedCharacterModalId = id;
           }}
+          padding="p-6"
         >
-          <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+          <CharacterBox characterId={characterModalId} sticky={true} />
         </Modal>
       );
       wrapper.appendChild(modal);

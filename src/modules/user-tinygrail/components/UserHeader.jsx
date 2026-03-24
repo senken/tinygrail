@@ -48,7 +48,7 @@ export function UserHeader({
   const isBanned = state === 666;
 
   return (
-    <div id="tg-user-tinygrail-header" className="tg-bg-content px-2">
+    <div id="tg-user-tinygrail-header" className="tg-bg-content px-2 pt-1">
       <div className="mx-auto">
         {/* 头像 */}
         <div className="flex items-center justify-between gap-3">

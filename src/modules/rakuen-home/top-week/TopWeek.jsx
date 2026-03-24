@@ -10,6 +10,7 @@ import { Auction } from "@src/modules/auction/Auction.jsx";
 import { RefreshCwIcon } from "@src/icons/RefreshCwIcon.js";
 import { ChevronRightIcon } from "@src/icons/ChevronRightIcon.js";
 import { TopWeekHistory } from "./components/TopWeekHistory.jsx";
+import { scrollToTop } from "@src/utils/scroll.js";
 
 /**
  * 每周萌王组件
@@ -128,11 +129,11 @@ export function TopWeek() {
 
         // 手动更新Modal内容
         if (generatedHistoryModalId) {
-          const modalBody = document.querySelector(
-            `#tg-modal[data-modal-id="${generatedHistoryModalId}"] #tg-modal-body > div`
+          const modalContent = document.querySelector(
+            `#tg-modal[data-modal-id="${generatedHistoryModalId}"] #tg-modal-content`
           );
-          if (modalBody) {
-            modalBody.innerHTML = "";
+          if (modalContent) {
+            modalContent.innerHTML = "";
             const newHistoryComponent = (
               <TopWeekHistory
                 historyData={newHistoryData}
@@ -147,7 +148,8 @@ export function TopWeek() {
                 }}
               />
             );
-            modalBody.appendChild(newHistoryComponent);
+            modalContent.appendChild(newHistoryComponent);
+            scrollToTop(modalContent);
           }
         }
       }
@@ -355,8 +357,9 @@ export function TopWeek() {
             getModalId={(id) => {
               generatedCharacterModalId = id;
             }}
+            padding="p-6"
           >
-            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+            <CharacterBox characterId={characterModalId} sticky={true} />
           </Modal>
         )}
         {showTempleModal && templeModalData && (

@@ -14,7 +14,10 @@ import { RateRank } from "./RateRank.jsx";
  */
 export function HotTab() {
   const container = (
-    <div id="tg-rakuen-home-hot-tab" className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md" />
+    <div
+      id="tg-rakuen-home-hot-tab"
+      className="tg-bg-content tg-border-card my-2 rounded-xl p-3 shadow-sm transition-shadow hover:shadow-md"
+    />
   );
 
   // 排行类型选项
@@ -58,9 +61,14 @@ export function HotTab() {
 
     // 标题栏
     const headerDiv = (
-      <div id="tg-rakuen-home-hot-tab-header" className="mb-3 flex items-center justify-between gap-2">
+      <div
+        id="tg-rakuen-home-hot-tab-header"
+        className="mb-3 flex items-center justify-between gap-2"
+      >
         <div className="flex items-center gap-2">
-          <div id="tg-rakuen-home-hot-tab-title" className="text-sm font-semibold">/ {getRankingTitle(activeRanking)}</div>
+          <div id="tg-rakuen-home-hot-tab-title" className="text-sm font-semibold">
+            / {getRankingTitle(activeRanking)}
+          </div>
         </div>
         <SegmentedControl
           options={rankingOptions}
@@ -192,7 +200,11 @@ export function HotTab() {
     };
 
     // 内容区域
-    const contentDiv = <div id="tg-rakuen-home-hot-tab-content" className="mt-3">{renderRankingContent(activeRanking)}</div>;
+    const contentDiv = (
+      <div id="tg-rakuen-home-hot-tab-content" className="mt-3">
+        {renderRankingContent(activeRanking)}
+      </div>
+    );
 
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
@@ -208,8 +220,9 @@ export function HotTab() {
           getModalId={(id) => {
             generatedCharacterModalId = id;
           }}
+          padding="p-6"
         >
-          <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+          <CharacterBox characterId={characterModalId} sticky={true} />
         </Modal>
       );
       wrapper.appendChild(modal);
@@ -246,7 +259,7 @@ export function HotTab() {
             generatedUserModalId = id;
           }}
         >
-          <UserTinygrail username={userModalUsername} stickyTop="-16px" />
+          <UserTinygrail username={userModalUsername} stickyTop="-8px" />
         </Modal>
       );
       wrapper.appendChild(userModal);

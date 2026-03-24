@@ -46,7 +46,7 @@ export function TradeBoxUser({
   };
 
   const container = <div id="tg-trade-box-user" data-character-id={characterData?.Id} />;
-  const gridDiv = <div id="tg-trade-box-user-list" className="grid gap-3" />;
+  const gridDiv = <div id="tg-trade-box-user-list" className="grid gap-1" />;
   const paginationDiv = <div id="tg-trade-box-user-pagination" className="mt-4" />;
 
   // 渲染用户列表
@@ -98,7 +98,7 @@ export function TradeBoxUser({
       const itemContainer = (
         <div
           id="tg-trade-box-user-item"
-          className="flex min-w-0 cursor-pointer items-center gap-2"
+          className="flex min-w-0 cursor-pointer items-center gap-2 px-2 py-1"
           data-user-name={user.Name}
           data-balance={user.Balance}
           data-rank={serialNumber}
@@ -167,7 +167,7 @@ export function TradeBoxUser({
   renderItems(initialCols);
 
   // 组装容器
-  const contentDiv = <div className="px-2" />;
+  const contentDiv = <div />;
   contentDiv.appendChild(gridDiv);
 
   // 添加分页
@@ -184,20 +184,20 @@ export function TradeBoxUser({
       {/* 标题 */}
       <div
         id="tg-trade-box-user-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 p-2 dark:border-gray-700 ${stickyClass}`}
+        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
+        onClick={onToggleCollapse}
       >
         <span className="bgm-color text-sm font-semibold">董事会 {totalItems}</span>
-        <button
-          className="flex items-center justify-center border-none bg-transparent p-0 opacity-60 transition-all hover:opacity-100"
-          onClick={onToggleCollapse}
+        <div
+          className="flex items-center justify-center opacity-60 transition-all"
           style={{
             transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
             transition: "transform 0.2s ease",
           }}
         >
           <ChevronDownIcon className="h-5 w-5" />
-        </button>
+        </div>
       </div>
 
       {/* 用户列表 */}

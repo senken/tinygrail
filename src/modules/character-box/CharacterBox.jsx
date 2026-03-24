@@ -45,7 +45,7 @@ import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 export function CharacterBox(props) {
   const { characterId, sticky = false, stickyTop = 0 } = props || {};
 
-  const container = <div id="tg-character-box" className="relative tg-bg-content" />;
+  const container = <div id="tg-character-box" className="tg-bg-content relative" />;
 
   // 在外部作用域存储蒙版引用和唯一ID
   let overlayRef = null;
@@ -402,7 +402,7 @@ export function CharacterBox(props) {
               generatedUserModalId = id;
             }}
           >
-            <UserTinygrail username={userModalUsername} stickyTop="-16px" />
+            <UserTinygrail username={userModalUsername} stickyTop="-8px" />
           </Modal>
         )}
         {/* 角色信息Modal */}
@@ -414,8 +414,9 @@ export function CharacterBox(props) {
             getModalId={(id) => {
               generatedCharacterModalId = id;
             }}
+            padding="p-6"
           >
-            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-17} />
+            <CharacterBox characterId={characterModalId} sticky={true} />
           </Modal>
         )}
         {/* 资产重组Modal */}

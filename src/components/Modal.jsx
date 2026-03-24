@@ -126,31 +126,29 @@ export function Modal({
         }}
       >
         <div
-          id="tg-modal-content"
-          className={`tg-bg-content relative flex max-h-full ${widthClass} max-w-6xl flex-col overflow-hidden rounded-[15px] shadow-2xl backdrop-blur`}
+          id="tg-modal-body"
+          className={`tg-bg-content relative flex max-h-full ${widthClass} max-w-6xl flex-col overflow-hidden rounded-2xl shadow-2xl backdrop-blur`}
           style={maxWidthStyle}
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            className="tg-link absolute right-1 top-1 z-50 flex items-center justify-center rounded-full p-2 opacity-60 transition-colors hover:bg-gray-100 hover:opacity-100 dark:hover:bg-gray-800"
+            className="tg-link absolute right-1.5 top-1.5 z-50 flex items-center justify-center rounded-full p-1 opacity-80 transition-colors hover:bg-gray-100 hover:opacity-100 dark:hover:bg-gray-800"
             onClick={handleClose}
           >
             <XIcon className="size-4" />
           </button>
 
-          {/* 标题区域 */}
-          {title && (
-            <div
-              id="tg-modal-title"
-              className="flex flex-shrink-0 items-center border-b border-gray-200 px-4 py-3 pr-12 dark:border-gray-700"
-            >
-              <h3 className="text-base font-semibold">{title}</h3>
+          <div className={`flex min-h-48 min-w-64 flex-1 flex-col gap-3 overflow-hidden ${padding}`}>
+            {/* 标题区域 */}
+            {title && (
+              <div id="tg-modal-title" className="flex flex-shrink-0 items-center">
+                <h3 className="text-base font-medium">{title}</h3>
+              </div>
+            )}
+            {/* 内容区域 */}
+            <div id="tg-modal-content" className="overflow-auto">
+              {children}
             </div>
-          )}
-
-          {/* 内容区域 */}
-          <div id="tg-modal-body" className={`min-h-32 overflow-auto ${padding}`}>
-            {children}
           </div>
         </div>
       </div>

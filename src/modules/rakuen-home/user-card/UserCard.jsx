@@ -99,7 +99,7 @@ export function UserCard() {
 
         {showModal && (
           <Modal visible={showModal} onClose={() => setState({ showModal: false })}>
-            <UserTinygrail username={name} stickyTop="-16px" />
+            <UserTinygrail username={name} stickyTop="-8px" />
           </Modal>
         )}
 

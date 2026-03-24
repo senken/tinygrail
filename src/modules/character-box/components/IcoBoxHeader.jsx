@@ -65,12 +65,12 @@ export function IcoBoxHeader({ characterData, predicted }) {
   }
 
   return (
-    <div id="tg-ico-box-header" data-character-id={CharacterId} className="flex flex-col gap-2 p-2">
+    <div id="tg-ico-box-header" data-character-id={CharacterId} className="flex flex-col gap-2 pb-2">
       <div className="flex gap-4">
         {/* 头像 */}
         <div
           id="tg-ico-box-header-avatar"
-          className="size-[72px] flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
+          className="size-16 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
           style={{ backgroundImage: `url(${avatarUrl})` }}
         />
 

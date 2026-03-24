@@ -228,8 +228,9 @@ export function LatestLinks() {
             getModalId={(id) => {
               generatedCharacterModalId = id;
             }}
+            padding="p-6"
           >
-            <CharacterBox characterId={characterModalId} sticky={true} stickyTop={-16} />
+            <CharacterBox characterId={characterModalId} sticky={true} />
           </Modal>
         )}
         {showTempleModal && templeModalData && (
@@ -252,7 +253,7 @@ export function LatestLinks() {
               generatedUserModalId = id;
             }}
           >
-            <UserTinygrail username={userModalName} stickyTop="-16px" />
+            <UserTinygrail username={userModalName} stickyTop="-8px" />
           </Modal>
         )}
       </div>

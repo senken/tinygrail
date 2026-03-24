@@ -42,7 +42,7 @@ export function TradeBoxHeaderDetails(props) {
       : `₵${Stars} × 2`;
 
   return (
-    <div id="tg-trade-box-header-details" className="flex flex-col gap-2 px-2">
+    <div id="tg-trade-box-header-details" className="flex flex-col gap-2">
       {/* 角色属性 */}
       <div id="tg-trade-box-header-badges" className="flex flex-wrap items-center gap-2">
         {/* 徽章组 */}
