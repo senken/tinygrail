@@ -149,7 +149,6 @@ export function UserCard() {
             onClose={() => setState({ showBalanceLogModal: false })}
             title="交易记录"
             position="center"
-            padding="p-4 pt-0"
             maxWidth={960}
           >
             <UserAssetsLog />

@@ -52,15 +52,13 @@ export function MyAsks({ data, onPageChange, onCharacterClick }) {
                 onClick={() => onCharacterClick && onCharacterClick(item.CharacterId)}
               >
                 {/* 头像 */}
-                {item.Icon && (
-                  <div>
-                    <img
-                      src={normalizeAvatar(item.Icon)}
-                      alt={item.Name || `#${item.CharacterId}`}
-                      className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
-                    />
-                  </div>
-                )}
+                <div>
+                  <img
+                    src={normalizeAvatar(item.Icon)}
+                    alt={item.Name || `#${item.CharacterId}`}
+                    className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                  />
+                </div>
 
                 {/* 角色信息 */}
                 <div className="flex-1">
