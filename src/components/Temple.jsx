@@ -97,6 +97,18 @@ export function Temple({ temple, bottomText, onClick, showProgress = true }) {
           {levelText}
         </div>
 
+        {/* 星之力标记 */}
+        <div
+          id="tg-temple-star-forces"
+          className="absolute right-1 top-1"
+          title={`已贡献星之力: ${formatNumber(temple.StarForces ?? 0, 0)}`}
+        >
+          <StarIcon 
+            className="h-4 w-4 text-yellow-400" 
+            filled={temple.StarForces >= 10000} 
+          />
+        </div>
+
         {/* 右下角文本 */}
         {bottomText && (
           <div
@@ -125,13 +137,8 @@ export function Temple({ temple, bottomText, onClick, showProgress = true }) {
       {/* 进度条 */}
       {showProgress && (
         <div id="tg-temple-progress" className="flex w-full flex-col gap-0.5">
-          <div className="flex items-center justify-between gap-1">
-            <div className="text-xs opacity-60">
-              {formatNumber(temple.Assets ?? 0, 0)} / {formatNumber(temple.Sacrifices ?? 0, 0)}
-            </div>
-            {temple.StarForces >= 10000 && (
-              <StarIcon className="h-3 w-3 text-yellow-400" filled={true} />
-            )}
+          <div className="text-xs opacity-60">
+            {formatNumber(temple.Assets ?? 0, 0)} / {formatNumber(temple.Sacrifices ?? 0, 0)}
           </div>
           <ProgressBar
             value={temple.Assets ?? 0}
