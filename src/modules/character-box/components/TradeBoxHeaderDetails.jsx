@@ -61,28 +61,63 @@ export function TradeBoxHeaderDetails(props) {
 
       {/* 详细信息 */}
       <div className="flex flex-wrap gap-1.5">
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
+        <span
+          id="price"
+          data-current={Current}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
           现价：{formatCurrency(Current)}
         </span>
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
+        <span
+          id="total"
+          data-total={Total}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
           流通：{formatNumber(Total, 0)}
         </span>
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
-          奖池：{pool !== undefined ? formatNumber(pool, 0) : "..."}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
+        <span
+          id="dividend"
+          data-dividend={dividend}
+          className="inline-flex items-center gap-1 rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
           股息：{formatCurrency(dividend)}
           <Tooltip content={dividendFormula} trigger="click">
             <QuestionIcon className="h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" />
           </Tooltip>
         </span>
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
-          英灵殿：{tinygrailCharacter?.Total !== undefined ? formatNumber(tinygrailCharacter.Total, 0) : "..."}
+        <span
+          id="pool"
+          data-pool={pool}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
+          奖池：{pool !== undefined ? formatNumber(pool, 0) : "..."}
         </span>
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
-          幻想乡：{gensokyoCharacter?.Amount !== undefined ? formatNumber(gensokyoCharacter.Amount, 0) : "..."}
+        <span
+          id="valhalla"
+          data-amount={tinygrailCharacter?.Amount}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
+          英灵殿：
+          {tinygrailCharacter?.Amount !== undefined
+            ? formatNumber(tinygrailCharacter.Amount, 0)
+            : "..."}
         </span>
-        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800" title="上市时间">
+        <span
+          id="gensokyo"
+          data-amount={gensokyoCharacter?.Amount}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+        >
+          幻想乡：
+          {gensokyoCharacter?.Amount !== undefined
+            ? formatNumber(gensokyoCharacter.Amount, 0)
+            : "..."}
+        </span>
+        <span
+          id="listed-date"
+          data-listed-date={ListedDate}
+          className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
+          title="上市时间"
+        >
           上市时间：{formatDateTime(ListedDate, "YYYY-MM-DD HH:mm")}
         </span>
       </div>
