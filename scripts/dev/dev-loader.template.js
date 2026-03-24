@@ -87,7 +87,12 @@
     console.log('[Dev Loader] Hot reload enabled (experimental)');
     console.log('[Dev Loader] Tip: Some changes may require full page reload');
     
+    let reloadTimeout;
+    
     function checkForUpdates() {
+      // 页面不可见时跳过检查
+      if (document.hidden) return;
+      
       GM_xmlhttpRequest({
         method: 'GET',
         url: DEV_URL + '?t=' + Date.now(),
@@ -106,14 +111,17 @@
             console.log('[Dev Loader] Changes detected, hot reloading...');
             lastModified = currentHash;
             
-            // 尝试热重载
-            try {
-              loadScript(true);
-              console.log('[Dev Loader] Hot reload successful');
-            } catch (error) {
-              console.error('[Dev Loader] Hot reload failed, full page reload required');
-              location.reload();
-            }
+            // 防抖：延迟300ms执行，避免频繁更新
+            clearTimeout(reloadTimeout);
+            reloadTimeout = setTimeout(() => {
+              try {
+                loadScript(true);
+                console.log('[Dev Loader] Hot reload successful');
+              } catch (error) {
+                console.error('[Dev Loader] Hot reload failed, full page reload required');
+                location.reload();
+              }
+            }, 300);
           }
         },
         onerror: function () {
