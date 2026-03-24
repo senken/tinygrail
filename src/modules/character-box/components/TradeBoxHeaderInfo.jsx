@@ -28,14 +28,14 @@ export function TradeBoxHeaderInfo(props) {
       />
 
       {/* 名称和ID */}
-      <div className="flex flex-col justify-center gap-1">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
         <a
           href={`https://bgm.tv/character/${CharacterId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="tg-link flex items-center gap-1 text-base font-semibold leading-tight"
+          className="tg-link flex min-w-0 items-center gap-1 text-base font-semibold leading-tight"
         >
-          <span>
+          <span className="truncate">
             #{CharacterId} -「{Name}」
           </span>
           <SquareArrowOutUpRightIcon className="h-4 w-4 flex-shrink-0" />

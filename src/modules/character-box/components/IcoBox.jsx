@@ -34,9 +34,20 @@ export function IcoBox({
   // 计算ICO数据
   const predicted = calculateICO({ Total: data.Total, Users: data.Users });
 
+  const stickyClass = sticky ? "sticky" : "";
+  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
+
+  // 其他区域的stickyTop需要加上IcoBoxHeader的高度
+  const otherStickyTop = stickyTop + 140;
+
   return (
     <div id="tg-ico-box" data-character-id={data.CharacterId} className="flex flex-col">
-      <IcoBoxHeader characterData={data} predicted={predicted} />
+      <div 
+        className={`tg-bg-content z-20 ${stickyClass}`}
+        style={stickyStyle}
+      >
+        <IcoBoxHeader characterData={data} predicted={predicted} />
+      </div>
       {/* ICO参与者列表 */}
       {icoUsers && (
         <IcoBoxUser
@@ -45,7 +56,7 @@ export function IcoBox({
           loadUsersPage={loadIcoUsersPage}
           openUserModal={openUserModal}
           sticky={sticky}
-          stickyTop={stickyTop}
+          stickyTop={otherStickyTop}
         />
       )}
       {/* ICO注资 */}

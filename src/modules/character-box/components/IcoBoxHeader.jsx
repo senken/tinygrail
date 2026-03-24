@@ -65,7 +65,7 @@ export function IcoBoxHeader({ characterData, predicted }) {
   }
 
   return (
-    <div id="tg-ico-box-header" data-character-id={CharacterId} className="flex flex-col gap-2 pb-2">
+    <div id="tg-ico-box-header" data-character-id={CharacterId} className="flex flex-col gap-2">
       <div className="flex gap-4">
         {/* 头像 */}
         <div
@@ -75,22 +75,22 @@ export function IcoBoxHeader({ characterData, predicted }) {
         />
 
         {/* 信息 */}
-        <div id="tg-ico-box-header-info" className="flex flex-col justify-center gap-px">
+        <div id="tg-ico-box-header-info" className="flex min-w-0 flex-col justify-center gap-px">
           <div className="flex items-center gap-2">
             <a
               href={`https://bgm.tv/character/${CharacterId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="tg-link flex items-center gap-1 text-base font-semibold"
+              className="tg-link flex min-w-0 flex-1 items-center gap-1 text-base font-semibold"
             >
-              <span>
+              <span className="truncate">
                 #{CharacterId} -「{Name}」
               </span>
               <SquareArrowOutUpRightIcon className="h-4 w-4 flex-shrink-0" />
             </a>
             {Type === 1 && Bonus > 0 && (
               <span
-                className="inline-block h-4 rounded-md bg-green-500 px-1.5 py-0 text-[10px] font-semibold leading-4 text-white"
+                className="inline-block h-4 flex-shrink-0 rounded-md bg-green-500 px-1.5 py-0 text-[10px] font-semibold leading-4 text-white"
                 title={`剩余${Bonus}期额外分红`}
               >
                 ×{Bonus}
@@ -118,7 +118,10 @@ export function IcoBoxHeader({ characterData, predicted }) {
             </div>
             <div className="flex items-center">
               <span className="text-gray-600 dark:text-gray-400">上市等级：</span>
-              <LevelBadge level={Math.floor(Math.log(predicted.Amount / 7500.0) / Math.log(1.3) + 1)} size="sm" />
+              <LevelBadge
+                level={Math.floor(Math.log(predicted.Amount / 7500.0) / Math.log(1.3) + 1)}
+                size="sm"
+              />
             </div>
           </div>
           <div className="text-gray-600 dark:text-gray-400">
