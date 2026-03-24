@@ -8,6 +8,8 @@
  * @param {string} props.stickyTop - 粘性布局的top值
  * @param {string} props.size - 尺寸：'large'(默认) | 'small'
  * @param {string} props.padding - 内容区域的padding类名
+ * @param {string} props.navBgClass - 导航栏背景颜色类名，默认'tg-bg-content'
+ * @param {string} props.contentBgClass - 内容区域背景颜色类名，默认'tg-bg-content'
  * @param {JSX.Element} props.icon - 导航右侧的图标
  * @param {Function} props.onIconClick - 图标点击回调
  */
@@ -19,6 +21,8 @@ export function Tabs({
   stickyTop = "0",
   size = "large",
   padding = "px-1 py-3",
+  navBgClass = "tg-bg",
+  contentBgClass = "tg-bg",
   icon = null,
   onIconClick = null,
 }) {
@@ -41,7 +45,7 @@ export function Tabs({
       {/* Tabs导航 */}
       <div
         id="tg-tabs-nav"
-        className={`${stickyClass} tg-bg-content border-b border-gray-200 dark:border-gray-600`}
+        className={`${stickyClass} ${navBgClass} border-b border-gray-200 dark:border-gray-600`}
         style={stickyStyle}
       >
         <div className="mx-auto flex">
@@ -78,7 +82,7 @@ export function Tabs({
       </div>
 
       {/* Tab内容 */}
-      <div id="tg-tabs-content" className={`mx-auto ${padding}`}>
+      <div id="tg-tabs-content" className={`${contentBgClass} mx-auto ${padding}`}>
         {TabComponent && <TabComponent />}
       </div>
     </div>

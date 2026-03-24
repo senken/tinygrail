@@ -110,6 +110,8 @@ export function UserTinygrailTabs({
       onTabChange={onTabChange}
       sticky={true}
       stickyTop={stickyTop}
+      navBgClass="tg-bg-content"
+      contentBgClass="tg-bg-content"
     />
   );
 }

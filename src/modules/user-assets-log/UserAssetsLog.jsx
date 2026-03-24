@@ -255,6 +255,8 @@ export function UserAssetsLog() {
             sticky={true}
             size="small"
             padding="px-1 pt-0 pb-3"
+            navBgClass="tg-bg-content"
+            contentBgClass="tg-bg-content"
           />
           {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
             <Modal
