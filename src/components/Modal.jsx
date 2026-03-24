@@ -138,7 +138,9 @@ export function Modal({
             <XIcon className="size-4" />
           </button>
 
-          <div className={`flex min-h-48 min-w-64 flex-1 flex-col gap-3 overflow-hidden ${padding}`}>
+          <div
+            className={`flex min-h-48 min-w-64 flex-1 flex-col gap-3 overflow-hidden ${padding}`}
+          >
             {/* 标题区域 */}
             {title && (
               <div id="tg-modal-title" className="flex flex-shrink-0 items-center">
@@ -146,7 +148,7 @@ export function Modal({
               </div>
             )}
             {/* 内容区域 */}
-            <div id="tg-modal-content" className="overflow-auto">
+            <div id="tg-modal-content" className="-mr-2 box-content overflow-auto pr-2">
               {children}
             </div>
           </div>
