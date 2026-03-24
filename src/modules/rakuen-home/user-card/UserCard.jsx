@@ -133,7 +133,6 @@ export function UserCard() {
               title="彩票抽奖"
               position="center"
               maxWidth={800}
-              padding=""
               modalId={generatedScratchResultModalId}
               getModalId={(id) => {
                 generatedScratchResultModalId = id;
