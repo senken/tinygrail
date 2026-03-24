@@ -13,6 +13,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Object} props.userAssets - 用户资产数据
  * @param {Object} props.userCharacter - 用户角色数据
  * @param {Object} props.tinygrailCharacter - tinygrail用户的角色数据
+ * @param {Object} props.gensokyoCharacter - gensokyo用户的角色数据
  * @param {number} props.pool - 奖池数量
  * @param {Object} props.depth - 市场深度数据
  * @param {Array} props.links - LINK数据
@@ -50,6 +51,7 @@ export function TradeBox(props) {
     userAssets,
     userCharacter,
     tinygrailCharacter,
+    gensokyoCharacter,
     pool,
     depth,
     links,
@@ -100,7 +102,7 @@ export function TradeBox(props) {
       >
         <TradeBoxHeaderInfo characterData={characterData} userCharacter={userCharacter} />
       </div>
-      <TradeBoxHeaderDetails characterData={characterData} pool={pool} />
+      <TradeBoxHeaderDetails characterData={characterData} pool={pool} tinygrailCharacter={tinygrailCharacter} gensokyoCharacter={gensokyoCharacter} />
       <TradeBoxHeaderActions
         tinygrailCharacter={tinygrailCharacter}
         canChangeAvatar={canChangeAvatar}

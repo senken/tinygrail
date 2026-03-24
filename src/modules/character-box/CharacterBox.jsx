@@ -116,6 +116,7 @@ export function CharacterBox(props) {
       userAssets,
       userCharacter,
       tinygrailCharacter,
+      gensokyoCharacter,
       pool,
       depth,
       links,
@@ -253,6 +254,7 @@ export function CharacterBox(props) {
             userAssets={userAssets}
             userCharacter={userCharacter}
             tinygrailCharacter={tinygrailCharacter}
+            gensokyoCharacter={gensokyoCharacter}
             pool={pool}
             depth={depth}
             links={links}
@@ -451,7 +453,7 @@ export function CharacterBox(props) {
             <Auction
               characterId={characterId}
               basePrice={tinygrailCharacter?.Price ?? 0}
-              maxAmount={tinygrailCharacter?.Amount ?? 0}
+              maxAmount={tinygrailCharacter?.Total ?? 0}
             />
           </Modal>
         )}
@@ -662,6 +664,7 @@ export function CharacterBox(props) {
       poolResult,
       userCharacterResult,
       tinygrailCharacterResult,
+      gensokyoCharacterResult,
       depthResult,
       linksResult,
       templesResult,
@@ -671,6 +674,7 @@ export function CharacterBox(props) {
       getCharacterPool(characterId),
       getUserCharacter(characterId),
       getUserCharacterByUsername(characterId, "tinygrail"),
+      getUserCharacterByUsername(characterId, "blueleaf"),
       getCharacterDepth(characterId),
       getCharacterLinks(characterId),
       getCharacterTemples(characterId),
@@ -718,6 +722,7 @@ export function CharacterBox(props) {
       pool: poolResult.success ? poolResult.data : null,
       userCharacter: userCharacterResult.success ? userCharacterResult.data : null,
       tinygrailCharacter: tinygrailCharacterResult.success ? tinygrailCharacterResult.data : null,
+      gensokyoCharacter: gensokyoCharacterResult.success ? gensokyoCharacterResult.data : null,
       depth: depthResult.success ? depthResult.data : null,
       links: linksResult.success ? linksResult.data : null,
       temples: templesResult.success ? templesResult.data : null,

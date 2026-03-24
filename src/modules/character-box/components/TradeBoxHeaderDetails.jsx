@@ -12,9 +12,11 @@ import { Tooltip } from "@src/components/Tooltip.jsx";
  * @param {Object} props
  * @param {Object} props.characterData - 角色数据
  * @param {number} props.pool - 奖池数量
+ * @param {Object} props.tinygrailCharacter - tinygrail用户的角色数据
+ * @param {Object} props.gensokyoCharacter - gensokyo用户的角色数据
  */
 export function TradeBoxHeaderDetails(props) {
-  const { characterData, pool } = props || {};
+  const { characterData, pool, tinygrailCharacter, gensokyoCharacter } = props || {};
 
   if (!characterData) {
     return null;
@@ -73,6 +75,12 @@ export function TradeBoxHeaderDetails(props) {
           <Tooltip content={dividendFormula} trigger="click">
             <QuestionIcon className="h-3 w-3 cursor-pointer opacity-60 hover:opacity-100" />
           </Tooltip>
+        </span>
+        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
+          英灵殿：{tinygrailCharacter?.Total !== undefined ? formatNumber(tinygrailCharacter.Total, 0) : "..."}
+        </span>
+        <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800">
+          幻想乡：{gensokyoCharacter?.Amount !== undefined ? formatNumber(gensokyoCharacter.Amount, 0) : "..."}
         </span>
         <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800" title="上市时间">
           上市时间：{formatDateTime(ListedDate, "YYYY-MM-DD HH:mm")}
