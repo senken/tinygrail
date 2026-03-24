@@ -83,9 +83,9 @@ export function UserHeader({
 
         {/* 资产和余额 */}
         <div className="mt-2 flex gap-4 text-sm">
-          <div className="text-sm font-medium opacity-60">资产: {formatCurrency(assets)}</div>
+          <div className="text-xs font-medium opacity-60">资产: {formatCurrency(assets)}</div>
           <button
-            className="flex items-center gap-1 border-none bg-transparent p-0 text-sm font-medium opacity-60 transition-opacity hover:opacity-80"
+            className="flex items-center gap-1 border-none bg-transparent p-0 text-xs font-medium opacity-60 transition-opacity hover:opacity-80"
             onClick={onToggleAbbreviate}
             title={abbreviateBalance ? "显示完整金额" : "显示缩略金额"}
             aria-label="切换缩略显示"
