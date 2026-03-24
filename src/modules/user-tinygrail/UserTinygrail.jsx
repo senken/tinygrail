@@ -150,9 +150,10 @@ export function UserTinygrail(props) {
                 loadCharaData(username);
               }
             }}
-            position="center"
+            position="top"
             maxWidth={1080}
             padding="p-0"
+            scrollMode="outside"
             modalId={generatedTempleModalId}
             getModalId={(id) => {
               generatedTempleModalId = id;

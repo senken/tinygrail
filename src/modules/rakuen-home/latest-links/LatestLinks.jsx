@@ -237,9 +237,10 @@ export function LatestLinks() {
           <Modal
             visible={showTempleModal}
             onClose={() => setState({ showTempleModal: false })}
-            position="center"
+            position="top"
             maxWidth={1080}
             padding="p-0"
+            scrollMode="outside"
           >
             <TempleDetail temple={templeModalData} characterName={templeModalData.Name} />
           </Modal>

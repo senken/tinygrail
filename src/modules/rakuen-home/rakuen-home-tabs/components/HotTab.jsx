@@ -234,9 +234,10 @@ export function HotTab() {
         <Modal
           visible={showTempleModal}
           onClose={() => setState({ showTempleModal: false })}
-          position="center"
+          position="top"
           maxWidth={1080}
           padding="p-0"
+          scrollMode="outside"
           modalId={generatedTempleModalId}
           getModalId={(id) => {
             generatedTempleModalId = id;

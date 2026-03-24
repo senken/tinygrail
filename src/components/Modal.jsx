@@ -30,6 +30,7 @@ export function closeModalById(modalId) {
  * @param {number} props.maxWidth - 最大宽度（px），不传入时使用w-full
  * @param {string} props.modalId - 可选的弹窗ID，用于精确清理
  * @param {string} props.padding - 内容区域的padding类名，默认p-4
+ * @param {('inside'|'outside')} props.scrollMode - 滚动模式，默认inside
  * @param {Function} props.getModalId - 可选的回调函数，用于获取生成的modalId
  * @param {JSX.Element} props.children - 弹窗内容
  */
@@ -41,6 +42,7 @@ export function Modal({
   maxWidth,
   modalId,
   padding = "p-4",
+  scrollMode = "inside",
   getModalId,
   children,
 }) {
@@ -109,7 +111,7 @@ export function Modal({
     <div id="tg-modal" className="tinygrail" data-modal-id={generatedModalId}>
       <div
         id="tg-modal-background"
-        className={`fixed inset-0 flex justify-center bg-black/20 px-3 ${positionClasses[position]}`}
+        className={`fixed inset-0 flex justify-center bg-black/20 px-3 ${positionClasses[position]} ${scrollMode === "outside" ? "overflow-auto" : ""}`}
         style={{ zIndex: 999 }}
         onMouseDown={(e) => {
           // 点击蒙版时标记
@@ -127,7 +129,7 @@ export function Modal({
       >
         <div
           id="tg-modal-body"
-          className={`tg-bg-content relative flex max-h-full ${widthClass} max-w-6xl flex-col overflow-hidden rounded-2xl shadow-2xl backdrop-blur`}
+          className={`tg-bg-content relative flex ${scrollMode === "outside" ? "h-auto" : "max-h-full"} ${widthClass} max-w-6xl flex-col rounded-2xl shadow-2xl backdrop-blur overflow-hidden`}
           style={maxWidthStyle}
           onClick={(e) => e.stopPropagation()}
         >
@@ -139,7 +141,7 @@ export function Modal({
           </button>
 
           <div
-            className={`flex min-h-48 min-w-64 flex-1 flex-col gap-3 overflow-hidden ${padding}`}
+            className={`flex min-h-48 min-w-64 ${scrollMode === "inside" ? "flex-1" : ""} flex-col gap-3 overflow-hidden ${padding}`}
           >
             {/* 标题区域 */}
             {title && (
@@ -148,7 +150,10 @@ export function Modal({
               </div>
             )}
             {/* 内容区域 */}
-            <div id="tg-modal-content" className="-mr-2 box-content overflow-auto pr-2">
+            <div 
+              id="tg-modal-content" 
+              className={scrollMode === "inside" ? "-mr-2 box-content overflow-auto pr-2" : ""}
+            >
               {children}
             </div>
           </div>

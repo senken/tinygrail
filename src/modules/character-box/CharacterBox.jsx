@@ -572,9 +572,10 @@ export function CharacterBox(props) {
           <Modal
             visible={showTempleModal}
             onClose={closeTempleModal}
-            position="center"
+            position="top"
             maxWidth={1080}
             padding="p-0"
+            scrollMode="outside"
             modalId={generatedTempleModalId}
             getModalId={(id) => {
               generatedTempleModalId = id;
