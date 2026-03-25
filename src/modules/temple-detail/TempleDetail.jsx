@@ -41,6 +41,8 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
     <div
       id="tg-temple-detail"
       data-character-id={temple.CharacterId}
+      data-user-id={temple.UserId}
+      data-name={temple.Name}
       className="tg-bg-content"
       style={{ width: `${minWidth}px` }}
     />

@@ -45,6 +45,8 @@ export function Temple({ temple, bottomText, onClick, showProgress = true }) {
     <div
       id="tg-temple"
       data-character-id={temple.CharacterId}
+      data-user-id={temple.UserId}
+      data-name={temple.Name}
       data-level={temple.Level}
       data-assets={temple.Assets}
       data-sacrifices={temple.Sacrifices}

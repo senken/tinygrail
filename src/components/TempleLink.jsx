@@ -82,6 +82,8 @@ export function TempleLink({
         <div
           id="tg-temple-link-left"
           data-character-id={left.CharacterId}
+          data-user-id={left.UserId}
+          data-name={left.Name}
           className={`${styles.leftOuter} origin-top-left overflow-hidden ${onCoverClick ? "cursor-pointer" : ""}`}
           style={{ transform: "skewX(-10deg)" }}
           onClick={() => onCoverClick && onCoverClick(left)}
@@ -101,6 +103,8 @@ export function TempleLink({
         <div
           id="tg-temple-link-right"
           data-character-id={right.CharacterId}
+          data-user-id={right.UserId}
+          data-name={right.Name}
           className={`absolute ${styles.rightOuter} origin-bottom-right overflow-hidden ${onCoverClick ? "cursor-pointer" : ""}`}
           style={{ transform: "skewX(-10deg)" }}
           onClick={() => onCoverClick && onCoverClick(right)}
