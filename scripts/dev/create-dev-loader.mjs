@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import fs from 'fs';
 import path from 'path';
 import { DEV_USER_SCRIPT_URL } from './dev-constants.mjs';
