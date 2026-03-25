@@ -60,8 +60,7 @@ export function TempleImage({ imageUrl, characterName, line, onLoad }) {
     );
   }
 
-  // 图片加载完成后设置宽度
-  img.onload = () => {
+  const handleImageLoad = () => {
     const naturalWidth = img.naturalWidth;
     let finalWidth;
 
@@ -99,6 +98,13 @@ export function TempleImage({ imageUrl, characterName, line, onLoad }) {
       onLoad(finalWidth);
     }
   };
+
+  img.onload = handleImageLoad;
+
+  // 如果图片已经加载完成，立即触发回调
+  if (img.complete && img.naturalWidth > 0) {
+    handleImageLoad();
+  }
 
   container.appendChild(img);
 

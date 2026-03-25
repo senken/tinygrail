@@ -167,7 +167,8 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
             }
 
             alert("更换封面成功");
-            setState({ imageUrl: dataUrl });
+            hasSetWidth = false;
+            setState({ imageUrl: getLargeCover(ossUrl), containerWidth: minWidth });
           };
           reader.readAsDataURL(file);
         } catch (error) {
@@ -196,7 +197,8 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
         const newImageUrl = result.data.Cover
           ? getLargeCover(result.data.Cover)
           : normalizeAvatar(templeData.Avatar);
-        setState({ imageUrl: newImageUrl });
+        hasSetWidth = false;
+        setState({ imageUrl: newImageUrl, containerWidth: minWidth });
       } catch (error) {
         console.error("重置封面失败:", error);
         alert("重置封面失败");
