@@ -44,7 +44,7 @@ export function ICOsTab({ data, onPageChange, onCharacterClick }) {
 
       const itemDiv = (
         <div
-          className={`flex min-w-0 cursor-pointer items-center gap-3 ${
+          className={`flex min-w-0 cursor-pointer items-start gap-3 ${
             isMobile
               ? "tg-bg-content border-b border-gray-200 p-3 px-3 py-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700"
               : "tg-bg-content rounded-lg"
@@ -62,7 +62,7 @@ export function ICOsTab({ data, onPageChange, onCharacterClick }) {
           />
 
           {/* 信息 */}
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <div className="flex min-w-0 items-center gap-1 text-sm font-medium">
               <span className="min-w-0 truncate">{item.Name}</span>
             </div>

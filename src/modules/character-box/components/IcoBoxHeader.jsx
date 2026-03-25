@@ -36,6 +36,8 @@ export function IcoBoxHeader({ characterData, predicted }) {
 
   // 倒计时
   if (End) {
+    const endTimeText = End ? formatDateTime(End, "YYYY-MM-DD HH:mm:ss") : "未知";
+
     const updateCountdown = () => {
       const endDate = new Date(End);
       const now = new Date();
@@ -56,6 +58,7 @@ export function IcoBoxHeader({ characterData, predicted }) {
       timeText += `${hours}小时`;
       timeText += `${minutes}分`;
       timeText += `${seconds}秒`;
+      timeText += `（${endTimeText}）`;
 
       countdownSpan.textContent = timeText;
     };
