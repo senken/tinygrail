@@ -21,11 +21,14 @@ export function Avatar({ src, alt = "avatar", size = "md", rank, onClick, classN
     lg: "text-sm px-1.5",
   };
 
-  const baseClasses = "tg-avatar flex-shrink-0 border-2 border-white/30";
+  const baseClasses = "tg-avatar flex-shrink-0";
   const interactiveClasses = onClick ? "cursor-pointer transition-transform hover:scale-105" : "";
 
   return (
-    <div id="tg-user-avatar" className={`relative ${interactiveClasses} ${className}`}>
+    <div
+      id="tg-user-avatar"
+      className={`relative rounded-full border-2 border-white/30 ${interactiveClasses} ${className}`}
+    >
       <div
         className={`${baseClasses} ${sizeClasses[size]}`}
         style={{
