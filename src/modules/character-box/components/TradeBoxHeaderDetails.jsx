@@ -60,7 +60,7 @@ export function TradeBoxHeaderDetails(props) {
       </div>
 
       {/* 详细信息 */}
-      <div className="flex flex-wrap gap-1.5">
+      <div id="tg-trade-box-header-details-info" className="flex flex-wrap gap-1.5">
         <span
           id="price"
           data-current={Current}
