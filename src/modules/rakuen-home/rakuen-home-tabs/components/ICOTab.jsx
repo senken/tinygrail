@@ -115,7 +115,9 @@ export function ICOTab() {
       // 倒计时
       if (item.End) {
         const updateCountdown = () => {
-          const endDate = new Date(item.End);
+          const localOffset = new Date().getTimezoneOffset();
+          const serverOffset = -8 * 60; // 服务器是UTC+8
+          const endDate = new Date(item.End) - (localOffset - serverOffset) * 60 * 1000;
           const now = new Date();
           const diff = endDate - now;
 

@@ -63,7 +63,10 @@ export function formatCurrency(amount, symbol = "₵", decimals = 2, abbreviate 
  */
 export function formatDateTime(dateStr, format = "YYYY-MM-DD HH:mm:ss") {
   if (!dateStr) return "";
-  const date = new Date(dateStr);
+  const localOffset = new Date().getTimezoneOffset();
+  const serverOffset = -8 * 60; // 服务器是UTC+8
+  const correctedTime = new Date(dateStr) - (localOffset - serverOffset) * 60 * 1000;
+  const date = new Date(correctedTime);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -87,7 +90,9 @@ export function formatDateTime(dateStr, format = "YYYY-MM-DD HH:mm:ss") {
  */
 export function formatRemainingTime(endTime) {
   const now = new Date();
-  const end = new Date(endTime);
+  const localOffset = new Date().getTimezoneOffset();
+  const serverOffset = -8 * 60; // 服务器是UTC+8
+  const end = new Date(endTime) - (localOffset - serverOffset) * 60 * 1000;
   const diff = end - now;
 
   // 已结束
@@ -121,7 +126,9 @@ export function formatTimeAgo(dateTime) {
   if (!dateTime) return "";
 
   const now = new Date();
-  const past = new Date(dateTime);
+  const localOffset = new Date().getTimezoneOffset();
+  const serverOffset = -8 * 60; // 服务器是UTC+8
+  const past = new Date(dateTime) - (localOffset - serverOffset) * 60 * 1000;
   const diff = now - past;
 
   const seconds = Math.floor(diff / 1000);
@@ -146,12 +153,14 @@ export function formatTimeAgo(dateTime) {
 }
 
 /**
- * 计算时间差（考虑时区调整）
+ * 计算时间差
  * @param {string|Date} timeStr - 时间字符串或日期对象
  * @returns {number} 时间差（毫秒）
  */
 export function getTimeDiff(timeStr) {
   const now = new Date();
-  const time = new Date(timeStr) - (new Date().getTimezoneOffset() + 8 * 60) * 60 * 1000;
+  const localOffset = new Date().getTimezoneOffset();
+  const serverOffset = -8 * 60; // 服务器是UTC+8
+  const time = new Date(timeStr) - (localOffset - serverOffset) * 60 * 1000;
   return now - time;
 }
