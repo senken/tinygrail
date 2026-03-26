@@ -47,7 +47,7 @@ export function TradeBoxUser({
 
   const container = <div id="tg-trade-box-user" data-character-id={characterData?.Id} />;
   const gridDiv = <div id="tg-trade-box-user-list" className="grid gap-1" />;
-  const paginationDiv = <div id="tg-trade-box-user-pagination" className="mt-4" />;
+  const paginationDiv = <div id="tg-trade-box-user-pagination" className="mt-4 pb-1" />;
 
   // 渲染用户列表
   const renderItems = (cols) => {
