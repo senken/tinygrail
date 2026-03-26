@@ -1,7 +1,7 @@
 import { Fragment } from "@src/utils/jsx-dom.js";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { createRequestManager } from "@src/utils/requestManager.js";
-import { getTimeDiff } from "@src/utils/format.js";
+import { formatNumber, getTimeDiff } from "@src/utils/format.js";
 import { processImage } from "@src/utils/image.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import {
@@ -122,6 +122,7 @@ export function CharacterBox(props) {
       links,
       temples,
       users,
+      fixedAssets,
       icoUsers,
       userIcoInfo,
       loading,
@@ -260,6 +261,7 @@ export function CharacterBox(props) {
             links={links}
             temples={temples}
             users={users}
+            fixedAssets={fixedAssets}
             onRefresh={refreshTradeBoxData}
             setLoading={setLoading}
             loadUsersPage={loadUsersPage}
@@ -682,39 +684,61 @@ export function CharacterBox(props) {
       getCharacterUsers(characterId, 1, 10), // 获取前10名用户用于判断权限
     ]);
 
-    // 判断当前用户是否可以更换头像
+    // 判断当前用户是否可以更换头像和计算固定资产
     let canChangeAvatar = false;
-    if (topTenUsersResult.success && topTenUsersResult.data?.Items) {
-      // 从缓存中获取当前用户资产
-      const userAssets = getCachedUserAssets();
-      if (userAssets) {
-        const currentUserId = userAssets.id;
-        const currentUserName = userAssets.name;
+    let fixedAssets = "0";
 
-        // 神秘的702用户(641)永远可以更换头像
-        if (currentUserId === 702) {
-          canChangeAvatar = true;
-        } else {
-          const topTenUsers = topTenUsersResult.data.Items;
+    // 从缓存中获取当前用户资产
+    const userAssets = getCachedUserAssets();
 
-          // 检查当前用户是否在前10名中
-          const currentUserIndex = topTenUsers.findIndex((user) => user.Name === currentUserName);
+    if (topTenUsersResult.success && topTenUsersResult.data?.Items && userAssets) {
+      const currentUserId = userAssets.id;
+      const currentUserName = userAssets.name;
 
-          if (currentUserIndex !== -1) {
-            // 获取主席
-            const chairman = topTenUsers[0];
-            const timeDiff = getTimeDiff(chairman.LastActiveDate);
-            const chairmanActive = timeDiff < 1000 * 60 * 60 * 24 * 5 && chairman.State !== 666;
+      // 神秘的702用户(641)永远可以更换头像
+      if (currentUserId === 702) {
+        canChangeAvatar = true;
+      } else {
+        const topTenUsers = topTenUsersResult.data.Items;
 
-            // 如果主席活跃，只有主席可以更换头像
-            if (chairmanActive) {
-              canChangeAvatar = currentUserIndex === 0;
-            } else {
-              // 如果主席不活跃，前2-10名都可以更换头像
-              canChangeAvatar = currentUserIndex > 0;
-            }
+        // 检查当前用户是否在前10名中
+        const currentUserIndex = topTenUsers.findIndex((user) => user.Name === currentUserName);
+
+        if (currentUserIndex !== -1) {
+          // 获取主席
+          const chairman = topTenUsers[0];
+          const timeDiff = getTimeDiff(chairman.LastActiveDate);
+          const chairmanActive = timeDiff < 1000 * 60 * 60 * 24 * 5 && chairman.State !== 666;
+
+          // 如果主席活跃，只有主席可以更换头像
+          if (chairmanActive) {
+            canChangeAvatar = currentUserIndex === 0;
+          } else {
+            // 如果主席不活跃，前2-10名都可以更换头像
+            canChangeAvatar = currentUserIndex > 0;
           }
         }
+      }
+    }
+
+    // 计算固定资产
+    if (userAssets && userAssets.name) {
+      const userName = userAssets.name;
+
+      // 从links中查找
+      let foundData = null;
+      if (linksResult.success && linksResult.data) {
+        foundData = linksResult.data.find((link) => link.Name === userName);
+      }
+
+      // 从temples中查找
+      if (!foundData && templesResult.success && templesResult.data) {
+        foundData = templesResult.data.find((temple) => temple.Name === userName);
+      }
+
+      // 格式化固定资产
+      if (foundData) {
+        fixedAssets = `${formatNumber(foundData.Assets ?? 0, 0)} / ${formatNumber(foundData.Sacrifices ?? 0, 0)}`;
       }
     }
 
@@ -728,6 +752,7 @@ export function CharacterBox(props) {
       temples: templesResult.success ? templesResult.data : null,
       users: usersResult.success ? usersResult.data : null,
       canChangeAvatar,
+      fixedAssets,
     });
   };
 

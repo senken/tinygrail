@@ -7,9 +7,10 @@ import { SquareArrowOutUpRightIcon } from "@src/icons";
  * @param {Object} props
  * @param {Object} props.characterData - 角色数据
  * @param {Object} props.userCharacter - 用户角色数据
+ * @param {string} props.fixedAssets - 固定资产字符串
  */
 export function TradeBoxHeaderInfo(props) {
-  const { characterData, userCharacter } = props || {};
+  const { characterData, userCharacter, fixedAssets } = props || {};
 
   if (!characterData) {
     return null;
@@ -43,7 +44,7 @@ export function TradeBoxHeaderInfo(props) {
         <div className="text-xs text-gray-600 dark:text-gray-400">
           <span>持股：{userCharacter ? formatNumber(userCharacter.Amount, 0) : "..."}股</span>
           <span className="mx-2">•</span>
-          <span>固定资产：{userCharacter ? formatNumber(userCharacter.Sacrifices, 0) : "..."}</span>
+          <span>固定资产：{fixedAssets ?? "..."}</span>
         </div>
       </div>
     </div>

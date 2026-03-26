@@ -19,6 +19,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Array} props.links - LINK数据
  * @param {Array} props.temples - 圣殿数据
  * @param {Object} props.users - 持股用户数据
+ * @param {string} props.fixedAssets - 固定资产字符串
  * @param {Function} props.onRefresh - 刷新数据的回调函数
  * @param {Function} props.setLoading - 设置全局加载状态的函数
  * @param {Function} props.loadUsersPage - 加载指定页用户数据的函数
@@ -57,6 +58,7 @@ export function TradeBox(props) {
     links,
     temples,
     users,
+    fixedAssets,
     onRefresh,
     setLoading,
     loadUsersPage,
@@ -100,7 +102,7 @@ export function TradeBox(props) {
         className={`tg-bg-content z-20 ${stickyClass}`}
         style={stickyStyle}
       >
-        <TradeBoxHeaderInfo characterData={characterData} userCharacter={userCharacter} />
+        <TradeBoxHeaderInfo characterData={characterData} userCharacter={userCharacter} fixedAssets={fixedAssets} />
       </div>
       <TradeBoxHeaderDetails characterData={characterData} pool={pool} tinygrailCharacter={tinygrailCharacter} gensokyoCharacter={gensokyoCharacter} />
       <TradeBoxHeaderActions
