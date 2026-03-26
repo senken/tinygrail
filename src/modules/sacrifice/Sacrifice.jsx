@@ -6,8 +6,9 @@ import { formatCurrency } from "@src/utils/format.js";
  * 资产重组/股权融资组件
  * @param {Object} props
  * @param {number} props.characterId - 角色ID
+ * @param {number} props.availableAmount - 可用持股数量
  */
-export function Sacrifice({ characterId }) {
+export function Sacrifice({ characterId, availableAmount = 0 }) {
   let sacrificeType = "restructure";
   let amount = "500";
 
@@ -23,6 +24,33 @@ export function Sacrifice({ characterId }) {
       min="0"
       step="1"
     />
+  );
+
+  const createQuickButton = (text, value) => (
+    <button
+      type="button"
+      className="bgm-color hover:bgm-bg w-fit whitespace-nowrap rounded-full border border-current px-2 py-0.5 text-xs font-medium transition-all hover:border-transparent hover:text-white"
+      onClick={() => {
+        amount = String(value);
+        amountInput.value = String(value);
+      }}
+    >
+      {text}
+    </button>
+  );
+
+  const maxButton = createQuickButton("max", availableAmount);
+  const button500 = createQuickButton("500", 500);
+  const button2500 = createQuickButton("2500", 2500);
+  const button12500 = createQuickButton("12500", 12500);
+
+  const quickButtonsDiv = (
+    <div className="flex gap-2">
+      {button500}
+      {button2500}
+      {button12500}
+      {maxButton}
+    </div>
   );
 
   const descriptionDiv = (
@@ -59,12 +87,21 @@ export function Sacrifice({ characterId }) {
           switchThumb.style.transform = "translateX(20px)";
           descriptionDiv.textContent = "将股份出售给幻想乡，立刻获取现金。";
           submitButton.textContent = "股权融资";
+          // 股权融资只显示 max 按钮
+          quickButtonsDiv.innerHTML = "";
+          quickButtonsDiv.appendChild(maxButton);
         } else {
           switchTrack.className =
             "relative inline-block h-6 w-11 rounded-full bg-gray-300 transition-colors dark:bg-gray-600";
           switchThumb.style.transform = "translateX(0)";
           descriptionDiv.textContent = "将股份转化为固定资产，同时获得现金奖励并掉落道具。";
           submitButton.textContent = "资产重组";
+          // 资产重组显示所有按钮
+          quickButtonsDiv.innerHTML = "";
+          quickButtonsDiv.appendChild(button500);
+          quickButtonsDiv.appendChild(button2500);
+          quickButtonsDiv.appendChild(button12500);
+          quickButtonsDiv.appendChild(maxButton);
         }
       }}
     >
@@ -140,7 +177,7 @@ export function Sacrifice({ characterId }) {
   const submitButton = <Button onClick={handleSubmit}>资产重组</Button>;
 
   return (
-    <div id="tg-sacrifice" className="flex min-w-64 flex-col gap-4">
+    <div id="tg-sacrifice" className="flex min-w-64 flex-col gap-2">
       {/* 类型切换 */}
       <div id="tg-sacrifice-type-switch" className="flex items-center gap-3">
         {switchButton}
@@ -153,6 +190,7 @@ export function Sacrifice({ characterId }) {
       {/* 数量输入 */}
       <div id="tg-sacrifice-amount-input" className="flex flex-col gap-2">
         {amountInput}
+        {quickButtonsDiv}
       </div>
 
       {/* 状态消息 */}

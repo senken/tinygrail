@@ -434,7 +434,7 @@ export function CharacterBox(props) {
               generatedSacrificeModalId = id;
             }}
           >
-            <Sacrifice characterId={characterId} />
+            <Sacrifice characterId={characterId} availableAmount={userCharacter?.Amount ?? 0} />
           </Modal>
         )}
         {/* 拍卖Modal */}
