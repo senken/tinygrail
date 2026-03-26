@@ -195,8 +195,6 @@ export function TradeBoxSection({
 
   // 取消买入委托
   const handleCancelBid = async (bidId) => {
-    if (!confirm("确定要取消这个买入委托吗？")) return;
-
     if (setLoading) setLoading(true);
 
     const result = await cancelBid(bidId);
@@ -213,8 +211,6 @@ export function TradeBoxSection({
 
   // 取消卖出委托
   const handleCancelAsk = async (askId) => {
-    if (!confirm("确定要取消这个卖出委托吗？")) return;
-
     if (setLoading) setLoading(true);
 
     const result = await cancelAsk(askId);
