@@ -34,7 +34,7 @@ export function IcoBox({
   // 计算ICO数据
   const predicted = calculateICO({ Total: data.Total, Users: data.Users });
 
-  const stickyClass = sticky ? "sticky" : "";
+  const stickyClass = sticky ? "sticky z-20" : "";
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
 
   // 其他区域的stickyTop需要加上IcoBoxHeader的高度
@@ -43,7 +43,7 @@ export function IcoBox({
   return (
     <div id="tg-ico-box" data-character-id={data.CharacterId} className="flex flex-col">
       <div 
-        className={`tg-bg-content z-20 ${stickyClass}`}
+        className={`tg-bg-content ${stickyClass}`}
         style={stickyStyle}
       >
         <IcoBoxHeader characterData={data} predicted={predicted} />
