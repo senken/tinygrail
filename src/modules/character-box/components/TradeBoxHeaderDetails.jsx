@@ -118,7 +118,7 @@ export function TradeBoxHeaderDetails(props) {
           className="rounded bg-gray-100 px-1.5 py-0.5 text-xs dark:bg-gray-800"
           title="上市时间"
         >
-          上市时间：{formatDateTime(ListedDate, "YYYY-MM-DD HH:mm")}
+          {formatDateTime(ListedDate, "YYYY-MM-DD HH:mm")}
         </span>
       </div>
     </div>
