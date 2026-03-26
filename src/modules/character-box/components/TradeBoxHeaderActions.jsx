@@ -27,14 +27,28 @@ export function TradeBoxHeaderActions(props) {
 
   return (
     <div id="tg-trade-box-header-actions" className="flex flex-wrap gap-2 py-2">
-      <Button onClick={onSacrificeClick}>资产重组</Button>
-      <Button onClick={onAuctionClick}>
+      <Button id="tg-btn-sacrifice" onClick={onSacrificeClick}>
+        资产重组
+      </Button>
+      <Button id="tg-btn-auction" onClick={onAuctionClick}>
         {tinygrailCharacter?.Amount > 0 ? "参与竞拍" : "萌王投票"}
       </Button>
-      <Button onClick={onAuctionHistoryClick}>往期拍卖</Button>
-      <Button onClick={onTradeHistoryClick}>交易记录</Button>
-      {canChangeAvatar && <Button onClick={onChangeAvatarClick}>更换头像</Button>}
-      {isGameMaster() && <Button onClick={onGMTradeHistoryClick}>交易记录(gm)</Button>}
+      <Button id="tg-btn-auction-history" onClick={onAuctionHistoryClick}>
+        往期拍卖
+      </Button>
+      <Button id="tg-btn-trade-history" onClick={onTradeHistoryClick}>
+        交易记录
+      </Button>
+      {canChangeAvatar && (
+        <Button id="tg-btn-change-avatar" onClick={onChangeAvatarClick}>
+          更换头像
+        </Button>
+      )}
+      {isGameMaster() && (
+        <Button id="tg-btn-gm-trade-history" onClick={onGMTradeHistoryClick}>
+          交易记录(gm)
+        </Button>
+      )}
     </div>
   );
 }
