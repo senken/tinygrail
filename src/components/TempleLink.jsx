@@ -1,4 +1,6 @@
 import { getCover } from "@src/utils/oos.js";
+import { StarIcon } from "@src/icons";
+import { formatNumber } from "@src/utils/format.js";
 
 /**
  * 角色连接组件
@@ -89,14 +91,25 @@ export function TempleLink({
           onClick={() => onCoverClick && onCoverClick(left)}
         >
           <div
-            className={`${styles.leftInner} box-content origin-top-left overflow-hidden border-2 border-r-0 ${leftColor}`}
+            className={`${styles.leftInner} relative box-content origin-top-left overflow-hidden border-2 border-r-0 ${leftColor}`}
             style={{
               transform: "skewX(10deg)",
               backgroundImage: `url(${leftCover})`,
               backgroundPosition: "top",
               backgroundSize: "cover",
             }}
-          />
+          >
+            {/* 星之力标记 - 左上角 */}
+            <div
+              className="absolute left-1.5 top-1.5"
+              title={`已贡献星之力: ${formatNumber(left.StarForces ?? 0, 0)}`}
+            >
+              <StarIcon 
+                className="h-4 w-4 text-yellow-400" 
+                filled={left.StarForces >= 10000} 
+              />
+            </div>
+          </div>
         </div>
 
         {/* 右侧 */}
@@ -110,14 +123,25 @@ export function TempleLink({
           onClick={() => onCoverClick && onCoverClick(right)}
         >
           <div
-            className={`${styles.rightInner} box-content origin-bottom-right overflow-hidden border-2 border-l-0 ${rightColor}`}
+            className={`${styles.rightInner} relative box-content origin-bottom-right overflow-hidden border-2 border-l-0 ${rightColor}`}
             style={{
               transform: "skewX(10deg)",
               backgroundImage: `url(${rightCover})`,
               backgroundPosition: "top",
               backgroundSize: "cover",
             }}
-          />
+          >
+            {/* 星之力标记 - 右上角 */}
+            <div
+              className="absolute right-1.5 top-1.5"
+              title={`已贡献星之力: ${formatNumber(right.StarForces ?? 0, 0)}`}
+            >
+              <StarIcon 
+                className="h-4 w-4 text-yellow-400" 
+                filled={right.StarForces >= 10000} 
+              />
+            </div>
+          </div>
         </div>
       </div>
 
