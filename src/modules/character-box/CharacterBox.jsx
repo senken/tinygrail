@@ -28,6 +28,7 @@ import { LoaderCircleIcon } from "@src/icons/index.js";
 import { Modal } from "@src/components/Modal.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail/index.js";
 import { Sacrifice } from "@src/modules/sacrifice/index.js";
+import { AddToFavorite } from "@src/modules/favorite/index.js";
 import { Auction } from "@src/modules/auction/index.js";
 import { AuctionHistory } from "@src/modules/auction-history/index.js";
 import { TradeHistory } from "@src/modules/trade-history/index.js";
@@ -63,6 +64,7 @@ export function CharacterBox(props) {
   let generatedUserModalId = null;
   let generatedCharacterModalId = null;
   let generatedSacrificeModalId = null;
+  let generatedFavoriteModalId = null;
   let generatedAuctionModalId = null;
   let generatedAuctionHistoryModalId = null;
   let generatedChangeAvatarModalId = null;
@@ -132,6 +134,7 @@ export function CharacterBox(props) {
       showCharacterModal,
       characterModalId,
       showSacrificeModal,
+      showFavoriteModal,
       showAuctionModal,
       showAuctionHistoryModal,
       showChangeAvatarModal,
@@ -180,6 +183,16 @@ export function CharacterBox(props) {
     const closeSacrificeModal = () => {
       setState({ showSacrificeModal: false });
       refreshTradeBoxData();
+    };
+
+    // 打开收藏Modal
+    const openFavoriteModal = () => {
+      setState({ showFavoriteModal: true });
+    };
+
+    // 关闭收藏Modal
+    const closeFavoriteModal = () => {
+      setState({ showFavoriteModal: false });
     };
 
     // 打开拍卖Modal
@@ -268,6 +281,7 @@ export function CharacterBox(props) {
             openUserModal={openUserModal}
             openCharacterModal={openCharacterModal}
             openSacrificeModal={openSacrificeModal}
+            openFavoriteModal={openFavoriteModal}
             openAuctionModal={openAuctionModal}
             openAuctionHistoryModal={openAuctionHistoryModal}
             openChangeAvatarModal={openChangeAvatarModal}
@@ -324,6 +338,7 @@ export function CharacterBox(props) {
             loadIcoUsersPage={(page) => loadIcoUsersPage(page, characterData.Id)}
             openUserModal={openUserModal}
             onInvest={(amount) => handleIcoInvest(amount, characterData.Id)}
+            onFavoriteClick={openFavoriteModal}
             sticky={sticky}
             stickyTop={stickyTop}
           />
@@ -437,6 +452,22 @@ export function CharacterBox(props) {
             }}
           >
             <Sacrifice characterId={characterId} availableAmount={userCharacter?.Amount ?? 0} />
+          </Modal>
+        )}
+        {/* 收藏Modal */}
+        {showFavoriteModal && !isModalExist(generatedFavoriteModalId) && (
+          <Modal
+            visible={showFavoriteModal}
+            onClose={closeFavoriteModal}
+            title={`收藏 - #${characterData?.CharacterId ?? ""}「${characterData?.Name ?? ""}」`}
+            position="center"
+            maxWidth={480}
+            modalId={generatedFavoriteModalId}
+            getModalId={(id) => {
+              generatedFavoriteModalId = id;
+            }}
+          >
+            <AddToFavorite characterData={characterData} />
           </Modal>
         )}
         {/* 拍卖Modal */}

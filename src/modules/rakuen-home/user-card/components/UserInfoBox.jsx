@@ -24,6 +24,7 @@ export function UserInfoBox(userData) {
     onAvatarClick,
     onToggleAbbreviate,
     onBalanceLog,
+    onFavorite,
   } = userData || {};
 
   // 按钮组
@@ -68,6 +69,14 @@ export function UserInfoBox(userData) {
       show: true,
       onClick: () => {
         if (onBalanceLog) onBalanceLog();
+      },
+    },
+    {
+      id: "favorite-button",
+      label: "收藏夹",
+      show: true,
+      onClick: () => {
+        if (onFavorite) onFavorite();
       },
     },
   ].filter((btn) => btn.show);

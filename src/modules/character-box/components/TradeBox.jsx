@@ -65,6 +65,7 @@ export function TradeBox(props) {
     openUserModal,
     openCharacterModal,
     openSacrificeModal,
+    openFavoriteModal,
     openAuctionModal,
     openAuctionHistoryModal,
     openChangeAvatarModal,
@@ -94,7 +95,7 @@ export function TradeBox(props) {
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
   
   // 其他区域的stickyTop需要加上TradeBoxHeaderInfo的高度
-  const otherStickyTop = stickyTop + 48;
+  const otherStickyTop = stickyTop + 56;
 
   return (
     <div id="tg-trade-box" data-character-id={characterData.CharacterId}>
@@ -102,7 +103,12 @@ export function TradeBox(props) {
         className={`tg-bg-content ${stickyClass}`}
         style={stickyStyle}
       >
-        <TradeBoxHeaderInfo characterData={characterData} userCharacter={userCharacter} fixedAssets={fixedAssets} />
+        <TradeBoxHeaderInfo 
+          characterData={characterData} 
+          userCharacter={userCharacter} 
+          fixedAssets={fixedAssets} 
+          onFavoriteClick={openFavoriteModal}
+        />
       </div>
       <TradeBoxHeaderDetails characterData={characterData} pool={pool} tinygrailCharacter={tinygrailCharacter} gensokyoCharacter={gensokyoCharacter} />
       <TradeBoxHeaderActions

@@ -1,6 +1,6 @@
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatCurrency, formatNumber, formatDateTime } from "@src/utils/format.js";
-import { SquareArrowOutUpRightIcon } from "@src/icons";
+import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 
@@ -9,14 +9,30 @@ import { LevelBadge } from "@src/components/LevelBadge.jsx";
  * @param {Object} props
  * @param {Object} props.characterData - 角色ICO数据
  * @param {Object} props.predicted - 计算后的ICO数据
+ * @param {Function} props.onFavoriteClick - 点击收藏按钮的回调
  */
-export function IcoBoxHeader({ characterData, predicted }) {
+export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   if (!characterData) {
     return null;
   }
 
   const { CharacterId, Name, Icon, Begin, End, Total, Users, Type, Bonus } = characterData;
   const avatarUrl = normalizeAvatar(Icon);
+
+  // 获取包含当前角色的收藏夹
+  const getFavoritesForCharacter = () => {
+    try {
+      const data = localStorage.getItem("tinygrail:favorites");
+      if (!data) return [];
+      const favorites = JSON.parse(data);
+      return favorites.filter((f) => f.characters && f.characters.includes(CharacterId));
+    } catch (e) {
+      console.error("获取收藏夹失败:", e);
+      return [];
+    }
+  };
+
+  const characterFavorites = getFavoritesForCharacter();
 
   // 计算进度条百分比
   const percent = Math.round((Total / predicted.Next) * 100);
@@ -73,7 +89,7 @@ export function IcoBoxHeader({ characterData, predicted }) {
         {/* 头像 */}
         <div
           id="tg-ico-box-header-avatar"
-          className="size-16 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
+          className="size-[72px] flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
           style={{ backgroundImage: `url(${avatarUrl})` }}
         />
 
@@ -84,12 +100,12 @@ export function IcoBoxHeader({ characterData, predicted }) {
               href={`https://bgm.tv/character/${CharacterId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="tg-link flex min-w-0 flex-1 items-center gap-1 text-base font-semibold"
+              className="tg-link flex min-w-0 flex-1 items-center gap-1 text-sm font-semibold"
             >
               <span className="truncate">
                 #{CharacterId} -「{Name}」
               </span>
-              <SquareArrowOutUpRightIcon className="h-4 w-4 flex-shrink-0" />
+              <SquareArrowOutUpRightIcon className="h-3.5 w-3.5 flex-shrink-0" />
             </a>
             {Type === 1 && Bonus > 0 && (
               <span
@@ -101,12 +117,34 @@ export function IcoBoxHeader({ characterData, predicted }) {
             )}
           </div>
           <div className="flex flex-col gap-px">
-            <div className="text-xs text-gray-600 dark:text-gray-400">
+            <div className="truncate text-xs text-gray-600 dark:text-gray-400">
               <span className="font-semibold">已筹集 {formatCurrency(Total, "₵", 0, false)}</span>
             </div>
-            <div className="text-xs text-gray-600 dark:text-gray-400">
+            <div className="truncate text-xs text-gray-600 dark:text-gray-400">
               <span>{restText}</span>
             </div>
+          </div>
+          {/* 收藏夹标签 */}
+          <div className="flex items-center gap-1 overflow-hidden">
+            {/* 收藏按钮 */}
+            <button
+              type="button"
+              className="inline-flex h-4 flex-shrink-0 items-center justify-center gap-0.5 rounded-md border border-gray-300 px-1 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800"
+              onClick={onFavoriteClick}
+              title="添加到收藏夹"
+            >
+              <PlusIcon className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+              <span className="text-[10px] leading-4 text-gray-600 dark:text-gray-400">收藏</span>
+            </button>
+            {/* 收藏夹标签列表 */}
+            {characterFavorites.map((favorite) => (
+              <span
+                key={favorite.id}
+                className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+              >
+                {favorite.name}
+              </span>
+            ))}
           </div>
         </div>
       </div>

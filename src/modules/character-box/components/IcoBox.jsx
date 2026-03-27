@@ -13,6 +13,7 @@ import { calculateICO } from "@src/utils/ico.js";
  * @param {Function} props.loadIcoUsersPage - 加载指定页ICO参与者数据的函数
  * @param {Function} props.openUserModal - 打开用户信息Modal的函数
  * @param {Function} props.onInvest - 注资回调函数
+ * @param {Function} props.onFavoriteClick - 点击收藏按钮的回调
  * @param {boolean} props.sticky - 是否启用粘性布局
  * @param {number} props.stickyTop - 粘性布局的top值
  */
@@ -24,6 +25,7 @@ export function IcoBox({
   loadIcoUsersPage,
   openUserModal,
   onInvest,
+  onFavoriteClick,
   sticky = false,
   stickyTop = 0,
 }) {
@@ -38,7 +40,7 @@ export function IcoBox({
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
 
   // 其他区域的stickyTop需要加上IcoBoxHeader的高度
-  const otherStickyTop = stickyTop + 140;
+  const otherStickyTop = stickyTop + 148;
 
   return (
     <div id="tg-ico-box" data-character-id={data.CharacterId} className="flex flex-col">
@@ -46,7 +48,7 @@ export function IcoBox({
         className={`tg-bg-content ${stickyClass}`}
         style={stickyStyle}
       >
-        <IcoBoxHeader characterData={data} predicted={predicted} />
+        <IcoBoxHeader characterData={data} predicted={predicted} onFavoriteClick={onFavoriteClick} />
       </div>
       {/* ICO参与者列表 */}
       {icoUsers && (

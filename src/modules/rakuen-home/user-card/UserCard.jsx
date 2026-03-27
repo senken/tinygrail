@@ -17,12 +17,14 @@ import { Modal, closeModalById } from "@src/components/Modal.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 import { ScratchCard } from "@src/modules/scratch-card";
 import { UserAssetsLog } from "@src/modules/user-assets-log";
+import { Favorite } from "@src/modules/favorite";
 
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
 
   let generatedScratchModalId = null;
   let generatedScratchResultModalId = null;
+  let generatedFavoriteModalId = null;
 
   const { setState } = createMountedComponent(container, (state, setState) => {
     const {
@@ -41,6 +43,7 @@ export function UserCard() {
       showScratchModal = false,
       showScratchResultModal = false,
       showBalanceLogModal = false,
+      showFavoriteModal = false,
       scratchResultData = null,
       isLotus = false,
       lotusCount = 0,
@@ -94,6 +97,9 @@ export function UserCard() {
           }}
           onBalanceLog={() => {
             setState({ showBalanceLogModal: true });
+          }}
+          onFavorite={() => {
+            setState({ showFavoriteModal: true });
           }}
         />
 
@@ -151,6 +157,22 @@ export function UserCard() {
             maxWidth={960}
           >
             <UserAssetsLog />
+          </Modal>
+        )}
+
+        {showFavoriteModal && !isModalExist(generatedFavoriteModalId) && (
+          <Modal
+            visible={showFavoriteModal}
+            onClose={() => setState({ showFavoriteModal: false })}
+            title="收藏夹"
+            position="center"
+            maxWidth={640}
+            modalId={generatedFavoriteModalId}
+            getModalId={(id) => {
+              generatedFavoriteModalId = id;
+            }}
+          >
+            <Favorite />
           </Modal>
         )}
       </div>
