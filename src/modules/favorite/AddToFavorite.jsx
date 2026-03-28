@@ -1,6 +1,7 @@
 import { Button } from "@src/components/Button.jsx";
 import { TrashIcon, StarIcon } from "@src/icons";
 import { normalizeAvatar } from "@src/utils/oos.js";
+import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 
 /**
  * 添加到收藏夹组件
@@ -13,26 +14,6 @@ export function AddToFavorite({ characterData }) {
   if (!characterId) {
     return <div className="p-4 text-center text-sm opacity-60">角色数据无效</div>;
   }
-
-  // 从localStorage获取收藏夹列表
-  const getFavorites = () => {
-    try {
-      const data = localStorage.getItem("tinygrail:favorites");
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      console.error("获取收藏夹失败:", e);
-      return [];
-    }
-  };
-
-  // 保存收藏夹列表
-  const saveFavorites = (favorites) => {
-    try {
-      localStorage.setItem("tinygrail:favorites", JSON.stringify(favorites));
-    } catch (e) {
-      console.error("保存收藏夹失败:", e);
-    }
-  };
 
   // 检查角色是否在收藏夹中
   const isInFavorite = (favoriteId) => {
@@ -80,6 +61,9 @@ export function AddToFavorite({ characterData }) {
       }
     }
 
+    // 更新时间戳
+    favorite.updatedAt = Date.now();
+
     saveFavorites(favorites);
     renderFavoriteList();
   };
@@ -87,11 +71,14 @@ export function AddToFavorite({ characterData }) {
   // 创建新收藏夹
   const createFavorite = (name, color) => {
     const favorites = getFavorites();
+    const now = Date.now();
     const newFavorite = {
-      id: Date.now(),
+      id: now,
       name,
       color,
       characters: [],
+      createdAt: now,
+      updatedAt: now,
     };
     favorites.push(newFavorite);
     saveFavorites(favorites);

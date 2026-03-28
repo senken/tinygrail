@@ -5,6 +5,7 @@ import { Modal } from "@src/components/Modal.jsx";
 import { FavoriteDetail } from "./FavoriteDetail.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
+import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 
 /**
  * 收藏夹管理组件
@@ -40,26 +41,6 @@ export function Favorite() {
       selectedFavorite = null,
       selectedCharacterId = null,
     } = state || {};
-
-    // 从localStorage获取收藏夹列表
-    const getFavorites = () => {
-      try {
-        const data = localStorage.getItem("tinygrail:favorites");
-        return data ? JSON.parse(data) : [];
-      } catch (e) {
-        console.error("获取收藏夹失败:", e);
-        return [];
-      }
-    };
-
-    // 保存收藏夹列表
-    const saveFavorites = (favorites) => {
-      try {
-        localStorage.setItem("tinygrail:favorites", JSON.stringify(favorites));
-      } catch (e) {
-        console.error("保存收藏夹失败:", e);
-      }
-    };
 
     // 删除收藏夹
     const deleteFavorite = (favoriteId) => {
@@ -149,6 +130,7 @@ export function Favorite() {
 
       favorite.name = trimmedName;
       favorite.color = editingColor.value;
+      favorite.updatedAt = Date.now();
 
       saveFavorites(currentFavorites);
       setState({
@@ -421,14 +403,8 @@ export function Favorite() {
 
   // 初始化加载收藏夹列表
   const loadFavorites = () => {
-    try {
-      const data = localStorage.getItem("tinygrail:favorites");
-      const favorites = data ? JSON.parse(data) : [];
-      setState({ favorites });
-    } catch (e) {
-      console.error("获取收藏夹失败:", e);
-      setState({ favorites: [] });
-    }
+    const favorites = getFavorites();
+    setState({ favorites });
   };
 
   loadFavorites();

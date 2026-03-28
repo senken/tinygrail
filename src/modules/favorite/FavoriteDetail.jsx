@@ -5,6 +5,7 @@ import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { Button } from "@src/components/Button.jsx";
 import { LoaderCircleIcon, TrashIcon } from "@src/icons";
+import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 
 /**
  * 收藏夹详情组件
@@ -53,26 +54,6 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
     // 处理分页变化
     const handlePageChange = (page) => {
       loadCharacters(page);
-    };
-
-    // 从localStorage获取收藏夹列表
-    const getFavorites = () => {
-      try {
-        const data = localStorage.getItem("tinygrail:favorites");
-        return data ? JSON.parse(data) : [];
-      } catch (e) {
-        console.error("获取收藏夹失败:", e);
-        return [];
-      }
-    };
-
-    // 保存收藏夹列表
-    const saveFavorites = (favorites) => {
-      try {
-        localStorage.setItem("tinygrail:favorites", JSON.stringify(favorites));
-      } catch (e) {
-        console.error("保存收藏夹失败:", e);
-      }
     };
 
     // 切换选择模式
@@ -124,6 +105,9 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
           currentFavorite.characters.splice(index, 1);
         }
       });
+
+      // 更新时间戳
+      currentFavorite.updatedAt = Date.now();
 
       saveFavorites(favorites);
 
@@ -314,17 +298,6 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
     loadCharacters(1);
   };
 
-  // 从localStorage获取收藏夹列表
-  const getFavorites = () => {
-    try {
-      const data = localStorage.getItem("tinygrail:favorites");
-      return data ? JSON.parse(data) : [];
-    } catch (e) {
-      console.error("获取收藏夹失败:", e);
-      return [];
-    }
-  };
-
   // 加载角色数据
   const loadCharacters = async (page = 1) => {
     const favorites = getFavorites();
@@ -337,11 +310,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
         const targetFavorite = allFavorites.find((f) => f.id === favoriteId);
         if (targetFavorite) {
           targetFavorite.cover = [];
-          try {
-            localStorage.setItem("tinygrail:favorites", JSON.stringify(allFavorites));
-          } catch (e) {
-            console.error("保存封面失败:", e);
-          }
+          saveFavorites(allFavorites);
         }
       }
       setState({ loading: false, characters: [], currentPage: 1, totalPages: 1 });
@@ -400,11 +369,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
         const targetFavorite = allFavorites.find((f) => f.id === favoriteId);
         if (targetFavorite) {
           targetFavorite.cover = coverImages;
-          try {
-            localStorage.setItem("tinygrail:favorites", JSON.stringify(allFavorites));
-          } catch (e) {
-            console.error("保存封面失败:", e);
-          }
+          saveFavorites(allFavorites);
         }
       }
 
