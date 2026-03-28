@@ -17,6 +17,7 @@ export default [
       globals: {
         ...globals.browser,
         $: 'readonly',
+        chiiApp: 'readonly',
       },
     },
     plugins: {

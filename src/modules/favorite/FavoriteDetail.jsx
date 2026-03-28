@@ -6,6 +6,7 @@ import { Pagination } from "@src/components/Pagination.jsx";
 import { Button } from "@src/components/Button.jsx";
 import { LoaderCircleIcon, TrashIcon } from "@src/icons";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
+import { uploadToCloud } from "./favoriteSync.js";
 
 /**
  * 收藏夹详情组件
@@ -110,6 +111,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
       currentFavorite.updatedAt = Date.now();
 
       saveFavorites(favorites);
+      uploadToCloud(favorites);
 
       // 通知父组件数据变化
       if (onDataChange) {
@@ -150,7 +152,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
           avatarUrl = normalizeAvatar(item.Icon);
           badgeType = "default";
         } else {
-          // ICO 角色
+          // ICO角色
           avatarUrl = normalizeAvatar(item.Icon);
           badgeType = "ico";
         }
@@ -311,6 +313,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
         if (targetFavorite) {
           targetFavorite.cover = [];
           saveFavorites(allFavorites);
+          uploadToCloud(allFavorites);
         }
       }
       setState({ loading: false, characters: [], currentPage: 1, totalPages: 1 });
@@ -370,6 +373,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
         if (targetFavorite) {
           targetFavorite.cover = coverImages;
           saveFavorites(allFavorites);
+          uploadToCloud(allFavorites);
         }
       }
 

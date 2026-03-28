@@ -6,6 +6,7 @@ import { FavoriteDetail } from "./FavoriteDetail.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
+import { uploadToCloud, syncFromCloud } from "./favoriteSync.js";
 
 /**
  * 收藏夹管理组件
@@ -55,6 +56,7 @@ export function Favorite() {
       if (index > -1) {
         currentFavorites.splice(index, 1);
         saveFavorites(currentFavorites);
+        uploadToCloud(currentFavorites);
         setState({
           favorites: currentFavorites,
           statusMessage: "收藏夹已删除",
@@ -69,12 +71,25 @@ export function Favorite() {
 
       if (index <= 0) return;
 
+      // 交换位置
       [currentFavorites[index - 1], currentFavorites[index]] = [
         currentFavorites[index],
         currentFavorites[index - 1],
       ];
 
+      // 交换order值
+      [currentFavorites[index - 1].order, currentFavorites[index].order] = [
+        currentFavorites[index].order,
+        currentFavorites[index - 1].order,
+      ];
+
+      // 更新两个收藏夹的时间戳
+      const now = Date.now();
+      currentFavorites[index - 1].updatedAt = now;
+      currentFavorites[index].updatedAt = now;
+
       saveFavorites(currentFavorites);
+      uploadToCloud(currentFavorites);
       setState({ favorites: currentFavorites });
     };
 
@@ -85,12 +100,25 @@ export function Favorite() {
 
       if (index === -1 || index >= currentFavorites.length - 1) return;
 
+      // 交换位置
       [currentFavorites[index], currentFavorites[index + 1]] = [
         currentFavorites[index + 1],
         currentFavorites[index],
       ];
 
+      // 交换order值
+      [currentFavorites[index].order, currentFavorites[index + 1].order] = [
+        currentFavorites[index + 1].order,
+        currentFavorites[index].order,
+      ];
+
+      // 更新两个收藏夹的时间戳
+      const now = Date.now();
+      currentFavorites[index].updatedAt = now;
+      currentFavorites[index + 1].updatedAt = now;
+
       saveFavorites(currentFavorites);
+      uploadToCloud(currentFavorites);
       setState({ favorites: currentFavorites });
     };
 
@@ -133,6 +161,7 @@ export function Favorite() {
       favorite.updatedAt = Date.now();
 
       saveFavorites(currentFavorites);
+      uploadToCloud(currentFavorites);
       setState({
         favorites: currentFavorites,
         isEditing: false,
@@ -362,7 +391,7 @@ export function Favorite() {
         {/* 收藏夹列表或编辑表单 */}
         {isEditing ? renderEditForm() : renderFavoriteList()}
 
-        {/* 收藏夹详情 Modal */}
+        {/* 收藏夹详情Modal */}
         {showDetailModal && selectedFavorite && !isModalExist(generatedDetailModalId) && (
           <Modal
             visible={showDetailModal}
@@ -383,7 +412,7 @@ export function Favorite() {
           </Modal>
         )}
 
-        {/* 角色详情 Modal */}
+        {/* 角色详情Modal */}
         {showCharacterModal && selectedCharacterId && !isModalExist(generatedCharacterModalId) && (
           <Modal
             visible={showCharacterModal}
@@ -403,7 +432,12 @@ export function Favorite() {
 
   // 初始化加载收藏夹列表
   const loadFavorites = () => {
-    const favorites = getFavorites();
+    // 先从云端同步
+    let favorites = syncFromCloud();
+    
+    // 按order字段排序
+    favorites.sort((a, b) => (a.order || 0) - (b.order || 0));
+    
     setState({ favorites });
   };
 

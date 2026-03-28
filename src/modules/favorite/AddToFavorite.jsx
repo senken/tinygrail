@@ -2,6 +2,7 @@ import { Button } from "@src/components/Button.jsx";
 import { TrashIcon, StarIcon } from "@src/icons";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
+import { uploadToCloud } from "./favoriteSync.js";
 
 /**
  * 添加到收藏夹组件
@@ -49,11 +50,11 @@ export function AddToFavorite({ characterData }) {
     }
 
     if (isAdding) {
-      // 添加角色：获取头像并插入到第一个位置
+      // 获取头像并插入到第一个位置
       const avatarUrl = normalizeAvatar(characterData.Icon);
       favorite.cover.unshift(avatarUrl);
     } else {
-      // 移除角色：从封面中移除该头像
+      // 从封面中移除该角色头像
       const avatarUrl = normalizeAvatar(characterData.Icon);
       const coverIndex = favorite.cover.indexOf(avatarUrl);
       if (coverIndex > -1) {
@@ -65,6 +66,7 @@ export function AddToFavorite({ characterData }) {
     favorite.updatedAt = Date.now();
 
     saveFavorites(favorites);
+    uploadToCloud(favorites);
     renderFavoriteList();
   };
 
@@ -77,11 +79,13 @@ export function AddToFavorite({ characterData }) {
       name,
       color,
       characters: [],
+      order: favorites.length,
       createdAt: now,
       updatedAt: now,
     };
     favorites.push(newFavorite);
     saveFavorites(favorites);
+    uploadToCloud(favorites);
     return newFavorite;
   };
 
@@ -98,6 +102,7 @@ export function AddToFavorite({ characterData }) {
     if (index > -1) {
       favorites.splice(index, 1);
       saveFavorites(favorites);
+      uploadToCloud(favorites);
       renderFavoriteList();
       statusDiv.textContent = "收藏夹已删除";
     }
