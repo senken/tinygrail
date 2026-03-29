@@ -2,7 +2,7 @@ import { auctionCharacter, getAuctionList } from "@src/api/chara.js";
 import { Button } from "@src/components/Button.jsx";
 import { Tooltip } from "@src/components/Tooltip.jsx";
 import { QuestionIcon } from "@src/icons";
-import { formatCurrency } from "@src/utils/format";
+import { formatCurrency, formatNumber } from "@src/utils/format";
 
 /**
  * 拍卖组件
@@ -97,18 +97,18 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
         const value = getValue();
         amount = String(value);
         amountInput.value = String(value);
-        
+
         // 如果锁定总额，修改数量时自动调整价格
         if (isLockTotal && lockedTotal > 0) {
           const amountNum = Number(amount) || 0;
-          
+
           if (amountNum > 0) {
-            const newPrice = Math.ceil(lockedTotal / amountNum * 100) / 100;
+            const newPrice = Math.ceil((lockedTotal / amountNum) * 100) / 100;
             price = String(newPrice);
             priceInput.value = String(newPrice);
           }
         }
-        
+
         updateTotal();
       }}
     >
@@ -263,15 +263,19 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
           <div className="flex gap-2">
             <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
               <div className="text-xs opacity-60">竞拍人数</div>
-              <div className="bgm-color text-sm font-medium">{auction?.State || 0}</div>
+              <div className="bgm-color text-sm font-medium">
+                {formatNumber(auction?.State || 0, 0)}
+              </div>
             </div>
             <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
               <div className="text-xs opacity-60">竞拍数量</div>
-              <div className="bgm-color text-sm font-medium">{auction?.Type || 0}</div>
+              <div className="bgm-color text-sm font-medium">
+                {formatNumber(auction?.Type || 0, 0)}
+              </div>
             </div>
             <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
               <div className="text-xs opacity-60">英灵殿</div>
-              <div className="bgm-color text-sm font-medium">{maxAmount || 0}</div>
+              <div className="bgm-color text-sm font-medium">{formatNumber(maxAmount || 0, 0)}</div>
             </div>
           </div>
         </div>
@@ -287,13 +291,13 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
               <div className="flex-1 rounded-lg bg-orange-50 p-2 dark:bg-orange-900/20">
                 <div className="text-xs opacity-60">价格</div>
                 <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                  {formatCurrency(auction.Price)}
+                  {formatCurrency(auction.Price || 0)}
                 </div>
               </div>
               <div className="flex-1 rounded-lg bg-orange-50 p-2 dark:bg-orange-900/20">
                 <div className="text-xs opacity-60">数量</div>
                 <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
-                  {auction.Amount}
+                  {formatNumber(auction.Amount || 0, 0)}
                 </div>
               </div>
             </div>
