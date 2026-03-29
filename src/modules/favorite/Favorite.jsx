@@ -54,11 +54,19 @@ export function Favorite() {
 
       const index = currentFavorites.findIndex((f) => f.id === favoriteId);
       if (index > -1) {
-        currentFavorites.splice(index, 1);
+        // 标记为已删除
+        const now = Date.now();
+        currentFavorites[index].deleted = true;
+        currentFavorites[index].deletedAt = now;
+        currentFavorites[index].updatedAt = now;
+
         saveFavorites(currentFavorites);
         uploadToCloud(currentFavorites);
+
+        // 从显示列表中移除已删除的收藏夹
+        const visibleFavorites = currentFavorites.filter((f) => !f.deleted);
         setState({
-          favorites: currentFavorites,
+          favorites: visibleFavorites,
           statusMessage: "收藏夹已删除",
         });
       }

@@ -42,7 +42,10 @@ export function uploadToCloud(favorites) {
       return false;
     }
 
-    const favoritesStr = JSON.stringify(favorites);
+    // 上传前清理超过保留期的已删除项
+    const cleaned = cleanupDeletedFavorites(favorites);
+
+    const favoritesStr = JSON.stringify(cleaned);
 
     // 上传到云端
     chiiApp.cloud_settings.update({
@@ -58,7 +61,32 @@ export function uploadToCloud(favorites) {
 }
 
 /**
- * 合并本地和云端的收藏夹数据（基于时间戳）
+ * 清理超过保留期的已删除收藏夹
+ * @param {Array} favorites - 收藏夹列表
+ * @returns {Array} 清理后的列表
+ */
+function cleanupDeletedFavorites(favorites) {
+  const RETENTION_DAYS = 30; // 保留30天
+  const retentionTime = RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+
+  return favorites.filter((fav) => {
+    // 如果没有删除标记，保留
+    if (!fav.deleted) {
+      return true;
+    }
+
+    // 如果已删除，检查是否超过保留期
+    const deletedAt = fav.deletedAt || fav.updatedAt || 0;
+    const age = now - deletedAt;
+
+    // 超过保留期，彻底删除
+    return age < retentionTime;
+  });
+}
+
+/**
+ * 合并本地和云端的收藏夹数据（基于时间戳，支持软删除）
  * @param {Array} localFavorites - 本地收藏夹列表
  * @param {Array} cloudFavorites - 云端收藏夹列表
  * @returns {Object} { merged: 合并后的列表, hasChanges: 是否有变化 }
@@ -109,15 +137,18 @@ function mergeFavorites(localFavorites, cloudFavorites) {
     }
   });
 
-  // 按order字段排序
-  merged.sort((a, b) => (a.order || 0) - (b.order || 0));
+  // 清理超过保留期的已删除项
+  const cleaned = cleanupDeletedFavorites(merged);
 
-  return { merged, hasChanges };
+  // 按order字段排序
+  cleaned.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  return { merged: cleaned, hasChanges };
 }
 
 /**
  * 从云端同步收藏夹到本地
- * @returns {Array} 合并后的收藏夹列表
+ * @returns {Array} 合并后的收藏夹列表（过滤掉已删除的）
  */
 export function syncFromCloud() {
   try {
@@ -125,7 +156,7 @@ export function syncFromCloud() {
     const localFavorites = getFavorites();
 
     if (!cloudFavorites) {
-      return localFavorites;
+      return localFavorites.filter((f) => !f.deleted);
     }
 
     const { merged, hasChanges } = mergeFavorites(localFavorites, cloudFavorites);
@@ -134,10 +165,11 @@ export function syncFromCloud() {
       saveFavorites(merged);
     }
 
-    return merged;
+    // 返回时过滤掉已删除的收藏夹
+    return merged.filter((f) => !f.deleted);
   } catch (e) {
     console.error("从云端同步收藏夹失败:", e);
-    return getFavorites();
+    return getFavorites().filter((f) => !f.deleted);
   }
 }
 

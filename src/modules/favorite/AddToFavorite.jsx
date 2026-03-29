@@ -100,7 +100,12 @@ export function AddToFavorite({ characterData }) {
 
     const index = favorites.findIndex((f) => f.id === favoriteId);
     if (index > -1) {
-      favorites.splice(index, 1);
+      // 标记为已删除
+      const now = Date.now();
+      favorites[index].deleted = true;
+      favorites[index].deletedAt = now;
+      favorites[index].updatedAt = now;
+
       saveFavorites(favorites);
       uploadToCloud(favorites);
       renderFavoriteList();
@@ -133,7 +138,10 @@ export function AddToFavorite({ characterData }) {
   // 渲染收藏夹列表
   const renderFavoriteList = () => {
     favoriteListDiv.innerHTML = "";
-    const favorites = getFavorites();
+    const allFavorites = getFavorites();
+
+    // 过滤掉已删除的收藏夹
+    const favorites = allFavorites.filter((f) => !f.deleted);
 
     if (favorites.length === 0) {
       const emptyDiv = <div className="py-4 text-center text-sm opacity-60">暂无收藏夹</div>;
