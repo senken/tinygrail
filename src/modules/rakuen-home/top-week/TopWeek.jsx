@@ -3,6 +3,7 @@ import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getCover, normalizeAvatar } from "@src/utils/oos.js";
 import { formatCurrency, formatNumber } from "@src/utils/format.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { Button } from "@src/components/Button.jsx";
 import { Modal } from "@src/components/Modal.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
@@ -220,13 +221,13 @@ export function TopWeek() {
 
           const itemContainer = (
             <div
-              className="flex w-full flex-col gap-1"
+              className="tg-bg-content flex w-full flex-col overflow-hidden rounded-lg border border-gray-200 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700"
               data-character-id={item.CharacterId}
               data-rank={rank}
             >
               {/* 圣殿图片 */}
               <div
-                className="group relative aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-lg border-2"
+                className="group relative aspect-[3/4] w-full cursor-pointer overflow-hidden border-b-2"
                 style={{ borderColor: rankColor }}
                 onClick={() => handleTempleClick(item)}
               >
@@ -284,23 +285,41 @@ export function TopWeek() {
               </div>
 
               {/* 角色信息 */}
-              <div className="flex flex-col gap-0.5">
-                <div className="flex items-center justify-start gap-1 text-sm">
-                  <LevelBadge level={item.CharacterLevel} zeroCount={item.ZeroCount} />
+              <div className="flex flex-col gap-2 p-2">
+                <div className="flex items-center justify-between gap-1 text-sm">
                   <span
-                    className="tg-link cursor-pointer font-semibold opacity-80 hover:opacity-100"
+                    className="tg-link cursor-pointer truncate font-semibold opacity-80 hover:opacity-100"
                     onClick={() => handleCharacterClick(item.CharacterId)}
+                    title={item.CharacterName}
                   >
                     {item.CharacterName}
                   </span>
+                  <LevelBadge level={item.CharacterLevel} zeroCount={item.ZeroCount} />
                 </div>
-                <div
-                  className="tg-link cursor-pointer text-xs opacity-60 hover:opacity-100"
-                  title="竞拍人数 / 竞拍数量 / 拍卖总数"
-                  onClick={() => handleAuctionClick(item)}
-                >
-                  {formatNumber(item.Type || 0, 0)} / {formatNumber(item.Assets || 0, 0)} /{" "}
-                  {formatNumber(item.Sacrifices || 0, 0)}
+
+                {/* 数据信息 */}
+                <div className="flex flex-col gap-0.5">
+                  <div className="truncate text-xs opacity-60" title="竞拍人数 • 竞拍数量">
+                    <span>{formatNumber(item.Type || 0, 0)} 人</span>
+                    <span className="mx-1.5">•</span>
+                    <span>{formatNumber(item.Assets || 0, 0)} 股</span>
+                  </div>
+                  <div className="truncate text-xs opacity-60">
+                    <span>英灵殿：{formatNumber(item.Sacrifices || 0, 0)} 股</span>
+                  </div>
+                </div>
+
+                {/* 均价和竞拍按钮 */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="bgm-color truncate text-sm font-bold" title="均价">
+                    {formatCurrency(
+                      ((item.Extra || 0) + (item.Price || 0) * (item.Sacrifices || 0)) /
+                        (item.Assets || 1)
+                    )}
+                  </div>
+                  <Button size="sm" rounded="full" onClick={() => handleAuctionClick(item)}>
+                    竞拍
+                  </Button>
                 </div>
               </div>
             </div>
@@ -311,7 +330,7 @@ export function TopWeek() {
 
       // 计算列数（12的因数：12, 6, 4, 3, 2, 1）
       const calculateColumns = (width) => {
-        const minCellWidth = 120;
+        const minCellWidth = 160;
         const gap = 16;
 
         // 计算可以容纳的最大列数
