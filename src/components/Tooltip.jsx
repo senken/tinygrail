@@ -8,10 +8,16 @@ import { createMountedComponent } from "@src/utils/createMountedComponent.js";
  * @param {JSX.Element|string} props.content - Tooltip内容
  * @param {('hover'|'click')} props.trigger - 触发方式
  * @param {('top'|'bottom'|'left'|'right')} props.placement - 位置
+ * @param {string} props.width - Tooltip宽度，默认 "10rem"
  */
-export function Tooltip({ children, content, trigger = "hover", placement = "top" }) {
+export function Tooltip({
+  children,
+  content,
+  trigger = "hover",
+  placement = "top",
+  width = "10rem",
+}) {
   const container = <div id="tg-tooltip" className="relative inline-block" />;
-  let tooltipRef = null;
 
   const { setState } = createMountedComponent(
     container,
@@ -57,8 +63,8 @@ export function Tooltip({ children, content, trigger = "hover", placement = "top
           {visible && (
             <div
               id="tg-tooltip-content"
-              ref={(el) => (tooltipRef = el)}
-              className={`absolute z-50 whitespace-nowrap rounded border border-gray-200 bg-white px-2 py-1 text-xs text-gray-900 shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 ${placementClasses[placement]}`}
+              className={`absolute z-50 rounded border border-gray-200 bg-white px-2 py-1 text-xs text-gray-900 shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 ${placementClasses[placement]}`}
+              style={{ width: "max-content", maxWidth: width, pointerEvents: "none" }}
             >
               {content}
             </div>

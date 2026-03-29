@@ -1,5 +1,7 @@
 import { auctionCharacter, getAuctionList } from "@src/api/chara.js";
 import { Button } from "@src/components/Button.jsx";
+import { Tooltip } from "@src/components/Tooltip.jsx";
+import { QuestionIcon } from "@src/icons";
 import { formatCurrency } from "@src/utils/format";
 
 /**
@@ -14,9 +16,11 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
   let price = minPrice.toString();
   let amount = maxAmount;
   let auctionData = null;
+  let isLockTotal = false; // 是否锁定总额
+  let lockedTotal = 0; // 锁定的总额
 
   const totalDiv = (
-    <div id="tg-auction-total" className="text-sm opacity-60">
+    <div id="tg-auction-total" className="text-xs opacity-60">
       合计：{formatCurrency(minPrice * maxAmount)}
     </div>
   );
@@ -37,6 +41,18 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       value={minPrice}
       onInput={(e) => {
         price = e.target.value;
+
+        // 如果锁定总额，修改价格时自动调整数量
+        if (isLockTotal && lockedTotal > 0) {
+          const priceNum = Number(price) || 0;
+
+          if (priceNum > 0) {
+            const newAmount = Math.ceil(lockedTotal / priceNum);
+            amount = String(newAmount);
+            amountInput.value = String(newAmount);
+          }
+        }
+
         updateTotal();
       }}
       min={minPrice}
@@ -53,6 +69,18 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       value={amount}
       onInput={(e) => {
         amount = e.target.value;
+
+        // 如果锁定总额，修改数量时自动调整价格
+        if (isLockTotal && lockedTotal > 0) {
+          const amountNum = Number(amount) || 0;
+
+          if (amountNum > 0) {
+            const newPrice = Math.ceil((lockedTotal / amountNum) * 100) / 100;
+            price = String(newPrice);
+            priceInput.value = String(newPrice);
+          }
+        }
+
         updateTotal();
       }}
       min="0"
@@ -60,9 +88,102 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
     />
   );
 
+  // 快速输入按钮
+  const createQuickButton = (text, getValue) => (
+    <button
+      type="button"
+      className="bgm-color hover:bgm-bg w-fit whitespace-nowrap rounded-full border border-current px-2 py-0.5 text-xs font-medium transition-all hover:border-transparent hover:text-white"
+      onClick={() => {
+        const value = getValue();
+        amount = String(value);
+        amountInput.value = String(value);
+        
+        // 如果锁定总额，修改数量时自动调整价格
+        if (isLockTotal && lockedTotal > 0) {
+          const amountNum = Number(amount) || 0;
+          
+          if (amountNum > 0) {
+            const newPrice = Math.ceil(lockedTotal / amountNum * 100) / 100;
+            price = String(newPrice);
+            priceInput.value = String(newPrice);
+          }
+        }
+        
+        updateTotal();
+      }}
+    >
+      {text}
+    </button>
+  );
+
+  // 拍满按钮
+  const fillButton = createQuickButton("拍满", () => {
+    const auctionedAmount = auctionData?.[0]?.Type || 0; // 已竞拍数量
+    const myAmount = auctionData?.[0]?.Amount || 0; // 我的出价数量
+
+    if (myAmount > 0) {
+      const remaining = maxAmount - (auctionedAmount - myAmount);
+      return Math.max(0, remaining);
+    } else {
+      const remaining = maxAmount - auctionedAmount;
+      return Math.max(0, remaining);
+    }
+  });
+
+  // 英灵殿按钮
+  const maxAmountButton = createQuickButton("英灵殿", () => {
+    return maxAmount;
+  });
+
+  const quickButtonsDiv = (
+    <div className="flex gap-2">
+      {fillButton}
+      {maxAmountButton}
+    </div>
+  );
+
+  // 锁定总额复选框
+  const checkboxContainer = (
+    <div className="relative inline-flex cursor-pointer">
+      <input
+        type="checkbox"
+        id="tg-auction-lock-checkbox"
+        className="peer sr-only"
+        onChange={(e) => {
+          isLockTotal = e.target.checked;
+          // 更新复选框状态
+          const indicator = document.getElementById("tg-auction-lock-indicator");
+          if (indicator) {
+            indicator.style.display = e.target.checked ? "block" : "none";
+          }
+        }}
+      />
+      <div className="flex h-4 w-4 items-center justify-center rounded border-2 border-gray-400 bg-white transition-colors peer-checked:border-blue-500 dark:bg-gray-800">
+        <div
+          id="tg-auction-lock-indicator"
+          className="h-2 w-2 rounded-sm bg-blue-500"
+          style={{ display: "none" }}
+        />
+      </div>
+    </div>
+  );
+
   const statusDiv = <div />;
 
   const auctionInfoContainer = <div style={{ display: "none" }} className="flex flex-col gap-1" />;
+
+  // 锁定总额复选框容器
+  const lockTotalContainer = (
+    <div className="flex items-center gap-1" style={{ display: "none" }}>
+      <label className="flex cursor-pointer items-center gap-2">
+        {checkboxContainer}
+        <span className="text-sm opacity-60">锁定总额</span>
+      </label>
+      <Tooltip content="开启后，修改价格或数量时会自动调整另一个值，保持总额不变" trigger="click">
+        <QuestionIcon className="h-3.5 w-3.5 cursor-pointer opacity-60" />
+      </Tooltip>
+    </div>
+  );
 
   const updateStatus = (msg, type) => {
     if (msg) {
@@ -129,59 +250,77 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
         updateStatus("", "");
       }
 
-      // 更新拍卖信息显示
-      if (auctionData && auctionData.length > 0) {
-        const auction = auctionData[0];
+      // 清空容器
+      auctionInfoContainer.innerHTML = "";
 
-        auctionInfoContainer.innerHTML = "";
-        let hasInfo = false;
+      // 获取拍卖数据
+      const auction = auctionData && auctionData.length > 0 ? auctionData[0] : null;
 
-        // 显示竞拍人数和竞拍数量
-        if (auction.State != 0) {
-          hasInfo = true;
-          const info = (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              <span>
-                竞拍人数：<span className="bgm-color">{auction.State}</span>
-              </span>
-              <span className="mx-2">•</span>
-              <span>
-                竞拍数量：<span className="bgm-color">{auction.Type}</span>
-              </span>
+      // 竞拍信息区域
+      const infoSection = (
+        <div className="space-y-2">
+          <div className="text-xs font-medium opacity-60">竞拍信息</div>
+          <div className="flex gap-2">
+            <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+              <div className="text-xs opacity-60">竞拍人数</div>
+              <div className="bgm-color text-sm font-medium">{auction?.State || 0}</div>
             </div>
-          );
-          auctionInfoContainer.appendChild(info);
-        }
-
-        // 显示我的出价和数量
-        if (auction.Price != 0) {
-          hasInfo = true;
-          const myInfo = (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              <span>
-                出价：<span className="bgm-color">{formatCurrency(auction.Price)}</span>
-              </span>
-              <span className="mx-2">•</span>
-              <span>
-                拍卖数量：<span className="bgm-color">{auction.Amount}</span>
-              </span>
+            <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+              <div className="text-xs opacity-60">竞拍数量</div>
+              <div className="bgm-color text-sm font-medium">{auction?.Type || 0}</div>
             </div>
-          );
-          auctionInfoContainer.appendChild(myInfo);
+            <div className="flex-1 rounded-lg bg-gray-50 p-2 dark:bg-gray-800">
+              <div className="text-xs opacity-60">英灵殿</div>
+              <div className="bgm-color text-sm font-medium">{maxAmount || 0}</div>
+            </div>
+          </div>
+        </div>
+      );
+      auctionInfoContainer.appendChild(infoSection);
 
-          // 设置输入框默认值为我的出价和数量
-          price = auction.Price;
-          amount = auction.Amount;
-          priceInput.value = price;
-          amountInput.value = amount;
-          updateTotal();
-        }
+      // 我的出价区域（如果有）
+      if (auction && auction.Price != 0) {
+        const myInfoSection = (
+          <div className="space-y-2">
+            <div className="text-xs font-medium opacity-60">我的出价</div>
+            <div className="flex gap-2">
+              <div className="flex-1 rounded-lg bg-orange-50 p-2 dark:bg-orange-900/20">
+                <div className="text-xs opacity-60">价格</div>
+                <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                  {formatCurrency(auction.Price)}
+                </div>
+              </div>
+              <div className="flex-1 rounded-lg bg-orange-50 p-2 dark:bg-orange-900/20">
+                <div className="text-xs opacity-60">数量</div>
+                <div className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                  {auction.Amount}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+        auctionInfoContainer.appendChild(myInfoSection);
 
-        // 只有在有信息时才显示容器
-        if (hasInfo) {
-          auctionInfoContainer.style.display = "flex";
-        }
+        // 设置输入框默认值为我的出价和数量
+        price = auction.Price;
+        amount = auction.Amount;
+        priceInput.value = price;
+        amountInput.value = amount;
+        updateTotal();
+
+        // 设置锁定的总额（基于我的出价）
+        lockedTotal = auction.Price * auction.Amount;
+
+        // 显示锁定总额复选框
+        lockTotalContainer.style.display = "flex";
+      } else {
+        // 没有出价时隐藏开关并重置锁定总额
+        lockTotalContainer.style.display = "none";
+        lockedTotal = 0;
       }
+
+      // 显示容器
+      auctionInfoContainer.style.display = "flex";
     } else {
       if (showLoading) {
         updateStatus(result.message, "error");
@@ -199,21 +338,25 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       id="tg-auction"
       data-character-id={characterId}
       data-base-price={basePrice}
-      className="flex min-w-64 flex-col gap-4"
+      className="flex min-w-64 flex-col gap-2"
     >
       {/* 拍卖信息 */}
       {auctionInfoContainer}
 
+      {/* 锁定总额复选框*/}
+      {lockTotalContainer}
+
       {/* 价格输入 */}
-      <div className="flex flex-col gap-2">
-        <label className="text-sm opacity-40">价格</label>
+      <div className="flex flex-col gap-1">
+        <label className="text-sm font-medium opacity-60">价格</label>
         {priceInput}
       </div>
 
       {/* 数量输入 */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm opacity-40">数量</label>
+        <label className="text-sm font-medium opacity-60">数量</label>
         {amountInput}
+        {quickButtonsDiv}
       </div>
 
       {/* 合计 */}
