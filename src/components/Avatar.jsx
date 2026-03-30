@@ -5,10 +5,19 @@
  * @param {string} props.alt - 图片描述
  * @param {('sm'|'md'|'lg')} props.size - 尺寸
  * @param {number} props.rank - 排名
+ * @param {boolean} props.isBanned - 是否被封禁
  * @param {Function} props.onClick - 点击回调
  * @param {string} props.className - 额外的类名
  */
-export function Avatar({ src, alt = "avatar", size = "md", rank, onClick, className = "" }) {
+export function Avatar({
+  src,
+  alt = "avatar",
+  size = "md",
+  rank,
+  isBanned = false,
+  onClick,
+  className = "",
+}) {
   const sizeClasses = {
     sm: "h-10 w-10",
     md: "h-12 w-12",
@@ -23,11 +32,12 @@ export function Avatar({ src, alt = "avatar", size = "md", rank, onClick, classN
 
   const baseClasses = "tg-avatar flex-shrink-0";
   const interactiveClasses = onClick ? "cursor-pointer transition-transform hover:scale-105" : "";
+  const borderClasses = isBanned ? "border-red-500" : "border-gray-300 dark:border-white/30";
 
   return (
     <div
       id="tg-user-avatar"
-      className={`relative rounded-full border-2 border-white/30 ${interactiveClasses} ${className}`}
+      className={`tg-avatar-border relative border-2 ${borderClasses} ${interactiveClasses} ${className}`}
     >
       <div
         className={`${baseClasses} ${sizeClasses[size]}`}

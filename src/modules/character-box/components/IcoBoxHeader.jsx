@@ -3,6 +3,7 @@ import { formatCurrency, formatNumber, formatDateTime } from "@src/utils/format.
 import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
 
 /**
  * ICO盒子头部组件
@@ -20,19 +21,14 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   const avatarUrl = normalizeAvatar(Icon);
 
   // 获取包含当前角色的收藏夹
-  const getFavoritesForCharacter = () => {
-    try {
-      const data = localStorage.getItem("tinygrail:favorites");
-      if (!data) return [];
-      const favorites = JSON.parse(data);
-      return favorites.filter((f) => f.characters && f.characters.includes(CharacterId));
-    } catch (e) {
-      console.error("获取收藏夹失败:", e);
-      return [];
-    }
+  const getCharacterFavorites = () => {
+    const favorites = getFavorites();
+    return favorites.filter(
+      (f) => !f.deleted && f.characters && f.characters.includes(CharacterId)
+    );
   };
 
-  const characterFavorites = getFavoritesForCharacter();
+  const characterFavorites = getCharacterFavorites();
 
   // 计算进度条百分比
   const percent = Math.round((Total / predicted.Next) * 100);
@@ -89,9 +85,13 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
         {/* 头像 */}
         <div
           id="tg-ico-box-header-avatar"
-          className="size-[72px] flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
-          style={{ backgroundImage: `url(${avatarUrl})` }}
-        />
+          className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30"
+        >
+          <div
+            className="tg-avatar size-[72px] bg-cover bg-top"
+            style={{ backgroundImage: `url(${avatarUrl})` }}
+          />
+        </div>
 
         {/* 信息 */}
         <div id="tg-ico-box-header-info" className="flex min-w-0 flex-col justify-center gap-px">
@@ -139,7 +139,6 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
             {/* 收藏夹标签列表 */}
             {characterFavorites.map((favorite) => (
               <span
-                key={favorite.id}
                 className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
               >
                 {favorite.name}

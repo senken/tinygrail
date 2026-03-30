@@ -19,14 +19,14 @@ export function RateRank({ data, currentPage = 1, onPageChange, onCharacterClick
   }
 
   const container = <div id="tg-rakuen-home-rate-rank" className="flex w-full flex-col gap-4" />;
-  const gridDiv = <div id="tg-rakuen-home-rate-rank-list" className="grid w-full gap-4" />;
+  const gridDiv = <div id="tg-rakuen-home-rate-rank-list" className="grid w-full" />;
   const paginationDiv = <div id="tg-rakuen-home-rate-rank-pagination" className="flex w-full justify-center" />;
 
   // 渲染函数
   const renderItems = (cols) => {
     gridDiv.innerHTML = "";
     gridDiv.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-    gridDiv.style.gap = "16px";
+    gridDiv.style.gap = "0px";
 
     data.forEach((item, index) => {
       const pageSize = 20;
@@ -43,7 +43,7 @@ export function RateRank({ data, currentPage = 1, onPageChange, onCharacterClick
   // 计算列数
   const calculateColumns = (width) => {
     const minCellWidth = 200;
-    const gap = 16;
+    const gap = 0;
 
     // 计算可以容纳的最大列数
     let cols = Math.floor((width + gap) / (minCellWidth + gap));

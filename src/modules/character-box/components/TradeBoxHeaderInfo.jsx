@@ -1,6 +1,7 @@
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
 import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
+import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
 
 /**
  * 交易盒子头像和基本信息组件
@@ -21,28 +22,27 @@ export function TradeBoxHeaderInfo(props) {
   const avatarUrl = normalizeAvatar(Icon);
 
   // 获取包含当前角色的收藏夹
-  const getFavoritesForCharacter = () => {
-    try {
-      const data = localStorage.getItem("tinygrail:favorites");
-      if (!data) return [];
-      const favorites = JSON.parse(data);
-      return favorites.filter((f) => f.characters && f.characters.includes(CharacterId));
-    } catch (e) {
-      console.error("获取收藏夹失败:", e);
-      return [];
-    }
+  const getCharacterFavorites = () => {
+    const favorites = getFavorites();
+    return favorites.filter(
+      (f) => !f.deleted && f.characters && f.characters.includes(CharacterId)
+    );
   };
 
-  const characterFavorites = getFavoritesForCharacter();
+  const characterFavorites = getCharacterFavorites();
 
   return (
     <div id="tg-trade-box-header-info" className="flex gap-3 pb-2">
       {/* 头像 */}
       <div
         id="tg-trade-box-header-avatar"
-        className="size-14 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
-        style={{ backgroundImage: `url(${avatarUrl})` }}
-      />
+        className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30"
+      >
+        <div
+          className="tg-avatar size-14 bg-cover bg-top"
+          style={{ backgroundImage: `url(${avatarUrl})` }}
+        />
+      </div>
 
       {/* 名称和ID */}
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
@@ -77,7 +77,6 @@ export function TradeBoxHeaderInfo(props) {
           {/* 收藏夹标签列表 */}
           {characterFavorites.map((favorite) => (
             <span
-              key={favorite.id}
               className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
             >
               {favorite.name}

@@ -9,6 +9,7 @@ import { getMaxValueICO, getRecentActiveICO, getMostRecentICO } from "@src/api/c
 import { calculateICO } from "@src/utils/ico.js";
 import { formatCurrency, formatNumber, formatRemainingTime } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
+import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
 
 /**
  * ICO Tab组件
@@ -144,22 +145,34 @@ export function ICOTab() {
         setInterval(updateCountdown, 1000);
       }
 
+      // 获取角色所在的收藏夹
+      const getCharacterFavorites = () => {
+        const favorites = getFavorites();
+        return favorites.filter(
+          (f) => !f.deleted && f.characters && f.characters.includes(item.CharacterId)
+        );
+      };
+
+      const characterFavorites = getCharacterFavorites();
+
       const icoItem = (
         <div
           data-character-id={item.CharacterId}
-          className="tg-bg-content tg-border-card flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-3 transition-shadow hover:shadow-md"
+          className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-4"
           onClick={() => handleCharacterClick(item.CharacterId)}
         >
           {/* 头像 */}
           <div className="relative">
-            <div
-              className="tg-avatar h-16 w-16 border-2 border-white/30"
-              style={{
-                backgroundImage: `url(${normalizeAvatar(item.Icon)})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center top",
-              }}
-            />
+            <div className="tg-avatar-border border-2 border-gray-300 dark:border-white/30">
+              <div
+                className="tg-avatar h-16 w-16"
+                style={{
+                  backgroundImage: `url(${normalizeAvatar(item.Icon)})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center top",
+                }}
+              />
+            </div>
             {/* 排名 */}
             <div
               className="absolute left-0 top-0 -translate-x-1/4 -translate-y-1/4 rounded px-1.5 text-sm font-bold text-white shadow-md"
@@ -186,6 +199,19 @@ export function ICOTab() {
                 {item.Name}
               </span>
             </div>
+
+            {/* 收藏标签行 */}
+            {characterFavorites.length > 0 && (
+              <div className="flex w-full flex-wrap items-center justify-center gap-1 px-2">
+                {characterFavorites.map((favorite) => (
+                  <span
+                    className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+                  >
+                    {favorite.name}
+                  </span>
+                ))}
+              </div>
+            )}
 
             {/* 资金和人数 */}
             <div className="text-xs opacity-80">
@@ -250,14 +276,14 @@ export function ICOTab() {
       }
 
       const gridContainer = <div className="flex w-full flex-col gap-4" />;
-      const gridDiv = <div className="grid w-full gap-4" />;
+      const gridDiv = <div className="grid w-full" />;
       const paginationDiv = <div className="flex w-full justify-center" />;
 
       // 渲染函数
       const renderItems = (cols) => {
         gridDiv.innerHTML = "";
         gridDiv.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-        gridDiv.style.gap = "16px";
+        gridDiv.style.gap = "0px";
 
         // 计算当前页显示的数据
         const startIndex = (currentPage - 1) * pageSize;
@@ -274,7 +300,7 @@ export function ICOTab() {
       // 计算列数
       const calculateColumns = (width) => {
         const minCellWidth = 200;
-        const gap = 16;
+        const gap = 0;
 
         let cols = Math.floor((width + gap) / (minCellWidth + gap));
 

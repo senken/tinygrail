@@ -1,4 +1,4 @@
-import { auctionCharacter, getAuctionList } from "@src/api/chara.js";
+import { auctionCharacter, getAuctionList, cancelAuction } from "@src/api/chara.js";
 import { Button } from "@src/components/Button.jsx";
 import { Tooltip } from "@src/components/Tooltip.jsx";
 import { QuestionIcon } from "@src/icons";
@@ -204,6 +204,33 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
   };
 
   /**
+   * 处理取消竞拍
+   * @returns {Promise<void>}
+   */
+  const handleCancelAuction = async () => {
+    if (!auctionData || !auctionData[0] || !auctionData[0].Id) {
+      updateStatus("没有可取消的竞拍", "error");
+      return;
+    }
+
+    if (!confirm("确定要取消竞拍吗？")) {
+      return;
+    }
+
+    updateStatus("处理中...", "");
+
+    const result = await cancelAuction(auctionData[0].Id);
+
+    if (result.success) {
+      updateStatus("取消竞拍成功", "success");
+      // 取消成功后刷新数据
+      await loadAuctionList(false);
+    } else {
+      updateStatus(result.message || "取消竞拍失败", "error");
+    }
+  };
+
+  /**
    * 处理提交
    * @returns {Promise<void>}
    */
@@ -370,8 +397,11 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       {statusDiv}
 
       {/* 提交按钮 */}
-      <div className="flex justify-end">
-        <Button onClick={handleSubmit}>拍卖</Button>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={handleCancelAuction}>
+          取消竞拍
+        </Button>
+        <Button onClick={handleSubmit}>竞拍</Button>
       </div>
     </div>
   );

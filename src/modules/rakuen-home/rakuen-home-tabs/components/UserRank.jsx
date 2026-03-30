@@ -52,7 +52,7 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
   const renderItems = (cols) => {
     gridDiv.innerHTML = "";
     gridDiv.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-    gridDiv.style.gap = "16px";
+    gridDiv.style.gap = "0px";
 
     data.forEach((item, index) => {
       const pageSize = 20;
@@ -63,7 +63,7 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
 
       const userItem = (
         <div
-          className="tg-bg-content tg-border-card flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-3 transition-shadow hover:shadow-md"
+          className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-4"
           onClick={() => {
             if (onUserClick) {
               onUserClick(item.Name);
@@ -72,9 +72,13 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
           data-user-name={item.Name}
           data-rank={currentRank}
         >
-          <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
-            <Avatar src={item.Avatar} alt={nickname} size="lg" rank={currentRank} />
-          </div>
+          <Avatar
+            src={item.Avatar}
+            alt={nickname}
+            size="lg"
+            rank={currentRank}
+            isBanned={isBanned}
+          />
           <div className="flex w-full min-w-0 flex-col items-center gap-2">
             <div className="flex w-full min-w-0 items-center justify-center gap-2 px-2">
               <span
@@ -149,7 +153,7 @@ export function UserRank({ data, currentPage = 1, onPageChange, onUserClick }) {
   // 计算列数
   const calculateColumns = (width) => {
     const minCellWidth = 200; // 最小单元格宽度
-    const gap = 16;
+    const gap = 0;
 
     // 计算可以容纳的最大列数
     let cols = Math.floor((width + gap) / (minCellWidth + gap));

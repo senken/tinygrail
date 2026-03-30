@@ -176,10 +176,12 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
           >
             {/* 头像 */}
             <div className="relative">
-              <div
-                className="size-16 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
-                style={{ backgroundImage: `url(${avatarUrl})` }}
-              />
+              <div className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30">
+                <div
+                  className="tg-avatar size-14 bg-cover bg-top"
+                  style={{ backgroundImage: `url(${avatarUrl})` }}
+                />
+              </div>
               <div className="absolute -left-1 -top-1">
                 <LevelBadge level={item.Level} zeroCount={item.ZeroCount} type={badgeType} />
               </div>

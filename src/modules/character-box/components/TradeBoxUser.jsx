@@ -105,14 +105,13 @@ export function TradeBoxUser({
           onClick={() => openUserModal && openUserModal(user.Name)}
         >
           {/* 头像 */}
-          <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
-            <Avatar
-              src={normalizeAvatar(user.Avatar)}
-              alt={user.Nickname}
-              size="sm"
-              rank={user.LastIndex}
-            />
-          </div>
+          <Avatar
+            src={normalizeAvatar(user.Avatar)}
+            alt={user.Nickname}
+            size="sm"
+            rank={user.LastIndex}
+            isBanned={isBanned}
+          />
 
           {/* 用户信息 */}
           <div className="min-w-0 flex-1">

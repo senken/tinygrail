@@ -1,12 +1,13 @@
 import { getLatestLinks } from "@src/api/chara.js";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { TempleLink } from "@src/components/TempleLink.jsx";
-import { formatNumber } from "@src/utils/format.js";
-import { Pagination } from "@src/components/Pagination.jsx";
 import { Modal } from "@src/components/Modal.jsx";
+import { Pagination } from "@src/components/Pagination.jsx";
+import { TempleLink } from "@src/components/TempleLink.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { unescapeHtml } from "@src/utils/escape";
+import { formatNumber } from "@src/utils/format.js";
 
 /**
  * 最新连接组件
@@ -152,7 +153,7 @@ export function LatestLinks() {
                   className="tg-link cursor-pointer text-xs opacity-80 hover:opacity-100"
                   onClick={() => handleUserClick(temple1.Name)}
                 >
-                  @{temple1.Nickname} +{formatNumber(minAssets, 0)}
+                  @{unescapeHtml(temple1.Nickname)} +{formatNumber(minAssets, 0)}
                 </div>
               </div>
             );

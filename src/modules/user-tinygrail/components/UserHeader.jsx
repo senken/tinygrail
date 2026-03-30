@@ -53,9 +53,12 @@ export function UserHeader({
         {/* 头像 */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className={isBanned ? "rounded-full border-2 border-red-500" : ""}>
-              <Avatar src={avatar} alt={nickname} rank={lastIndex > 0 ? lastIndex : null} />
-            </div>
+            <Avatar
+              src={avatar}
+              alt={nickname}
+              rank={lastIndex > 0 ? lastIndex : null}
+              isBanned={isBanned}
+            />
             <div className="flex flex-col gap-0.5">
               <a
                 target="_blank"

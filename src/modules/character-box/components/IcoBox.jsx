@@ -40,7 +40,7 @@ export function IcoBox({
   const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
 
   // 其他区域的stickyTop需要加上IcoBoxHeader的高度
-  const otherStickyTop = stickyTop + 148;
+  const otherStickyTop = stickyTop + 152;
 
   return (
     <div id="tg-ico-box" data-character-id={data.CharacterId} className="flex flex-col">

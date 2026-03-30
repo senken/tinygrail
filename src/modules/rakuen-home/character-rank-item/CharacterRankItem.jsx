@@ -2,6 +2,7 @@ import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { ChangeBadge } from "@src/components/ChangeBadge.jsx";
 import { formatCurrency, formatTimeAgo } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
+import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
 
 /**
  * 角色排行项组件
@@ -34,10 +35,18 @@ export function CharacterRankItem({ item, rank, onClick }) {
 
   const fluctuationInfo = getFluctuationInfo(item.Fluctuation);
 
+  // 获取角色所在的收藏夹
+  const getCharacterFavorites = () => {
+    const favorites = getFavorites();
+    return favorites.filter((f) => !f.deleted && f.characters && f.characters.includes(item.Id));
+  };
+
+  const characterFavorites = getCharacterFavorites();
+
   return (
     <div
       data-character-id={item.Id}
-      className="tg-bg-content tg-border-card flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-3 transition-shadow hover:shadow-md"
+      className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-4"
       onClick={() => {
         if (onClick) {
           onClick(item.Id);
@@ -46,14 +55,16 @@ export function CharacterRankItem({ item, rank, onClick }) {
     >
       {/* 头像 */}
       <div className="relative">
-        <div
-          className="tg-avatar h-16 w-16 border-2 border-white/30"
-          style={{
-            backgroundImage: `url(${normalizeAvatar(item.Icon)})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center top",
-          }}
-        />
+        <div className="tg-avatar-border border-2 border-gray-300 dark:border-white/30">
+          <div
+            className="tg-avatar h-16 w-16"
+            style={{
+              backgroundImage: `url(${normalizeAvatar(item.Icon)})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center top",
+            }}
+          />
+        </div>
         {/* 排名 */}
         <div
           className="absolute left-0 top-0 -translate-x-1/4 -translate-y-1/4 rounded px-1.5 text-sm font-bold text-white shadow-md"
@@ -73,6 +84,18 @@ export function CharacterRankItem({ item, rank, onClick }) {
             {item.CharacterName || item.Name}
           </span>
         </div>
+        {/* 收藏标签行 */}
+        {characterFavorites.length > 0 && (
+          <div className="flex w-full flex-wrap items-center justify-center gap-1 px-2">
+            {characterFavorites.map((favorite) => (
+              <span
+                className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+              >
+                {favorite.name}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="flex w-full min-w-0 flex-col gap-1.5 text-xs">
           <div
             className="flex min-w-0 items-center justify-center gap-2"

@@ -57,6 +57,14 @@
       border-radius: 8px;
     }
 
+    .tg-avatar-border {
+      border-radius: 50%;
+    }
+
+    .tg-avatar-border:is(html[data-avatar-size="square"] *) {
+      border-radius: 10px;
+    }
+
     .tg-spin {
       animation: tg-spin 1s linear infinite;
     }

@@ -18,7 +18,12 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
   const container = <div id="tg-rakuen-home-babel-tower-log" className="flex flex-col gap-2" />;
 
   // 日志列表容器
-  const logsContainer = <div id="tg-rakuen-home-babel-tower-log-list" className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700" />;
+  const logsContainer = (
+    <div
+      id="tg-rakuen-home-babel-tower-log-list"
+      className="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+    />
+  );
   container.appendChild(logsContainer);
 
   // 分页容器
@@ -149,10 +154,12 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         onClick={() => onOpenCharacter && onOpenCharacter(log.CharacterId)}
       >
         {/* 头像 */}
-        <div
-          className="h-10 w-10 flex-shrink-0 cursor-pointer rounded bg-cover bg-top"
-          style={{ backgroundImage: `url(${normalizeAvatar(log.Icon)})` }}
-        />
+        <div className="tg-avatar-border flex-shrink-0 cursor-pointer border-2 border-gray-300 dark:border-white/30">
+          <div
+            className="tg-avatar h-10 w-10 bg-cover bg-top"
+            style={{ backgroundImage: `url(${normalizeAvatar(log.Icon)})` }}
+          />
+        </div>
 
         {/* 信息 */}
         <div className="flex min-w-0 flex-1 flex-col gap-1">

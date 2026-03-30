@@ -78,7 +78,7 @@ export function STTab() {
       const gridContainer = (
         <div id="tg-rakuen-home-st-content" className="flex w-full flex-col gap-4" />
       );
-      const gridDiv = <div id="tg-rakuen-home-st-list" className="grid w-full gap-4" />;
+      const gridDiv = <div id="tg-rakuen-home-st-list" className="grid w-full" />;
       const paginationDiv = (
         <div id="tg-rakuen-home-st-pagination" className="flex w-full justify-center" />
       );
@@ -87,7 +87,7 @@ export function STTab() {
       const renderItems = (cols) => {
         gridDiv.innerHTML = "";
         gridDiv.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
-        gridDiv.style.gap = "16px";
+        gridDiv.style.gap = "0px";
 
         stData.items.forEach((item, index) => {
           const pageSize = 24;
@@ -111,7 +111,7 @@ export function STTab() {
       // 计算列数
       const calculateColumns = (width) => {
         const minCellWidth = 200;
-        const gap = 16;
+        const gap = 0;
 
         let cols = Math.floor((width + gap) / (minCellWidth + gap));
 

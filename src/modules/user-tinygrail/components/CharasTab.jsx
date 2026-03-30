@@ -2,6 +2,7 @@ import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
 
 /**
  * 角色列表Tab
@@ -24,63 +25,72 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
   const paginationDiv = <div className="flex w-full justify-center" />;
 
   // 渲染函数
-  const renderItems = (cols, isMobile) => {
+  const renderItems = (cols) => {
     gridDiv.innerHTML = "";
 
-    if (isMobile) {
-      // 移动端布局
-      gridDiv.style.display = "flex";
-      gridDiv.style.flexDirection = "column";
-      gridDiv.style.gap = "0";
-    } else {
-      // PC端布局
-      gridDiv.style.display = "grid";
-      gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      gridDiv.style.gap = "0.75rem";
-    }
+    gridDiv.style.display = "grid";
+    gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    gridDiv.style.gap = "0rem";
 
     data.items.forEach((item) => {
       const avatarUrl = normalizeAvatar(item.Icon);
 
+      // 获取角色所在的收藏夹
+      const favorites = getFavorites();
+      const characterFavorites = favorites.filter(
+        (f) => !f.deleted && f.characters && f.characters.includes(item.CharacterId)
+      );
+
       const itemDiv = (
         <div
-          className={`flex min-w-0 cursor-pointer items-center gap-3 ${isMobile ? "tg-bg-content border-b border-gray-200 p-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700" : "tg-bg-content"}`}
+          className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-lg p-2"
           onClick={() => {
             if (onCharacterClick) {
               onCharacterClick(item.CharacterId);
             }
           }}
         >
-          {/* 头像 */}
-          <div
-            className="size-12 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
-            style={{ backgroundImage: `url(${avatarUrl})` }}
-          />
-
-          {/* 信息 */}
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="flex min-w-0 items-center gap-1 text-sm font-medium">
-              <LevelBadge level={item.Level} zeroCount={item.ZeroCount} />
-              <span className="min-w-0 truncate">{item.Name}</span>
+          {/* 头像区域 */}
+          <div className="relative flex-shrink-0">
+            <div className="tg-avatar-border border-2 border-gray-300 dark:border-white/30">
+              <div
+                className="tg-avatar size-12 bg-cover bg-top"
+                style={{ backgroundImage: `url(${avatarUrl})` }}
+              />
             </div>
-            {isMobile ? (
-              <div className="text-xs opacity-60">
-                <span>持股：{item.UserTotal === 0 ? "--" : formatNumber(item.UserTotal, 0)}</span>
-                <span className="mx-2">•</span>
-                <span>
-                  固定资产：{item.Sacrifices === 0 ? "--" : formatNumber(item.Sacrifices, 0)}
-                </span>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-0.5">
-                <div className="text-xs opacity-60">
-                  持股：{item.UserTotal === 0 ? "--" : formatNumber(item.UserTotal, 0)}
-                </div>
-                <div className="text-xs opacity-60">
-                  固定资产：{item.Sacrifices === 0 ? "--" : formatNumber(item.Sacrifices, 0)}
-                </div>
+            <div className="absolute left-0 top-0 -translate-x-1/4 -translate-y-1/4">
+              <LevelBadge level={item.Level} zeroCount={item.ZeroCount} />
+            </div>
+          </div>
+
+          {/* 信息区域 */}
+          <div className="flex w-full flex-col items-center gap-1.5">
+            {/* 角色名称 */}
+            <div className="w-full min-w-0 text-center">
+              <span className="block truncate text-sm font-semibold" title={item.Name}>
+                {item.Name}
+              </span>
+            </div>
+
+            {/* 收藏标签 */}
+            {characterFavorites.length > 0 && (
+              <div className="flex w-full flex-wrap items-center justify-center gap-1">
+                {characterFavorites.map((favorite) => (
+                  <span
+                    className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+                    title={favorite.name}
+                  >
+                    {favorite.name}
+                  </span>
+                ))}
               </div>
             )}
+
+            {/* 数据信息 */}
+            <div className="flex w-full flex-col items-center gap-0.5 text-xs opacity-70">
+              <div>持股：{item.UserTotal === 0 ? "--" : formatNumber(item.UserTotal, 0)}</div>
+              <div>固定资产：{item.Sacrifices === 0 ? "--" : formatNumber(item.Sacrifices, 0)}</div>
+            </div>
           </div>
         </div>
       );
@@ -89,16 +99,10 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
     });
   };
 
-  // 计算列数和是否为移动端
+  // 计算列数
   const calculateLayout = (width) => {
-    const isMobile = width < 640;
-
-    if (isMobile) {
-      return { cols: 1, isMobile: true };
-    }
-
-    const minCellWidth = 160;
-    const gap = 12;
+    const minCellWidth = 132;
+    const gap = 0;
 
     // 计算可以容纳的最大列数
     let cols = Math.floor((width + gap) / (minCellWidth + gap));
@@ -107,15 +111,15 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
     const divisors = [48, 24, 16, 12, 8, 6, 4, 3, 2, 1];
     for (const divisor of divisors) {
       if (cols >= divisor) {
-        return { cols: divisor, isMobile: false };
+        return { cols: divisor };
       }
     }
-    return { cols: 1, isMobile: false };
+    return { cols: 1 };
   };
 
   // 初始渲染
   const initialLayout = calculateLayout(container.offsetWidth || 800);
-  renderItems(initialLayout.cols, initialLayout.isMobile);
+  renderItems(initialLayout.cols);
 
   container.appendChild(gridDiv);
 
@@ -137,7 +141,7 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
     for (const entry of entries) {
       const width = entry.contentRect.width;
       const layout = calculateLayout(width);
-      renderItems(layout.cols, layout.isMobile);
+      renderItems(layout.cols);
     }
   });
 

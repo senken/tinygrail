@@ -1,13 +1,14 @@
 import { getLatestTemples } from "@src/api/chara.js";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { Temple } from "@src/components/Temple.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { Pagination } from "@src/components/Pagination.jsx";
-import { formatNumber } from "@src/utils/format.js";
 import { Modal } from "@src/components/Modal.jsx";
+import { Pagination } from "@src/components/Pagination.jsx";
+import { Temple } from "@src/components/Temple.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { unescapeHtml } from "@src/utils/escape";
+import { formatNumber } from "@src/utils/format.js";
 
 /**
  * 最新圣殿组件
@@ -151,7 +152,7 @@ export function LatestTemples() {
                   className="tg-link cursor-pointer truncate hover:opacity-100"
                   onClick={() => handleUserClick(item.Name)}
                 >
-                  @{item.Nickname}
+                  @{unescapeHtml(item.Nickname)}
                 </div>
               </div>
             </div>

@@ -253,7 +253,7 @@ export function Favorite() {
             const isLast = index === favorites.length - 1;
 
             return (
-              <div key={favorite.id} className="relative">
+              <div className="relative">
                 {/* 收藏夹卡片 */}
                 <div
                   className="group relative cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-all hover:shadow-md dark:border-gray-600 dark:bg-gray-800"
@@ -267,7 +267,6 @@ export function Favorite() {
                           const imageUrl = coverImages[index];
                           return (
                             <div
-                              key={index}
                               className="relative overflow-hidden bg-gray-100 dark:bg-gray-600"
                               style={{
                                 backgroundImage: imageUrl ? `url(${imageUrl})` : "none",
@@ -365,7 +364,6 @@ export function Favorite() {
           <div className="flex flex-wrap gap-2">
             {colors.map((color) => (
               <button
-                key={color.value}
                 type="button"
                 className={`h-8 w-8 rounded-full border-2 transition-all ${color.value} ${
                   editingColor.value === color.value
@@ -442,10 +440,10 @@ export function Favorite() {
   const loadFavorites = () => {
     // 先从云端同步
     let favorites = syncFromCloud();
-    
+
     // 按order字段排序
     favorites.sort((a, b) => (a.order || 0) - (b.order || 0));
-    
+
     setState({ favorites });
   };
 
