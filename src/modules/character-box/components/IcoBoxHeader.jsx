@@ -30,6 +30,9 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
 
   const characterFavorites = getCharacterFavorites();
 
+  // 计算上市等级
+  const listingLevel = Math.floor(Math.log(predicted.Amount / 7500.0) / Math.log(1.3) + 1);
+
   // 计算进度条百分比
   const percent = Math.round((Total / predicted.Next) * 100);
   const displayPercent = percent > 100 ? 100 : percent;
@@ -149,24 +152,24 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
       </div>
 
       {/* 等级和发行价 */}
-      {predicted.Level > 0 && (
+      {predicted.Level >= 0 && (
         <div id="tg-ico-box-header-level" className="flex flex-col gap-1 text-xs">
           <div className="flex items-center gap-4">
             <div className="flex items-center">
               <span className="text-gray-600 dark:text-gray-400">ICO等级：</span>
               <LevelBadge level={predicted.Level} size="sm" />
             </div>
-            <div className="flex items-center">
-              <span className="text-gray-600 dark:text-gray-400">上市等级：</span>
-              <LevelBadge
-                level={Math.floor(Math.log(predicted.Amount / 7500.0) / Math.log(1.3) + 1)}
-                size="sm"
-              />
-            </div>
+            {listingLevel > 0 && (
+              <div className="flex items-center">
+                <span className="text-gray-600 dark:text-gray-400">上市等级：</span>
+                <LevelBadge level={listingLevel} size="sm" />
+              </div>
+            )}
           </div>
           <div className="text-gray-600 dark:text-gray-400">
-            预计发行量：约{formatNumber(predicted.Amount, 0)}股 | 发行价：
-            {formatCurrency(predicted.Price)}
+            预计发行量：约{formatNumber(predicted.Amount, 0)}股<span className="mx-2">•</span>
+            发行价：
+            {formatCurrency(Math.max(predicted.Price, 10))}
           </div>
         </div>
       )}

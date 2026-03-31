@@ -1,4 +1,4 @@
-import { formatCurrency } from "@src/utils/format.js";
+import { formatCurrency, formatNumber } from "@src/utils/format.js";
 import { Button } from "@src/components/Button.jsx";
 
 /**
@@ -18,7 +18,9 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
   // 计算下一级所需金额
   const nextLevelAmount = predicted.Next - characterData.Total;
 
-  const container = <div id="tg-ico-box-invest" data-character-id={characterData.CharacterId} className="py-2" />;
+  const container = (
+    <div id="tg-ico-box-invest" data-character-id={characterData.CharacterId} className="py-2" />
+  );
   const input = (
     <input
       id="tg-ico-box-invest-input"
@@ -36,7 +38,12 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
       <div className="text-sm text-gray-600 dark:text-gray-400">
         {hasInvested ? (
           <span>
-            已注资{formatCurrency(investedAmount, "₵", 2, false)}，追加注资请在下方输入金额
+            已注资{formatCurrency(investedAmount, "₵", 2, false)}，预计可得
+            {formatNumber(
+              Math.floor(investedAmount / (Math.max(predicted.Price, 10) + 500000 / (10000 + (predicted.Level - 1) * 7500))),
+              0
+            )}
+            股
           </span>
         ) : (
           <span>追加注资请在下方输入金额</span>
