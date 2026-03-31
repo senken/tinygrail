@@ -2,10 +2,47 @@
  * SignalR动态加载器
  */
 
-const SIGNALR_CDN_URL = "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js";
+const SIGNALR_CDN_URLS = [
+  "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js",
+  "https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js",
+  "https://unpkg.com/@microsoft/signalr@8.0.7/dist/browser/signalr.min.js",
+];
 
 let signalRLoadPromise = null;
 let signalRInstance = null;
+
+/**
+ * 尝试从指定URL加载SignalR
+ * @param {string} url - CDN URL
+ * @returns {Promise<Object>} SignalR对象
+ */
+async function tryLoadFromUrl(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`加载失败: ${response.status}`);
+  }
+
+  const scriptContent = await response.text();
+
+  // 创建一个包装函数来捕获导出的对象
+  const wrapper = `
+    (function() {
+      var exports = {};
+      var module = { exports: exports };
+      ${scriptContent}
+      return module.exports || exports || window.signalR || window.SignalR;
+    })()
+  `;
+
+  // 执行脚本并获取返回值
+  const signalR = eval(wrapper);
+
+  if (!signalR || !signalR.HubConnectionBuilder) {
+    throw new Error("SignalR对象无效");
+  }
+
+  return signalR;
+}
 
 /**
  * 动态加载SignalR库
@@ -24,40 +61,31 @@ export async function loadSignalR() {
 
   // 创建加载Promise
   signalRLoadPromise = (async () => {
-    try {
-      // 使用fetch获取脚本内容
-      const response = await fetch(SIGNALR_CDN_URL);
-      if (!response.ok) {
-        throw new Error(`加载失败: ${response.status}`);
+    // 同时从所有CDN加载，使用加载速度最快的那个
+    const loadPromises = SIGNALR_CDN_URLS.map(async (url) => {
+      try {
+        const signalR = await tryLoadFromUrl(url);
+        return { success: true, signalR, url };
+      } catch (error) {
+        return { success: false, error, url };
       }
-      
-      const scriptContent = await response.text();
-      
-      // 创建一个包装函数来捕获导出的对象
-      const wrapper = `
-        (function() {
-          var exports = {};
-          var module = { exports: exports };
-          ${scriptContent}
-          return module.exports || exports || window.signalR || window.SignalR;
-        })()
-      `;
-      
-      // 执行脚本并获取返回值
-      const signalR = eval(wrapper);
-      
-      if (!signalR || !signalR.HubConnectionBuilder) {
-        throw new Error("SignalR对象无效");
+    });
+
+    // 使用Promise.allSettled等待所有请求完成
+    const results = await Promise.allSettled(loadPromises);
+
+    // 找到第一个成功的结果
+    for (const result of results) {
+      if (result.status === "fulfilled" && result.value.success) {
+        signalRInstance = result.value.signalR;
+        return result.value.signalR;
       }
-      
-      signalRInstance = signalR;
-      return signalR;
-      
-    } catch (error) {
-      signalRLoadPromise = null; // 重置以便重试
-      console.error("SignalR加载失败:", error);
-      throw error;
     }
+
+    // 所有CDN都失败
+    signalRLoadPromise = null; // 重置以便重试
+    console.error("SignalR加载失败");
+    throw new Error("SignalR加载失败: 所有CDN都不可用");
   })();
 
   return signalRLoadPromise;
