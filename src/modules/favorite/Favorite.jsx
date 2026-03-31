@@ -7,6 +7,7 @@ import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 import { uploadToCloud, syncFromCloud } from "./favoriteSync.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * 收藏夹管理组件
@@ -28,6 +29,8 @@ export function Favorite() {
 
   let generatedDetailModalId = null;
   let generatedCharacterModalId = null;
+  const userAssets = getCachedUserAssets();
+  const currentUserId = userAssets?.id;
 
   const { setState } = createMountedComponent(container, (state) => {
     const {
@@ -64,7 +67,9 @@ export function Favorite() {
         uploadToCloud(currentFavorites);
 
         // 从显示列表中移除已删除的收藏夹
-        const visibleFavorites = currentFavorites.filter((f) => !f.deleted);
+        const visibleFavorites = currentFavorites.filter(
+          (f) => !f.deleted && f.userId === currentUserId
+        );
         setState({
           favorites: visibleFavorites,
           statusMessage: "收藏夹已删除",
@@ -98,7 +103,10 @@ export function Favorite() {
 
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
-      setState({ favorites: currentFavorites });
+      // 只显示未删除且属于当前用户的收藏夹
+      setState({
+        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId),
+      });
     };
 
     // 下移收藏夹
@@ -127,7 +135,10 @@ export function Favorite() {
 
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
-      setState({ favorites: currentFavorites });
+      // 只显示未删除且属于当前用户的收藏夹
+      setState({
+        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId),
+      });
     };
 
     // 开始编辑收藏夹
@@ -150,6 +161,7 @@ export function Favorite() {
     // 保存编辑
     const saveEdit = () => {
       const trimmedName = editingName.trim();
+
       if (!trimmedName) {
         setState({ statusMessage: "请输入收藏夹名称" });
         return;
@@ -171,7 +183,7 @@ export function Favorite() {
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
       setState({
-        favorites: currentFavorites,
+        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId), // 只显示未删除且属于当前用户的收藏夹
         isEditing: false,
         editingFavoriteId: null,
         editingName: "",
@@ -440,6 +452,9 @@ export function Favorite() {
   const loadFavorites = () => {
     // 先从云端同步
     let favorites = syncFromCloud();
+
+    // 只显示未删除且属于当前用户的收藏夹
+    favorites = favorites.filter((f) => !f.deleted && f.userId === currentUserId);
 
     // 按order字段排序
     favorites.sort((a, b) => (a.order || 0) - (b.order || 0));

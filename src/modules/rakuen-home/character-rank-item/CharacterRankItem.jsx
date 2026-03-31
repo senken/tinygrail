@@ -3,6 +3,7 @@ import { ChangeBadge } from "@src/components/ChangeBadge.jsx";
 import { formatCurrency, formatTimeAgo } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * 角色排行项组件
@@ -38,7 +39,9 @@ export function CharacterRankItem({ item, rank, onClick }) {
   // 获取角色所在的收藏夹
   const getCharacterFavorites = () => {
     const favorites = getFavorites();
-    return favorites.filter((f) => !f.deleted && f.characters && f.characters.includes(item.Id));
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
+    return favorites.filter((f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(item.Id));
   };
 
   const characterFavorites = getCharacterFavorites();

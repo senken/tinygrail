@@ -4,6 +4,7 @@ import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * ICO盒子头部组件
@@ -23,8 +24,10 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   // 获取包含当前角色的收藏夹
   const getCharacterFavorites = () => {
     const favorites = getFavorites();
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
     return favorites.filter(
-      (f) => !f.deleted && f.characters && f.characters.includes(CharacterId)
+      (f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(CharacterId)
     );
   };
 

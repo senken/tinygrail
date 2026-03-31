@@ -2,6 +2,7 @@
  * 收藏夹云同步管理
  */
 
+import { getCachedUserAssets } from "@src/utils/session.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 
 const CLOUD_KEY = "tinygrail_favorites";
@@ -154,9 +155,15 @@ export function syncFromCloud() {
   try {
     const cloudFavorites = getCloudFavorites();
     const localFavorites = getFavorites();
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
 
     if (!cloudFavorites) {
-      return localFavorites.filter((f) => !f.deleted);
+      // 云端无数据，但本地有数据，上传到云端
+      if (localFavorites && localFavorites.length > 0) {
+        uploadToCloud(localFavorites);
+      }
+      return localFavorites.filter((f) => !f.deleted && f.userId === currentUserId);
     }
 
     const { merged, hasChanges } = mergeFavorites(localFavorites, cloudFavorites);
@@ -165,11 +172,13 @@ export function syncFromCloud() {
       saveFavorites(merged);
     }
 
-    // 返回时过滤掉已删除的收藏夹
-    return merged.filter((f) => !f.deleted);
+    // 返回时过滤掉已删除的收藏夹个不属于当前用户的收藏夹
+    return merged.filter((f) => !f.deleted && f.userId === currentUserId);
   } catch (e) {
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
     console.error("从云端同步收藏夹失败:", e);
-    return getFavorites().filter((f) => !f.deleted);
+    return getFavorites().filter((f) => !f.deleted && f.userId === currentUserId);
   }
 }
 

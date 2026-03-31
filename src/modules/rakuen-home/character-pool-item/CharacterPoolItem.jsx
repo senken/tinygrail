@@ -4,6 +4,7 @@ import { Button } from "@src/components/Button.jsx";
 import { formatCurrency } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * 角色奖池项组件
@@ -47,7 +48,9 @@ export function CharacterPoolItem({
   // 获取角色所在的收藏夹
   const getCharacterFavorites = () => {
     const favorites = getFavorites();
-    return favorites.filter((f) => !f.deleted && f.characters && f.characters.includes(item.Id));
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
+    return favorites.filter((f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(item.Id));
   };
 
   const characterFavorites = getCharacterFavorites();

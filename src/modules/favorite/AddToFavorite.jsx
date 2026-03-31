@@ -3,6 +3,7 @@ import { TrashIcon, StarIcon } from "@src/icons";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 import { uploadToCloud } from "./favoriteSync.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * 添加到收藏夹组件
@@ -72,8 +73,17 @@ export function AddToFavorite({ characterData }) {
 
   // 创建新收藏夹
   const createFavorite = (name, color) => {
+    const userAssets = getCachedUserAssets();
+    const userId = userAssets?.id;
+    
+    if (!userId) {
+      statusDiv.textContent = "创建失败：无法获取用户信息";
+      return null;
+    }
+    
     const favorites = getFavorites();
     const now = Date.now();
+    
     const newFavorite = {
       id: now,
       name,
@@ -82,6 +92,7 @@ export function AddToFavorite({ characterData }) {
       order: favorites.length,
       createdAt: now,
       updatedAt: now,
+      userId, // 添加创建者用户ID
     };
     favorites.push(newFavorite);
     saveFavorites(favorites);
@@ -139,9 +150,11 @@ export function AddToFavorite({ characterData }) {
   const renderFavoriteList = () => {
     favoriteListDiv.innerHTML = "";
     const allFavorites = getFavorites();
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
 
-    // 过滤掉已删除的收藏夹
-    const favorites = allFavorites.filter((f) => !f.deleted);
+    // 过滤掉已删除的收藏夹和不属于当前用户的收藏夹
+    const favorites = allFavorites.filter((f) => !f.deleted && f.userId === currentUserId);
 
     if (favorites.length === 0) {
       const emptyDiv = <div className="py-4 text-center text-sm opacity-60">暂无收藏夹</div>;
@@ -238,12 +251,14 @@ export function AddToFavorite({ characterData }) {
           statusDiv.textContent = "收藏夹名称不能超过20个字";
           return;
         }
-        createFavorite(trimmedName, selectedColor.value);
-        nameInput.value = "";
-        newFavoriteName = "";
-        createFormDiv.style.display = "none";
-        renderFavoriteList();
-        statusDiv.textContent = "收藏夹创建成功";
+        const newFavorite = createFavorite(trimmedName, selectedColor.value);
+        if (newFavorite) {
+          nameInput.value = "";
+          newFavoriteName = "";
+          createFormDiv.style.display = "none";
+          renderFavoriteList();
+          statusDiv.textContent = "收藏夹创建成功";
+        }
       }}
     >
       创建

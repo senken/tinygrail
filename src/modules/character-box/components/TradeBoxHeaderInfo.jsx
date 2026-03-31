@@ -2,6 +2,7 @@ import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
 import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
 import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * 交易盒子头像和基本信息组件
@@ -24,8 +25,10 @@ export function TradeBoxHeaderInfo(props) {
   // 获取包含当前角色的收藏夹
   const getCharacterFavorites = () => {
     const favorites = getFavorites();
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
     return favorites.filter(
-      (f) => !f.deleted && f.characters && f.characters.includes(CharacterId)
+      (f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(CharacterId)
     );
   };
 

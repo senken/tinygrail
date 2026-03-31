@@ -2,6 +2,7 @@ import { Pagination } from "@src/components/Pagination.jsx";
 import { formatCurrency, formatRemainingTime } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
  * ICO列表Tab
@@ -45,8 +46,10 @@ export function ICOsTab({ data, onPageChange, onCharacterClick }) {
 
       // 获取角色所在的收藏夹
       const favorites = getFavorites();
+      const userAssets = getCachedUserAssets();
+      const currentUserId = userAssets?.id;
       const characterFavorites = favorites.filter(
-        (f) => !f.deleted && f.characters && f.characters.includes(item.CharacterId)
+        (f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(item.CharacterId)
       );
 
       const itemDiv = (
