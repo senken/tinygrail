@@ -6,6 +6,7 @@ import { getCachedUserAssets } from "@src/utils/session.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 
 const CLOUD_KEY = "tinygrail_favorites";
+const RETENTION_DAYS = 90; // 保留90天
 
 /**
  * 从云端获取收藏夹数据
@@ -67,7 +68,6 @@ export function uploadToCloud(favorites) {
  * @returns {Array} 清理后的列表
  */
 function cleanupDeletedFavorites(favorites) {
-  const RETENTION_DAYS = 30; // 保留30天
   const retentionTime = RETENTION_DAYS * 24 * 60 * 60 * 1000;
   const now = Date.now();
 
@@ -120,8 +120,18 @@ function mergeFavorites(localFavorites, cloudFavorites) {
       merged.push(cloudFav);
       hasChanges = true;
     } else if (!cloudFav) {
-      // 只有本地有数据
-      merged.push(localFav);
+      // 只有本地有数据，检查本地数据是否超过保留期未修改
+      const localTime = localFav.updatedAt || localFav.createdAt || 0;
+      const age = Date.now() - localTime;
+      const retentionTime = RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+      if (age >= retentionTime) {
+        // 本地数据超过保留期未修改，直接丢弃
+        hasChanges = true;
+      } else {
+        // 本地数据未超过保留期，保留
+        merged.push(localFav);
+      }
     } else {
       // 两边都有数据，比较时间戳
       const localTime = localFav.updatedAt || localFav.createdAt || 0;
