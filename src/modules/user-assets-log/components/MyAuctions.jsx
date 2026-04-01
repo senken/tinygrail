@@ -57,16 +57,16 @@ export function MyAuctions({ data, onPageChange, onCharacterClick, onCancelAucti
               <li
                 id="tg-my-auctions-item"
                 data-character-id={item.CharacterId}
-                className="flex cursor-pointer items-center justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
+                className="flex cursor-pointer items-start justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 hover:bg-gray-100 dark:even:bg-gray-800/30 dark:hover:bg-gray-800/50"
                 onClick={() => onCharacterClick && onCharacterClick(item.CharacterId)}
               >
                 {/* 头像 */}
                 {item.Icon && (
-                  <div>
+                  <div className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30">
                     <img
                       src={normalizeAvatar(item.Icon)}
                       alt={item.Name || `#${item.CharacterId}`}
-                      className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                      className="tg-avatar size-10 object-cover object-top"
                     />
                   </div>
                 )}
@@ -120,7 +120,7 @@ export function MyAuctions({ data, onPageChange, onCharacterClick, onCancelAucti
                 </div>
 
                 {/* 拍卖状态 */}
-                <div>
+                <div className="self-center">
                   <span
                     className="rounded px-2 py-0.5 text-xs font-bold"
                     style={{

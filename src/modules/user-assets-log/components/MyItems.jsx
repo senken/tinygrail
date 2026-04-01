@@ -34,15 +34,15 @@ export function MyItems({ data, onPageChange }) {
               <li
                 id="tg-my-items-item"
                 data-item-id={item.Id}
-                className="flex items-center justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 dark:even:bg-gray-800/30"
+                className="flex items-start justify-between gap-3 px-3 py-1 transition-colors even:bg-gray-50/50 dark:even:bg-gray-800/30"
               >
                 {/* 图标 */}
                 {item.Icon && (
-                  <div>
+                  <div className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30">
                     <img
                       src={normalizeAvatar(item.Icon)}
                       alt={item.Name || `#${item.Id}`}
-                      className="size-10 rounded-lg border border-gray-200 object-cover object-top dark:border-gray-700"
+                      className="tg-avatar size-10 object-cover object-top"
                     />
                   </div>
                 )}
@@ -58,7 +58,7 @@ export function MyItems({ data, onPageChange }) {
                   <div className="mt-1 text-xs opacity-60">「{item.Line || ""}」</div>
                 </div>
                 {/* 数量 */}
-                <div>
+                <div className="self-center">
                   <span
                     className="rounded px-2 py-0.5 text-xs font-bold text-white"
                     style={{ backgroundColor: "#FFC107" }}

@@ -29,7 +29,7 @@ export function MyCharas({ data, onPageChange, onCharacterClick }) {
 
     const itemDiv = (
       <div
-        className="tg-bg-content flex min-w-0 cursor-pointer items-center gap-3 border-b border-gray-200 px-3 py-1 last:border-b-0 dark:border-gray-700"
+        className="tg-bg-content flex min-w-0 cursor-pointer items-start gap-3 border-b border-gray-200 px-3 py-1 last:border-b-0 dark:border-gray-700"
         onClick={() => {
           if (onCharacterClick) {
             onCharacterClick(item.CharacterId);
@@ -37,10 +37,12 @@ export function MyCharas({ data, onPageChange, onCharacterClick }) {
         }}
       >
         {/* 头像 */}
-        <div
-          className="size-10 flex-shrink-0 rounded-lg border border-gray-200 bg-cover bg-top dark:border-gray-600"
-          style={{ backgroundImage: `url(${avatarUrl})` }}
-        />
+        <div className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30">
+          <div
+            className="tg-avatar size-10 bg-cover bg-top"
+            style={{ backgroundImage: `url(${avatarUrl})` }}
+          />
+        </div>
 
         {/* 信息 */}
         <div className="flex min-w-0 flex-1 flex-col gap-1">
