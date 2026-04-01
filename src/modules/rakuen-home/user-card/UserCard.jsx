@@ -227,14 +227,15 @@ export function UserCard() {
     }
 
     const { total, temples, daily, share, tax } = result.data;
+    const taxRate = share > 0 ? formatNumber((tax / share) * 100, 2) : 0;
 
     if (daily) {
       alert(
-        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，登录奖励₵${formatNumber(daily, 0)}，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}`
+        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，登录奖励₵${formatNumber(daily, 0)}，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}(${taxRate}%)，税后₵${formatNumber(share - tax, 0)}`
       );
     } else {
       alert(
-        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}`
+        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}(${taxRate}%)，税后₵${formatNumber(share - tax, 0)}`
       );
     }
   };
