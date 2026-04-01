@@ -14,6 +14,7 @@ import {
   getUserItems,
   getUserCharas,
   cancelAuction,
+  getAuctionList,
 } from "@src/api/chara.js";
 import { getUserAuctions, getUserBalanceLog } from "@src/api/user.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
@@ -133,14 +134,17 @@ function loadGrailMenu() {
      */
     const handleCharacterClick = (characterId) => {
       // 发送消息到右侧iframe
-      const rightFrame = window.parent.frames['right'];
+      const rightFrame = window.parent.frames["right"];
       if (rightFrame) {
-        rightFrame.postMessage({
-          type: 'openCharacterModal',
-          characterId: characterId
-        }, '*');
+        rightFrame.postMessage(
+          {
+            type: "openCharacterModal",
+            characterId: characterId,
+          },
+          "*"
+        );
       }
-      
+
       // 收起移动端侧边栏
       collapseSidebarOnMobile();
     };
@@ -217,12 +221,11 @@ function loadGrailMenu() {
           <div className="pb-4">
             <MyAuctions
               data={myAuctionsData}
-              onPageChange={(page) => {
+              onPageChange={async (page) => {
                 setState({ myAuctionsData: null });
-                getUserAuctions(page, 50).then((result) => {
-                  setState({
-                    myAuctionsData: result.success ? result.data : { error: true },
-                  });
+                const result = await loadMyAuctionsData(page);
+                setState({
+                  myAuctionsData: result.success ? result.data : { error: true },
                 });
               }}
               onCharacterClick={handleCharacterClick}
@@ -374,14 +377,46 @@ function loadGrailMenu() {
   };
 
   /**
+   * 加载我的拍卖数据
+   * @param {number} page - 页码
+   */
+  const loadMyAuctionsData = async (page) => {
+    const auctionsResult = await getUserAuctions(page, 50);
+
+    if (auctionsResult.success && auctionsResult.data.items.length > 0) {
+      // 获取所有角色ID
+      const characterIds = auctionsResult.data.items.map((item) => item.CharacterId);
+
+      // 批量获取拍卖详情
+      const auctionDetailsResult = await getAuctionList(characterIds);
+
+      // 创建映射表
+      const auctionMap = {};
+
+      if (auctionDetailsResult.success) {
+        auctionDetailsResult.data.forEach((auction) => {
+          auctionMap[auction.CharacterId] = auction;
+        });
+      }
+
+      // 合并数据
+      auctionsResult.data.items = auctionsResult.data.items.map((item) => ({
+        ...item,
+        auctionDetail: auctionMap[item.CharacterId] || null,
+      }));
+    }
+
+    return auctionsResult;
+  };
+
+  /**
    * 加载我的拍卖
    */
-  const loadMyAuctions = () => {
+  const loadMyAuctions = async () => {
     setState({ activeMenu: "auction", myAuctionsData: null });
-    getUserAuctions(1, 50).then((result) => {
-      setState({
-        myAuctionsData: result.success ? result.data : { error: true },
-      });
+    const result = await loadMyAuctionsData(1);
+    setState({
+      myAuctionsData: result.success ? result.data : { error: true },
     });
   };
 
