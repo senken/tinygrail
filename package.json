@@ -21,6 +21,7 @@
     "eslint-plugin-react": "^7.37.5",
     "postcss": "^8.0.0",
     "postcss-discard-comments": "^7.0.5",
+    "postcss-nesting": "^14.0.0",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "rollup": "^4.0.0",
