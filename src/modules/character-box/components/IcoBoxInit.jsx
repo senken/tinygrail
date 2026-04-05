@@ -1,19 +1,68 @@
 import { formatCurrency } from "@src/utils/format.js";
 import { Button } from "@src/components/Button.jsx";
+import { get } from "@src/utils/http.js";
 
 /**
  * 获取角色名称
  * @param {number} characterId - 角色ID
- * @returns {string} 角色名称
+ * @param {HTMLElement} nameElement - 名称显示元素
  */
-function getCharacterName(characterId) {
+function getCharacterName(characterId, nameElement) {
   let name = document.querySelector(".nameSingle small")?.textContent;
   if (!name) name = document.querySelector(".nameSingle a")?.textContent;
   // 超展开子页面
   if (!name) name = document.querySelector("#pageHeader a.avatar")?.getAttribute("title");
-  // 如果都获取不到，使用角色ID
-  if (!name && characterId) name = `#${characterId}`;
-  return name || "";
+  
+  // 如果都获取不到，尝试从BGM API获取
+  if (!name && characterId) {
+    name = `#${characterId}`;
+    
+    nameElement.textContent = name;
+    
+    get(
+      `https://api.bgm.tv/v0/characters/${characterId}`,
+      {},
+      { xhrFields: { withCredentials: false } }
+    ).then((data) => {
+      let characterName = null;
+
+      // 简体中文名
+      if (data.infobox && Array.isArray(data.infobox)) {
+        const simplifiedChinese = data.infobox.find((item) => item.key === "简体中文名");
+        if (simplifiedChinese && simplifiedChinese.value) {
+          characterName = simplifiedChinese.value;
+        }
+
+        // 别名中的中文名
+        if (!characterName) {
+          const alias = data.infobox.find((item) => item.key === "别名");
+          if (alias && alias.value && Array.isArray(alias.value)) {
+            for (const item of alias.value) {
+              if (item.k && item.k.includes("中文名") && item.v) {
+                characterName = item.v;
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // name字段
+      if (!characterName && data.name) {
+        characterName = data.name;
+      }
+
+      // 更新DOM
+      if (characterName) {
+        nameElement.textContent = characterName;
+      }
+    }).fail((error) => {
+      console.error(`获取角色 ${characterId} 名称失败:`, error);
+    });
+  } else {
+    // 如果从DOM获取到了名称，直接设置
+    nameElement.textContent = name || "";
+  }
 }
 
 /**
@@ -25,9 +74,13 @@ function getCharacterName(characterId) {
  */
 export function IcoBoxInit({ characterId, userAssets, onInit }) {
   const balance = userAssets?.balance || 0;
-  const name = getCharacterName(characterId);
 
   const container = <div id="tg-ico-box-init" data-character-id={characterId} className="flex flex-col items-center justify-center gap-4 p-8" />;
+  
+  // 创建角色名称元素
+  const nameSpan = <span />;
+  getCharacterName(characterId, nameSpan);
+  
   const input = (
     <input
       id="tg-ico-box-init-input"
@@ -43,7 +96,7 @@ export function IcoBoxInit({ characterId, userAssets, onInit }) {
     <div className="flex w-full flex-col items-center gap-4">
       {/* 提示文字 */}
       <div className="text-center text-lg text-gray-700 dark:text-gray-300">
-        "{name}"已做好准备，点击启动按钮，加入"小圣杯"的争夺！
+        "{nameSpan}"已做好准备，点击启动按钮，加入"小圣杯"的争夺！
       </div>
 
       {/* 输入框和按钮 */}

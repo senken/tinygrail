@@ -7,6 +7,91 @@ import { Button } from "@src/components/Button.jsx";
 import { LoaderCircleIcon, TrashIcon } from "@src/icons";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 import { uploadToCloud } from "./favoriteSync.js";
+import { get } from "@src/utils/http.js";
+
+// 角色名称缓存
+const characterNameCache = new Map();
+// 正在进行的请求Promise
+const pendingRequests = new Map();
+
+/**
+ * 实际执行API请求的函数
+ * @param {number} characterId - 角色ID
+ * @returns {Promise<string|null>} 角色名称
+ */
+async function doFetchCharacterName(characterId) {
+  try {
+    const data = await get(
+      `https://api.bgm.tv/v0/characters/${characterId}`,
+      {},
+      { xhrFields: { withCredentials: false } }
+    );
+    let characterName = null;
+
+    if (data.infobox && Array.isArray(data.infobox)) {
+      // 简体中文名
+      const simplifiedChinese = data.infobox.find((item) => item.key === "简体中文名");
+      if (simplifiedChinese && simplifiedChinese.value) {
+        characterName = simplifiedChinese.value;
+      }
+
+      // 别名中的中文名
+      if (!characterName) {
+        const alias = data.infobox.find((item) => item.key === "别名");
+        if (alias && alias.value && Array.isArray(alias.value)) {
+          for (const item of alias.value) {
+            if (item.k && item.k.includes("中文名") && item.v) {
+              characterName = item.v;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // name字段
+    if (!characterName && data.name) {
+      characterName = data.name;
+    }
+
+    // 缓存结果
+    if (characterName) {
+      characterNameCache.set(characterId, characterName);
+    }
+
+    return characterName;
+  } catch (error) {
+    console.error(`获取角色 ${characterId} 名称失败:`, error);
+    return null;
+  } finally {
+    // 请求完成后，从pending中移除
+    pendingRequests.delete(characterId);
+  }
+}
+
+/**
+ * 从BGM API获取角色信息
+ * @param {number} characterId - 角色ID
+ * @returns {Promise<string|null>} 角色名称
+ */
+async function fetchCharacterName(characterId) {
+  // 检查缓存
+  if (characterNameCache.has(characterId)) {
+    return characterNameCache.get(characterId);
+  }
+
+  // 检查是否有正在进行的请求，直接返回该Promise
+  if (pendingRequests.has(characterId)) {
+    return pendingRequests.get(characterId);
+  }
+
+  // 创建新的请求Promise
+  const requestPromise = doFetchCharacterName(characterId);
+
+  // 将Promise存入pending队列
+  pendingRequests.set(characterId, requestPromise);
+  return requestPromise;
+}
 
 /**
  * 收藏夹详情组件
@@ -159,6 +244,13 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
 
         const isSelected = selectedIds.includes(item.CharacterId);
 
+        // 创建角色名称元素
+        const nameSpan = (
+          <span className="w-full min-w-0 truncate text-center text-sm" title={item.Name}>
+            {item.Name}
+          </span>
+        );
+
         const itemDiv = (
           <div
             className={`flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-lg p-2 transition-colors ${
@@ -200,14 +292,22 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
               )}
             </div>
 
-            {/* 名称 */}
-            <span className="w-full min-w-0 truncate text-center text-sm" title={item.Name}>
-              {item.Name}
-            </span>
+            {/* 角色名称 */}
+            {nameSpan}
           </div>
         );
 
         gridDiv.appendChild(itemDiv);
+
+        // 如果是未上市角色，异步加载真实名称
+        if (item.isUnlisted) {
+          fetchCharacterName(item.CharacterId).then((realName) => {
+            if (realName) {
+              nameSpan.textContent = realName;
+              nameSpan.title = realName;
+            }
+          });
+        }
       });
     };
 
