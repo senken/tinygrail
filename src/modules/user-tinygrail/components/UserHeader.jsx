@@ -52,22 +52,24 @@ export function UserHeader({
       <div className="mx-auto">
         {/* 头像 */}
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <Avatar
               src={avatar}
               alt={nickname}
               rank={lastIndex > 0 ? lastIndex : null}
               isBanned={isBanned}
             />
-            <div className="flex flex-col gap-0.5">
+            <div className="flex min-w-0 flex-col gap-0.5">
               <a
                 target="_blank"
                 href={`/user/${name}`}
-                className={`tg-link inline-flex items-center gap-1 text-sm font-semibold transition-colors ${isBanned ? "text-red-500" : ""}`}
+                className={`tg-link inline-flex min-w-0 items-center gap-1 text-sm font-semibold transition-colors ${isBanned ? "text-red-500" : ""}`}
               >
-                <span>{nickname}</span>
-                {isBanned && <span>[小圣杯已封禁]</span>}
-                <SquareArrowOutUpRightIcon className="h-3.5 w-3.5" />
+                <span className="min-w-0 truncate">
+                  {nickname}
+                  {isBanned && "[小圣杯已封禁]"}
+                </span>
+                <SquareArrowOutUpRightIcon className="h-3.5 w-3.5 flex-shrink-0" />
               </a>
               <span className="text-xs opacity-60">@{name}</span>
             </div>
@@ -99,7 +101,10 @@ export function UserHeader({
         </div>
 
         {/* GM按钮组 */}
-        <div id="tg-user-tinygrail-actions" className={`flex flex-wrap gap-2 ${isGameMaster() ? "mt-2" : ""}`}>
+        <div
+          id="tg-user-tinygrail-actions"
+          className={`flex flex-wrap gap-2 ${isGameMaster() ? "mt-2" : ""}`}
+        >
           {isGameMaster() && <Button onClick={onTradeHistoryClick}>交易记录</Button>}
           {isGameMaster() && <Button onClick={onBanClick}>封禁</Button>}
           {isGameMaster() && <Button onClick={onUnbanClick}>解封</Button>}
