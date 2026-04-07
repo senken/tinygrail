@@ -5,9 +5,11 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import alias from "@rollup/plugin-alias";
 import babel from "@rollup/plugin-babel";
+import json from "@rollup/plugin-json";
 import postcss from "rollup-plugin-postcss";
 import metablock from "rollup-plugin-userscript-metablock";
 import discardComments from "postcss-discard-comments";
+import { generateLoaderPlugin } from "./scripts/generate-loader-plugin.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,7 +59,8 @@ export function createBaseConfig() {
           { find: "jsx-dom", replacement: path.resolve(__dirname, "src/utils/jsx-dom.js") },
         ],
       }),
-      inlineCSSPlugin(), // 添加自定义插件
+      inlineCSSPlugin(),
+      json(),
       resolve({
         extensions: [".js", ".jsx"],
       }),
@@ -66,8 +69,8 @@ export function createBaseConfig() {
         config: {
           path: "postcss.config.cjs",
         },
-        inject: false,
-        extract: "userscript.css",
+        inject: true,
+        extract: false,
         minimize: false,
         plugins: [
           discardComments({ removeAll: true }), // 移除注释
@@ -108,6 +111,7 @@ export function createBaseConfig() {
           },
         },
       }),
+      generateLoaderPlugin(),
     ],
   };
 }
