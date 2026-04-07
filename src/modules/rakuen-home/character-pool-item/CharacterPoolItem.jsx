@@ -3,7 +3,7 @@ import { ChangeBadge } from "@src/components/ChangeBadge.jsx";
 import { Button } from "@src/components/Button.jsx";
 import { formatCurrency } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
@@ -47,10 +47,10 @@ export function CharacterPoolItem({
 
   // 获取角色所在的收藏夹
   const getCharacterFavorites = () => {
-    const favorites = getFavorites();
     const userAssets = getCachedUserAssets();
     const currentUserId = userAssets?.id;
-    return favorites.filter((f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(item.Id));
+    const favorites = getUserFavorites(currentUserId);
+    return favorites.filter((f) => f.characters && f.characters.includes(item.Id));
   };
 
   const characterFavorites = getCharacterFavorites();

@@ -2,7 +2,7 @@ import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { getFavorites } from "@src/modules/favorite/favoriteStorage.js";
+import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
@@ -37,11 +37,11 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
       const avatarUrl = normalizeAvatar(item.Icon);
 
       // 获取角色所在的收藏夹
-      const favorites = getFavorites();
       const userAssets = getCachedUserAssets();
       const currentUserId = userAssets?.id;
+      const favorites = getUserFavorites(currentUserId);
       const characterFavorites = favorites.filter(
-        (f) => !f.deleted && f.userId === currentUserId && f.characters && f.characters.includes(item.CharacterId)
+        (f) => f.characters && f.characters.includes(item.CharacterId)
       );
 
       const itemDiv = (

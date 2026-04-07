@@ -5,7 +5,12 @@ import { Modal } from "@src/components/Modal.jsx";
 import { FavoriteDetail } from "./FavoriteDetail.jsx";
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { getFavorites, saveFavorites } from "./favoriteStorage.js";
+import {
+  getFavorites,
+  saveFavorites,
+  getVisibleFavorites,
+  reindexFavorites,
+} from "./favoriteStorage.js";
 import { uploadToCloud, syncFromCloud } from "./favoriteSync.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 
@@ -57,19 +62,23 @@ export function Favorite() {
 
       const index = currentFavorites.findIndex((f) => f.id === favoriteId);
       if (index > -1) {
-        // 标记为已删除
+        // 只保留必要字段
         const now = Date.now();
-        currentFavorites[index].deleted = true;
-        currentFavorites[index].deletedAt = now;
-        currentFavorites[index].updatedAt = now;
+        currentFavorites[index] = {
+          id: currentFavorites[index].id,
+          deleted: true,
+          deletedAt: now,
+          updatedAt: now,
+          userId: currentFavorites[index].userId,
+        };
+
+        // 重新索引当前用户的收藏夹order
+        reindexFavorites(currentFavorites, currentUserId);
 
         saveFavorites(currentFavorites);
         uploadToCloud(currentFavorites);
 
-        // 从显示列表中移除已删除的收藏夹
-        const visibleFavorites = currentFavorites.filter(
-          (f) => !f.deleted && f.userId === currentUserId
-        );
+        const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
         setState({
           favorites: visibleFavorites,
           statusMessage: "收藏夹已删除",
@@ -80,65 +89,73 @@ export function Favorite() {
     // 上移收藏夹
     const moveFavoriteUp = (favoriteId) => {
       const currentFavorites = getFavorites();
-      const index = currentFavorites.findIndex((f) => f.id === favoriteId);
+      // 获取当前用户可见的收藏夹并排序
+      const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
+      const visibleIndex = visibleFavorites.findIndex((f) => f.id === favoriteId);
 
-      if (index <= 0) return;
+      if (visibleIndex <= 0) return;
 
-      // 交换位置
-      [currentFavorites[index - 1], currentFavorites[index]] = [
-        currentFavorites[index],
-        currentFavorites[index - 1],
-      ];
+      // 在全部收藏夹中找到这两个收藏夹的索引
+      const currentIndex = currentFavorites.findIndex((f) => f.id === favoriteId);
+      const prevIndex = currentFavorites.findIndex(
+        (f) => f.id === visibleFavorites[visibleIndex - 1].id
+      );
 
       // 交换order值
-      [currentFavorites[index - 1].order, currentFavorites[index].order] = [
-        currentFavorites[index].order,
-        currentFavorites[index - 1].order,
+      [currentFavorites[currentIndex].order, currentFavorites[prevIndex].order] = [
+        currentFavorites[prevIndex].order,
+        currentFavorites[currentIndex].order,
       ];
 
       // 更新两个收藏夹的时间戳
       const now = Date.now();
-      currentFavorites[index - 1].updatedAt = now;
-      currentFavorites[index].updatedAt = now;
+      currentFavorites[currentIndex].updatedAt = now;
+      currentFavorites[prevIndex].updatedAt = now;
+
+      // 重新索引当前用户的收藏夹 order
+      reindexFavorites(currentFavorites, currentUserId);
 
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
-      // 只显示未删除且属于当前用户的收藏夹
-      setState({
-        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId),
-      });
+
+      // 重新加载并排序
+      loadFavorites();
     };
 
     // 下移收藏夹
     const moveFavoriteDown = (favoriteId) => {
       const currentFavorites = getFavorites();
-      const index = currentFavorites.findIndex((f) => f.id === favoriteId);
+      // 获取当前用户可见的收藏夹并排序
+      const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
+      const visibleIndex = visibleFavorites.findIndex((f) => f.id === favoriteId);
 
-      if (index === -1 || index >= currentFavorites.length - 1) return;
+      if (visibleIndex === -1 || visibleIndex >= visibleFavorites.length - 1) return;
 
-      // 交换位置
-      [currentFavorites[index], currentFavorites[index + 1]] = [
-        currentFavorites[index + 1],
-        currentFavorites[index],
-      ];
+      // 在全部收藏夹中找到这两个收藏夹的索引
+      const currentIndex = currentFavorites.findIndex((f) => f.id === favoriteId);
+      const nextIndex = currentFavorites.findIndex(
+        (f) => f.id === visibleFavorites[visibleIndex + 1].id
+      );
 
       // 交换order值
-      [currentFavorites[index].order, currentFavorites[index + 1].order] = [
-        currentFavorites[index + 1].order,
-        currentFavorites[index].order,
+      [currentFavorites[currentIndex].order, currentFavorites[nextIndex].order] = [
+        currentFavorites[nextIndex].order,
+        currentFavorites[currentIndex].order,
       ];
 
       // 更新两个收藏夹的时间戳
       const now = Date.now();
-      currentFavorites[index].updatedAt = now;
-      currentFavorites[index + 1].updatedAt = now;
+      currentFavorites[currentIndex].updatedAt = now;
+      currentFavorites[nextIndex].updatedAt = now;
+
+      // 重新索引当前用户的收藏夹 order
+      reindexFavorites(currentFavorites, currentUserId);
 
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
-      // 只显示未删除且属于当前用户的收藏夹
-      setState({
-        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId),
-      });
+
+      // 重新加载并排序
+      loadFavorites();
     };
 
     // 开始编辑收藏夹
@@ -183,7 +200,7 @@ export function Favorite() {
       saveFavorites(currentFavorites);
       uploadToCloud(currentFavorites);
       setState({
-        favorites: currentFavorites.filter((f) => !f.deleted && f.userId === currentUserId), // 只显示未删除且属于当前用户的收藏夹
+        favorites: getVisibleFavorites(currentFavorites, currentUserId),
         isEditing: false,
         editingFavoriteId: null,
         editingName: "",
@@ -450,14 +467,11 @@ export function Favorite() {
 
   // 初始化加载收藏夹列表
   const loadFavorites = () => {
-    // 先从云端同步
+    // 从云端同步
     let favorites = syncFromCloud();
 
-    // 只显示未删除且属于当前用户的收藏夹
-    favorites = favorites.filter((f) => !f.deleted && f.userId === currentUserId);
-
-    // 按order字段排序
-    favorites.sort((a, b) => (a.order || 0) - (b.order || 0));
+    // 获取当前用户可见的收藏夹并排序
+    favorites = getVisibleFavorites(favorites, currentUserId);
 
     setState({ favorites });
   };

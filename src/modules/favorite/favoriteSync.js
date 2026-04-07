@@ -9,17 +9,26 @@ const CLOUD_KEY = "tinygrail_favorites";
 const RETENTION_DAYS = 90; // 保留90天
 
 /**
+ * 获取chiiApp实例
+ * @returns {Object|null}
+ */
+function getChiiApp() {
+  return typeof window !== 'undefined' && window.__chiiApp__ ? window.__chiiApp__ : (typeof chiiApp !== 'undefined' ? chiiApp : null);
+}
+
+/**
  * 从云端获取收藏夹数据
  * @returns {Array|null} 云端收藏夹列表，如果不存在返回null
  */
 export function getCloudFavorites() {
   try {
-    if (!chiiApp?.cloud_settings) {
+    const app = getChiiApp();
+    if (!app?.cloud_settings) {
       console.warn("云服务不可用");
       return null;
     }
 
-    const cloudDataStr = chiiApp.cloud_settings.get(CLOUD_KEY);
+    const cloudDataStr = app.cloud_settings.get(CLOUD_KEY);
 
     if (!cloudDataStr) {
       return null;
@@ -39,7 +48,8 @@ export function getCloudFavorites() {
  */
 export function uploadToCloud(favorites) {
   try {
-    if (!chiiApp?.cloud_settings) {
+    const app = getChiiApp();
+    if (!app?.cloud_settings) {
       console.warn("云服务不可用");
       return false;
     }
@@ -50,10 +60,10 @@ export function uploadToCloud(favorites) {
     const favoritesStr = JSON.stringify(cleaned);
 
     // 上传到云端
-    chiiApp.cloud_settings.update({
+    app.cloud_settings.update({
       [CLOUD_KEY]: favoritesStr,
     });
-    chiiApp.cloud_settings.save();
+    app.cloud_settings.save();
 
     return true;
   } catch (e) {
@@ -242,5 +252,6 @@ export function syncBidirectional() {
  * @returns {boolean}
  */
 export function isCloudAvailable() {
-  return !!chiiApp?.cloud_settings;
+  const app = getChiiApp();
+  return !!app?.cloud_settings;
 }

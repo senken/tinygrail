@@ -1,7 +1,7 @@
 import { Button } from "@src/components/Button.jsx";
 import { TrashIcon, StarIcon } from "@src/icons";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { getFavorites, saveFavorites } from "./favoriteStorage.js";
+import { getFavorites, saveFavorites, reindexFavorites, getVisibleFavorites } from "./favoriteStorage.js";
 import { uploadToCloud } from "./favoriteSync.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 
@@ -84,12 +84,18 @@ export function AddToFavorite({ characterData }) {
     const favorites = getFavorites();
     const now = Date.now();
     
+    // 重新索引当前用户的收藏夹order
+    reindexFavorites(favorites, userId);
+    
+    // 获取当前用户未删除的收藏夹数量
+    const userFavoritesCount = favorites.filter(f => !f.deleted && f.userId === userId).length;
+    
     const newFavorite = {
       id: now,
       name,
       color,
       characters: [],
-      order: favorites.length,
+      order: userFavoritesCount,
       createdAt: now,
       updatedAt: now,
       userId, // 添加创建者用户ID
@@ -102,6 +108,8 @@ export function AddToFavorite({ characterData }) {
 
   // 删除收藏夹
   const deleteFavorite = (favoriteId) => {
+    const userAssets = getCachedUserAssets();
+    const currentUserId = userAssets?.id;
     const favorites = getFavorites();
     const favorite = favorites.find((f) => f.id === favoriteId);
 
@@ -111,11 +119,18 @@ export function AddToFavorite({ characterData }) {
 
     const index = favorites.findIndex((f) => f.id === favoriteId);
     if (index > -1) {
-      // 标记为已删除
+      // 只保留必要字段
       const now = Date.now();
-      favorites[index].deleted = true;
-      favorites[index].deletedAt = now;
-      favorites[index].updatedAt = now;
+      favorites[index] = {
+        id: favorites[index].id,
+        deleted: true,
+        deletedAt: now,
+        updatedAt: now,
+        userId: favorites[index].userId,
+      };
+
+      // 重新索引当前用户的收藏夹order
+      reindexFavorites(favorites, currentUserId);
 
       saveFavorites(favorites);
       uploadToCloud(favorites);
@@ -154,7 +169,7 @@ export function AddToFavorite({ characterData }) {
     const currentUserId = userAssets?.id;
 
     // 过滤掉已删除的收藏夹和不属于当前用户的收藏夹
-    const favorites = allFavorites.filter((f) => !f.deleted && f.userId === currentUserId);
+    const favorites = getVisibleFavorites(allFavorites, currentUserId);
 
     if (favorites.length === 0) {
       const emptyDiv = <div className="py-4 text-center text-sm opacity-60">暂无收藏夹</div>;
