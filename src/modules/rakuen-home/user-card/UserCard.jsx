@@ -44,6 +44,7 @@ export function UserCard() {
       showScratchResultModal = false,
       showBalanceLogModal = false,
       showFavoriteModal = false,
+      showTarotModal = false,
       scratchResultData = null,
       isLotus = false,
       lotusCount = 0,
@@ -100,6 +101,9 @@ export function UserCard() {
           }}
           onFavorite={() => {
             setState({ showFavoriteModal: true });
+          }}
+          onTarot={() => {
+            setState({ showTarotModal: true });
           }}
         />
 
@@ -173,6 +177,29 @@ export function UserCard() {
             }}
           >
             <Favorite />
+          </Modal>
+        )}
+
+        {showTarotModal && (
+          <Modal
+            visible={showTarotModal}
+            onClose={() => setState({ showTarotModal: false })}
+            position="center"
+            maxWidth={480}
+            padding="p-0"
+          >
+            <div style={{ width: "440px", height: "80vh" }}>
+              <iframe
+                src="https://tinygrail.mange.cn/tarot2.html"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  border: "none",
+                  display: "block",
+                }}
+                title="塔罗占卜"
+              />
+            </div>
           </Modal>
         )}
       </div>

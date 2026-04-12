@@ -25,6 +25,7 @@ export function UserInfoBox(userData) {
     onToggleAbbreviate,
     onBalanceLog,
     onFavorite,
+    onTarot,
   } = userData || {};
 
   // 按钮组
@@ -78,6 +79,16 @@ export function UserInfoBox(userData) {
       onClick: () => {
         if (onFavorite) onFavorite();
       },
+    },
+    {
+      id: "tarot-button",
+      label: "✨ 塔罗占卜",
+      show: true,
+      onClick: () => {
+        if (onTarot) onTarot();
+      },
+      className:
+        "!bg-gradient-to-r !from-cyan-500 !to-blue-600 !text-white !font-medium hover:!from-cyan-600 hover:!to-blue-700 !shadow-md hover:!shadow-lg !transition-all",
     },
   ].filter((btn) => btn.show);
 
