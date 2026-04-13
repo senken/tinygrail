@@ -42,6 +42,7 @@ export function RakuenHome() {
         </Modal>
       );
       document.body.appendChild(characterModal);
+      document.body.style.overflow = "hidden";
     }
   });
 
@@ -64,11 +65,13 @@ export function RakuenHome() {
               </Modal>
             );
             document.body.appendChild(characterModal);
+            document.body.style.overflow = "hidden";
           }}
         />
       </Modal>
     );
     document.body.appendChild(characterSearchModal);
+    document.body.style.overflow = "hidden";
   };
 
   // 清空body并创建容器
