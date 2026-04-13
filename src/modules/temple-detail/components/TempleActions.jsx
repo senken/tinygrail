@@ -122,7 +122,7 @@ export function TempleActions({
 
   // 如果没有可显示的按钮，不渲染
   if (visibleButtons.length === 0) {
-    return null;
+    return <div id="tg-temple-actions" className="flex flex-wrap gap-2" />;
   }
 
   return (
