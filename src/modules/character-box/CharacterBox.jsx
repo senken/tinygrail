@@ -770,6 +770,9 @@ export function CharacterBox(props) {
       // 格式化固定资产
       if (foundData) {
         fixedAssets = `${formatNumber(foundData.Assets ?? 0, 0)} / ${formatNumber(foundData.Sacrifices ?? 0, 0)}`;
+      } else if (userCharacterResult.success && userCharacterResult.data?.Sacrifices) {
+        // 如果在links和temples中都没找到，则只显示Sacrifices
+        fixedAssets = formatNumber(userCharacterResult.data.Sacrifices, 0);
       }
     }
 
