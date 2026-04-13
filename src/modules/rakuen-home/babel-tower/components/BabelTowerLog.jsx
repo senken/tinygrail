@@ -69,8 +69,8 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
               onOpenUser && onOpenUser(log.UserName);
             }}
           >
-            <span>@{log.Nickname}</span>
-            <span>+{formatNumber(log.Amount, 0)}</span>
+            <span className="min-w-0 truncate">@{log.Nickname}</span>
+            <span className="flex-shrink-0">+{formatNumber(log.Amount, 0)}</span>
           </span>
         );
         break;
@@ -84,8 +84,8 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
               onOpenUser && onOpenUser(log.UserName);
             }}
           >
-            <span>@{log.Nickname}</span>
-            <span>鲤鱼之眼 +{formatNumber(log.Amount, 0)}</span>
+            <span className="min-w-0 truncate">@{log.Nickname}</span>
+            <span className="flex-shrink-0">鲤鱼之眼 +{formatNumber(log.Amount, 0)}</span>
           </span>
         );
         break;
@@ -99,8 +99,8 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
               onOpenUser && onOpenUser(log.UserName);
             }}
           >
-            <span>@{log.Nickname}</span>
-            <span>精炼成功 +{formatNumber(log.Amount, 0)}</span>
+            <span className="min-w-0 truncate">@{log.Nickname}</span>
+            <span className="flex-shrink-0">精炼成功 +{formatNumber(log.Amount, 0)}</span>
           </span>
         );
         break;
@@ -114,8 +114,8 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
               onOpenUser && onOpenUser(log.UserName);
             }}
           >
-            <span>@{log.Nickname}</span>
-            <span>精炼失败 +{formatNumber(log.Amount, 0)}</span>
+            <span className="min-w-0 truncate">@{log.Nickname}</span>
+            <span className="flex-shrink-0">精炼失败 +{formatNumber(log.Amount, 0)}</span>
           </span>
         );
         break;
@@ -129,9 +129,9 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
               onOpenUser && onOpenUser(log.UserName);
             }}
           >
-            <span>@{log.Nickname}</span>
-            <span>+{formatNumber(log.Amount, 0)}</span>
-            <span className="inline-flex items-center text-yellow-400">
+            <span className="min-w-0 truncate">@{log.Nickname}</span>
+            <span className="flex-shrink-0">+{formatNumber(log.Amount, 0)}</span>
+            <span className="inline-flex flex-shrink-0 items-center text-yellow-400">
               <StarIcon className="size-3" />
             </span>
           </span>
