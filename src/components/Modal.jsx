@@ -57,6 +57,9 @@ export function Modal({
 
   // 关闭弹窗函数
   const handleClose = () => {
+    // 移除ESC键监听
+    document.removeEventListener("keydown", handleKeyDown);
+
     // 按ID清理
     const modals = document.querySelectorAll("#tg-modal");
     modals.forEach((modal) => {
@@ -75,6 +78,23 @@ export function Modal({
     // 调用onClose回调
     if (onClose) {
       onClose();
+    }
+  };
+
+  // ESC键关闭弹窗
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      // 获取所有弹窗
+      const allModals = document.querySelectorAll("#tg-modal");
+      if (allModals.length === 0) return;
+
+      // 找到最顶层弹窗
+      const topModal = allModals[allModals.length - 1];
+
+      // 只有当前弹窗是最顶层时才关闭
+      if (topModal.dataset.modalId === generatedModalId) {
+        handleClose();
+      }
     }
   };
 
@@ -168,6 +188,8 @@ export function Modal({
       document.body.appendChild(modalElement);
       // 禁止body滚动
       document.body.style.overflow = "hidden";
+      // 添加ESC键监听
+      document.addEventListener("keydown", handleKeyDown);
     }
   }, 0);
 
