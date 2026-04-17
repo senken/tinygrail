@@ -616,7 +616,10 @@ export function CharacterBox(props) {
               generatedTempleModalId = id;
             }}
           >
-            <TempleDetail temple={templeModalData} characterName={characterData?.Name ?? ""} />
+            <TempleDetail
+              temple={{ ...templeModalData, Name: characterData?.Name }}
+              characterName={characterData?.Name ?? ""}
+            />
           </Modal>
         )}
       </>
