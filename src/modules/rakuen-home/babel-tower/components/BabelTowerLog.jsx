@@ -63,7 +63,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         // 星之力
         actionInfo = (
           <span
-            className="tg-link inline-flex cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
+            className="tg-link inline-flex min-w-0 cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser && onOpenUser(log.UserName);
@@ -78,7 +78,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         // 鲤鱼之眼
         actionInfo = (
           <span
-            className="tg-link inline-flex cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
+            className="tg-link inline-flex min-w-0 cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser && onOpenUser(log.UserName);
@@ -93,7 +93,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         // 精炼成功
         actionInfo = (
           <span
-            className="tg-link inline-flex cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
+            className="tg-link inline-flex min-w-0 cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser && onOpenUser(log.UserName);
@@ -108,7 +108,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         // 精炼失败
         actionInfo = (
           <span
-            className="tg-link inline-flex cursor-pointer items-center gap-1 leading-none text-[#a7e3ff] hover:opacity-80"
+            className="tg-link inline-flex min-w-0 cursor-pointer items-center gap-1 leading-none text-[#a7e3ff] hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser && onOpenUser(log.UserName);
@@ -123,7 +123,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
         // 星级提升
         actionInfo = (
           <span
-            className="tg-link inline-flex cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
+            className="tg-link inline-flex min-w-0 cursor-pointer items-center gap-1 leading-none text-[#ffa7cc] hover:opacity-80"
             onClick={(e) => {
               e.stopPropagation();
               onOpenUser && onOpenUser(log.UserName);
@@ -140,7 +140,7 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
       default:
         // 受到攻击
         actionInfo = (
-          <span className="inline-flex items-center gap-1 leading-none text-[#a7e3ff]">
+          <span className="inline-flex min-w-0 items-center gap-1 leading-none text-[#a7e3ff]">
             <span>受到攻击</span>
             <span>-{formatNumber(log.Amount, 0)}</span>
           </span>
