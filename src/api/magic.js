@@ -96,9 +96,13 @@ export async function fisheye(fromCharaId, toCharaId) {
  * @param {number} amount - 数量
  * @returns {Promise<Object>} 星光碎片结果
  */
-export async function stardust(fromCharaId, toCharaId, amount) {
+export async function stardust(fromCharaId, toCharaId, amount, isDownSacrifices = false) {
   try {
-    const data = await post(`magic/stardust/${fromCharaId}/${toCharaId}/${amount}/false`);
+    const endpoint = isDownSacrifices
+      ? `magic/stardust2/${fromCharaId}/${toCharaId}/${amount}/false`
+      : `magic/stardust/${fromCharaId}/${toCharaId}/${amount}/false`;
+    
+    const data = await post(endpoint);
 
     if (!data || data.State !== 0) {
       return {
