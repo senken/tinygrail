@@ -18,11 +18,13 @@
     "@tailwindcss/container-queries": "^0.1.1",
     "autoprefixer": "^10.0.0",
     "babel-plugin-jsx-pragmatic": "^1.0.2",
+    "daisyui": "^4.12.24",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.37.5",
     "postcss": "^8.0.0",
     "postcss-discard-comments": "^7.0.5",
     "postcss-nesting": "^14.0.0",
+    "postcss-prefix-selector": "^2.1.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "rollup": "^4.0.0",
@@ -30,6 +32,6 @@
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-serve": "^2.0.0",
     "rollup-plugin-userscript-metablock": "^0.4.3",
-    "tailwindcss": "^3.0.0"
+    "tailwindcss": "^3.4.19"
   }
 }

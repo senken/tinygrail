@@ -1,13 +1,66 @@
-.tinygrail {
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+.tinygrail {
   /* 防止iOS自动调整字体大小 */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 
   @layer components {
+    /* 自定义btn-bgm按钮样式 */
+    .btn-bgm {
+      --tw-border-opacity: 1;
+      --tw-bg-opacity: 1;
+      --tw-text-opacity: 1;
+      border-color: var(--primary-color, #f09199);
+      background-color: var(--primary-color, #f09199);
+      color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+    }
+
+    .btn-bgm:hover {
+      --tw-border-opacity: 1;
+      --tw-bg-opacity: 1;
+      border-color: color-mix(in oklab, var(--primary-color, #f09199) 90%, black);
+      background-color: color-mix(in oklab, var(--primary-color, #f09199) 90%, black);
+    }
+
+    .btn-bgm:focus-visible {
+      outline-color: var(--primary-color, #f09199);
+    }
+
+    .btn-bgm:active:hover,
+    .btn-bgm:active:focus {
+      --tw-border-opacity: 1;
+      --tw-bg-opacity: 1;
+      border-color: color-mix(in oklab, var(--primary-color, #f09199) 90%, black);
+      background-color: color-mix(in oklab, var(--primary-color, #f09199) 90%, black);
+    }
+
+    .btn-bgm.btn-outline {
+      --tw-text-opacity: 1;
+      color: var(--primary-color, #f09199);
+      border-color: var(--primary-color, #f09199);
+      background-color: transparent;
+    }
+
+    .btn-bgm.btn-outline:hover {
+      --tw-border-opacity: 1;
+      --tw-bg-opacity: 1;
+      --tw-text-opacity: 1;
+      border-color: var(--primary-color, #f09199);
+      background-color: var(--primary-color, #f09199);
+      color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+    }
+
+    .btn-bgm.btn-disabled,
+    .btn-bgm:disabled,
+    .btn-bgm[disabled] {
+      --tw-border-opacity: 0;
+      background-color: color-mix(in oklab, var(--primary-color, #f09199) 20%, transparent);
+      color: color-mix(in oklab, var(--primary-color, #f09199) 20%, transparent);
+    }
+
     .bgm-color {
       color: var(--primary-color, #f09199);
     }
@@ -109,7 +162,7 @@
 }
 
 @keyframes tg-spin {
-    to {
-      transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
   }
+}
