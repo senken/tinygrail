@@ -1,7 +1,16 @@
-import { formatCurrency } from "@src/utils/format.js";
-import { Button } from "@src/components/Button.jsx";
 import { Avatar } from "@src/components/Avatar.jsx";
-import { ArrowRightLeftIcon, SquareArrowOutUpRightIcon } from "@src/icons";
+import {
+  ArrowRightLeftIcon,
+  CalendarCheckIcon,
+  CircleCentIcon,
+  ClipboardClockIcon,
+  DicesIcon,
+  GiftIcon,
+  PentagramIcon,
+  SquareArrowOutUpRightIcon,
+  StarIcon,
+} from "@src/icons";
+import { formatCurrency } from "@src/utils/format.js";
 
 export function UserInfoBox(userData) {
   const {
@@ -33,6 +42,7 @@ export function UserInfoBox(userData) {
     {
       id: "scratch-button",
       label: "刮刮乐",
+      icon: DicesIcon,
       show: true,
       onClick: () => {
         if (onScratch) onScratch();
@@ -41,6 +51,7 @@ export function UserInfoBox(userData) {
     {
       id: "share-bonus-button",
       label: "每周分红",
+      icon: CircleCentIcon,
       show: showWeekly,
       onClick: () => {
         if (onShareBonus) onShareBonus();
@@ -49,24 +60,16 @@ export function UserInfoBox(userData) {
     {
       id: "bonus-button",
       label: "签到奖励",
+      icon: CalendarCheckIcon,
       show: showDaily,
       onClick: () => {
         if (onBonus) onBonus();
       },
     },
     {
-      id: "holiday-bonus-button",
-      label: `${holidayName}福利`,
-      show: showHoliday,
-      onClick: () => {
-        if (onHolidayBonus) onHolidayBonus();
-      },
-      className:
-        "!bg-gradient-to-r !from-pink-500 !via-purple-500 !to-indigo-500 !text-white !font-semibold hover:!opacity-90 hover:!shadow-lg !transition-all",
-    },
-    {
       id: "balance-log-button",
       label: "资金日志",
+      icon: ClipboardClockIcon,
       show: true,
       onClick: () => {
         if (onBalanceLog) onBalanceLog();
@@ -75,20 +78,39 @@ export function UserInfoBox(userData) {
     {
       id: "favorite-button",
       label: "收藏夹",
+      icon: StarIcon,
+      iconProps: { filled: false },
       show: true,
       onClick: () => {
         if (onFavorite) onFavorite();
       },
     },
     {
+      id: "holiday-bonus-button",
+      label: `${holidayName}福利`,
+      icon: GiftIcon,
+      show: showHoliday,
+      onClick: () => {
+        if (onHolidayBonus) onHolidayBonus();
+      },
+      className: "text-white hover:opacity-90",
+      style: {
+        backgroundImage:
+          "linear-gradient(to right, rgb(236 72 153), rgb(168 85 247), rgb(99 102 241))",
+      },
+    },
+    {
       id: "tarot-button",
-      label: "✨ 塔罗占卜",
+      label: "塔罗占卜",
+      icon: PentagramIcon,
       show: true,
       onClick: () => {
         if (onTarot) onTarot();
       },
-      className:
-        "!bg-gradient-to-r !from-cyan-500 !to-blue-600 !text-white !font-medium hover:!from-cyan-600 hover:!to-blue-700 !shadow-md hover:!shadow-lg !transition-all",
+      className: "text-white hover:opacity-90",
+      style: {
+        backgroundImage: "linear-gradient(to right, rgb(6 182 212), rgb(37 99 235))",
+      },
     },
   ].filter((btn) => btn.show);
 
@@ -113,7 +135,6 @@ export function UserInfoBox(userData) {
               className="tg-link inline-flex items-center gap-1 text-sm font-semibold transition-colors"
             >
               <span>{nickname}</span>
-              <SquareArrowOutUpRightIcon className="h-3.5 w-3.5" />
             </a>
             <button
               id="tg-rakuen-home-logout-button"
@@ -142,10 +163,16 @@ export function UserInfoBox(userData) {
         </div>
       </div>
       <div id="tg-rakuen-home-user-actions" className="flex flex-wrap gap-2 pt-1">
-        {actionButtons.map(({ id, label, onClick, className }) => (
-          <Button id={`tg-rakuen-home-${id}`} onClick={onClick} className={className}>
+        {actionButtons.map(({ id, label, onClick, className, icon: Icon, iconProps, style }) => (
+          <button
+            id={`tg-rakuen-home-${id}`}
+            className={className ? `btn btn-xs ${className}` : "btn-bgm btn btn-xs"}
+            onClick={onClick}
+            style={style}
+          >
+            {Icon && <Icon className="h-3.5 w-3.5" {...iconProps} />}
             {label}
-          </Button>
+          </button>
         ))}
       </div>
     </div>
