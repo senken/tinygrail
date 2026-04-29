@@ -1,10 +1,9 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { getMarketValueRank, getMaxFallRank, getMaxRiseRank } from "@src/api/chara.js";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box";
 import { CharacterRankItem } from "@src/modules/rakuen-home/character-rank-item/CharacterRankItem.jsx";
-import { getMarketValueRank, getMaxRiseRank, getMaxFallRank } from "@src/api/chara.js";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 
 /**
  * 交易榜单Tab组件
@@ -24,17 +23,6 @@ export function TradeTab() {
     { value: "maxFall", label: "最大跌幅" },
   ];
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
     const {
       activeTradeType = "marketValue",
@@ -47,8 +35,6 @@ export function TradeTab() {
       maxFallData = null,
       maxFallLoading = true,
       maxFallPage = 1,
-      showCharacterModal = false,
-      characterModalId = null,
     } = state || {};
 
     // 标题栏
@@ -83,14 +69,6 @@ export function TradeTab() {
         />
       </div>
     );
-
-    // 角色点击处理
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
 
     /**
      * 渲染交易榜单内容
@@ -173,7 +151,7 @@ export function TradeTab() {
           const currentRank = (currentPage - 1) * pageSize + index + 1;
 
           const characterItem = (
-            <CharacterRankItem item={item} rank={currentRank} onClick={handleCharacterClick} />
+            <CharacterRankItem item={item} rank={currentRank} onClick={openCharacterBoxModal} />
           );
 
           gridDiv.appendChild(characterItem);
@@ -234,24 +212,6 @@ export function TradeTab() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
 
     return wrapper;
   });

@@ -1,1 +1,1 @@
-export { AuctionHistory } from "./AuctionHistory.jsx";
+export { AuctionHistory, openAuctionHistoryModal } from "./AuctionHistory.jsx";

@@ -1,14 +1,16 @@
 import { sacrificeCharacter } from "@src/api/chara.js";
 import { Button } from "@src/components/Button.jsx";
 import { formatCurrency } from "@src/utils/format.js";
+import { openConfirmModal, openModal } from "@src/utils/modalManager.js";
 
 /**
  * 资产重组/股权融资组件
  * @param {Object} props
  * @param {number} props.characterId - 角色ID
  * @param {number} props.availableAmount - 可用持股数量
+ * @param {Function} props.onSuccess - 成功回调
  */
-export function Sacrifice({ characterId, availableAmount = 0 }) {
+export function Sacrifice({ characterId, availableAmount = 0, onSuccess }) {
   let sacrificeType = "restructure";
   let amount = "500";
 
@@ -143,33 +145,46 @@ export function Sacrifice({ characterId, availableAmount = 0 }) {
     const isEquity = sacrificeType === "equity";
     const amountNum = Number(amount);
 
+    // 执行融资
+    const executeSacrifice = async () => {
+      updateStatus("处理中...", "");
+
+      const result = await sacrificeCharacter(characterId, amountNum, isEquity);
+
+      if (result.success) {
+        let message = `融资完成！获得资金${formatCurrency(result.data.Balance)}`;
+
+        // 如果有掉落道具
+        if (result.data.Items && result.data.Items.length > 0) {
+          message += " 掉落道具";
+          for (let i = 0; i < result.data.Items.length; i++) {
+            const item = result.data.Items[i];
+            message += ` 「${item.Name}」×${item.Count}`;
+          }
+        }
+
+        updateStatus(message, "success");
+
+        // 调用成功回调
+        if (onSuccess) {
+          onSuccess();
+        }
+      } else {
+        updateStatus(result.message, "error");
+      }
+    };
+
     // 股权融资且数量大于2500时二次确认
     if (isEquity && amountNum >= 2500) {
-      if (!confirm("当前股权融资数量过大，是否继续？")) {
-        return;
-      }
+      openConfirmModal({
+        title: "股权融资确认",
+        message: "当前股权融资数量过大，是否继续？",
+        onConfirm: executeSacrifice,
+      });
+      return;
     }
 
-    updateStatus("处理中...", "");
-
-    const result = await sacrificeCharacter(characterId, amountNum, isEquity);
-
-    if (result.success) {
-      let message = `融资完成！获得资金${formatCurrency(result.data.Balance)}`;
-
-      // 如果有掉落道具
-      if (result.data.Items && result.data.Items.length > 0) {
-        message += " 掉落道具";
-        for (let i = 0; i < result.data.Items.length; i++) {
-          const item = result.data.Items[i];
-          message += ` 「${item.Name}」×${item.Count}`;
-        }
-      }
-
-      updateStatus(message, "success");
-    } else {
-      updateStatus(result.message, "error");
-    }
+    executeSacrifice();
   };
 
   statusDiv.style.display = "none";
@@ -202,4 +217,31 @@ export function Sacrifice({ characterId, availableAmount = 0 }) {
       </div>
     </div>
   );
+}
+
+/**
+ * 打开资产重组弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {string} params.characterName - 角色名称
+ * @param {number} params.availableAmount - 可用持股数量
+ * @param {Function} params.onSuccess - 成功回调
+ */
+export function openSacrificeModal({
+  characterId,
+  characterName = "",
+  availableAmount = 0,
+  onSuccess,
+}) {
+  openModal(`sacrifice-${characterId}`, {
+    title: `资产重组 - #${characterId}「${characterName}」`,
+    content: (
+      <Sacrifice
+        characterId={characterId}
+        availableAmount={availableAmount}
+        onSuccess={onSuccess}
+      />
+    ),
+    size: "sm",
+  });
 }

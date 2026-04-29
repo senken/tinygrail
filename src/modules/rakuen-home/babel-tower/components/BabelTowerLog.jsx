@@ -5,6 +5,10 @@ import { ArrowUpIcon } from "@src/icons/ArrowUpIcon.js";
 import { ArrowDownIcon } from "@src/icons/ArrowDownIcon.js";
 import { StarIcon } from "@src/icons";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { openModal } from "@src/utils/modalManager.js";
+import { getStarLog } from "@src/api/chara.js";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { scrollToTop } from "@src/utils/scroll.js";
 
 /**
  * 通天塔日志组件
@@ -231,4 +235,55 @@ export function BabelTowerLog({ logData, onOpenCharacter, onOpenUser, onPageChan
   renderPagination();
 
   return container;
+}
+
+/**
+ * 打开通天塔日志弹窗
+ * @param {Object} params
+ * @param {Object} params.initialLogData - 初始日志数据
+ * @param {Function} params.onOpenCharacter - 打开角色回调函数
+ * @param {Function} params.onOpenUser - 打开用户回调函数
+ * @param {Function} params.onSyncLogData - 同步日志数据到外部的回调函数
+ * @returns {Function} updateLogData - 更新日志数据的函数
+ */
+export function openBabelTowerLogModal({ initialLogData, onOpenCharacter, onOpenUser, onSyncLogData }) {
+  const modalId = "babel-tower-log";
+  
+  const container = <div />;
+  
+  const { setState } = createMountedComponent(container, (state) => {
+    const { logData = initialLogData } = state || {};
+    
+    const handlePageChange = async (page) => {
+      const result = await getStarLog(page, 30);
+      if (result.success) {
+        setState({ logData: result.data });
+        // 同步到外部
+        if (onSyncLogData) {
+          onSyncLogData(result.data);
+        }
+        // 滚动到顶部
+        scrollToTop(container);
+      }
+    };
+    
+    return (
+      <BabelTowerLog
+        logData={logData}
+        onOpenCharacter={onOpenCharacter}
+        onOpenUser={onOpenUser}
+        onPageChange={handlePageChange}
+      />
+    );
+  }, true);
+
+  openModal(modalId, {
+    title: "通天塔日志",
+    content: container,
+  });
+  
+  // 返回更新函数，供外部调用
+  return (newLogData) => {
+    setState({ logData: newLogData });
+  };
 }

@@ -1,5 +1,8 @@
-import { Button } from "@src/components/Button.jsx";
+import { scratchBonus } from "@src/api/event.js";
+import { openScratchCardModal } from "@src/modules/scratch-card";
 import { formatNumber } from "@src/utils/format.js";
+import { closeModal, openModal } from "@src/utils/modalManager.js";
+import { showError } from "@src/utils/toastManager";
 
 /**
  * 刮刮乐确认框组件
@@ -63,18 +66,6 @@ export function ScratchConfirm({ isLotus = false, lotusCount = 0, onConfirm, onC
     </button>
   );
 
-  const confirmButton = (
-    <Button
-      variant="solid"
-      onClick={() => {
-        const isLotusType = scratchType === "lotus";
-        onConfirm(isLotusType);
-      }}
-    >
-      确定
-    </Button>
-  );
-
   return (
     <div id="tg-rakuen-home-scratch-confirm" className="flex min-w-64 flex-col gap-4">
       {/* 类型切换 */}
@@ -87,12 +78,68 @@ export function ScratchConfirm({ isLotus = false, lotusCount = 0, onConfirm, onC
       {descriptionDiv}
 
       {/* 按钮 */}
-      <div id="tg-rakuen-home-scratch-confirm-actions" className="flex justify-end gap-2">
-        <Button variant="outline" onClick={onCancel}>
+      <div id="tg-rakuen-home-scratch-confirm-actions" className="flex justify-end gap-2 p-1">
+        <button className="btn btn-sm" onClick={onCancel}>
           取消
-        </Button>
-        {confirmButton}
+        </button>
+        <button
+          className="btn-bgm btn btn-sm"
+          onClick={() => {
+            const isLotusType = scratchType === "lotus";
+            onConfirm(isLotusType);
+          }}
+        >
+          确定
+        </button>
       </div>
     </div>
   );
+}
+
+/**
+ * 打开刮刮乐确认弹窗
+ * @param {Object} params
+ * @param {boolean} params.isLotus - 是否为幻想乡彩票
+ * @param {number} params.lotusCount - 幻想乡彩票次数
+ * @param {Function} params.onSuccess - 成功后的回调（用于刷新用户资产）
+ */
+export function openScratchConfirmModal({ isLotus = false, lotusCount = 0, onSuccess }) {
+  const modalId = "scratch-confirm";
+
+  openModal(modalId, {
+    title: "彩票抽奖",
+    content: (
+      <ScratchConfirm
+        isLotus={isLotus}
+        lotusCount={lotusCount}
+        onConfirm={async (isLotusType) => {
+          // 调用刮刮乐API
+          const result = await scratchBonus(isLotusType);
+
+          if (!result.success) {
+            showError(result.message);
+            return;
+          }
+
+          // 关闭确认弹窗
+          closeModal(modalId);
+
+          // 显示刮刮乐结果
+          openScratchCardModal({
+            charas: result.data,
+            title: "彩票抽奖",
+          });
+
+          // 确认按钮回调
+          if (onSuccess) {
+            onSuccess();
+          }
+        }}
+        onCancel={() => {
+          closeModal(modalId);
+        }}
+      />
+    ),
+    size: "sm",
+  });
 }

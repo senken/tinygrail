@@ -12,7 +12,7 @@ import { getCachedUserAssets } from "@src/utils/session.js";
  * @param {Function} props.onPageChange - 页码变化回调函数
  * @param {Function} props.onCharacterClick - 角色点击回调函数
  */
-export function CharasTab({ data, onPageChange, onCharacterClick }) {
+export function UserCharasTab({ data, onPageChange, onCharacterClick }) {
   if (!data || !data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
@@ -46,7 +46,7 @@ export function CharasTab({ data, onPageChange, onCharacterClick }) {
 
       const itemDiv = (
         <div
-          className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-lg p-2"
+          className="flex min-w-0 cursor-pointer flex-col items-center gap-2 rounded-lg p-2"
           onClick={() => {
             if (onCharacterClick) {
               onCharacterClick(item.CharacterId);

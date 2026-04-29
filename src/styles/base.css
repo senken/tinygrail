@@ -7,6 +7,15 @@
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 
+  /* 页面背景色变量 */
+  --page-bg: #ffffff;
+}
+
+[data-theme="dark"] .tinygrail {
+  --page-bg: #2d2e2f;
+}
+
+.tinygrail {
   @layer components {
     /* 自定义btn-bgm按钮样式 */
     .btn-bgm {
@@ -56,7 +65,7 @@
     .btn-bgm.btn-disabled,
     .btn-bgm:disabled,
     .btn-bgm[disabled] {
-      --tw-border-opacity: 0;
+      border-color: transparent;
       background-color: color-mix(in oklab, var(--primary-color, #f09199) 20%, transparent);
       color: color-mix(in oklab, var(--primary-color, #f09199) 20%, transparent);
     }
@@ -120,6 +129,12 @@
 
     .tg-spin {
       animation: tg-spin 1s linear infinite;
+    }
+
+    /* 覆盖DaisyUI modal-box的max-height */
+    .modal-box {
+      max-height: calc(100vh - 5em);
+      max-height: calc(100dvh - 5em);
     }
   }
 

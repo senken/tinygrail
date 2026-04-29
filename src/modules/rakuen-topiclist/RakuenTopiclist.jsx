@@ -19,6 +19,7 @@ import {
 import { getUserAuctions, getUserBalanceLog } from "@src/api/user.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { showError, showSuccess } from "@src/utils/toastManager";
 
 /**
  * 加载样式到 parent.document
@@ -161,11 +162,11 @@ function loadGrailMenu() {
       const result = await cancelAuction(auctionId);
 
       if (result.success) {
-        alert("取消竞拍成功");
+        showSuccess("取消竞拍成功");
         // 重新加载我的拍卖数据
         loadMyAuctions();
       } else {
-        alert(result.message || "取消竞拍失败");
+        showError(result.message || "取消竞拍失败");
       }
     };
 

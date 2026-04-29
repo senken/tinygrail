@@ -1,5 +1,5 @@
-import { Button } from "@src/components/Button.jsx";
 import { convertStarForces } from "@src/api/chara.js";
+import { openModal } from "@src/utils/modalManager.js";
 
 /**
  * 星之力组件
@@ -13,7 +13,7 @@ export function StarForces({ temple, onSuccess }) {
   const amountInput = (
     <input
       type="number"
-      className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
+      className="input input-bordered w-full"
       placeholder="请输入数量"
       value={100}
       onInput={(e) => {
@@ -77,25 +77,56 @@ export function StarForces({ temple, onSuccess }) {
 
   statusDiv.style.display = "none";
 
-  const submitButton = <Button onClick={handleSubmit}>确定</Button>;
+  const submitButton = (
+    <bitton className="btn-bgm btn btn-sm btn-block" onClick={handleSubmit}>
+      转化
+    </bitton>
+  );
 
   return (
     <div id="tg-star-forces" className="flex min-w-64 flex-col gap-4">
-      {/* 描述 */}
-      {descriptionDiv}
+      <div className="flex flex-col gap-4 px-1">
+        {/* 描述 */}
+        {descriptionDiv}
 
-      {/* 输入框 */}
-      <div id="tg-star-forces-amount-input" className="flex flex-col gap-2">
-        {amountInput}
+        {/* 输入框 */}
+        <div id="tg-star-forces-amount-input" className="flex flex-col gap-2">
+          {amountInput}
+        </div>
+
+        {/* 状态消息 */}
+        {statusDiv}
       </div>
 
-      {/* 状态消息 */}
-      {statusDiv}
-
       {/* 提交按钮 */}
-      <div id="tg-star-forces-submit" className="flex justify-end">
+      <div id="tg-star-forces-submit" className="flex justify-center p-1">
         {submitButton}
       </div>
     </div>
   );
+}
+
+/**
+ * 打开星之力弹窗
+ * @param {Object} params
+ * @param {Object} params.temple - 圣殿对象
+ * @param {Function} params.onSuccess - 成功回调函数，参数为转化的数量
+ */
+export function openStarForcesModal({ temple, onSuccess }) {
+  const modalId = `star-forces-${temple.CharacterId}`;
+
+  openModal(modalId, {
+    title: "转化星之力",
+    content: (
+      <StarForces
+        temple={temple}
+        onSuccess={(amount) => {
+          if (onSuccess) {
+            onSuccess(amount);
+          }
+        }}
+      />
+    ),
+    size: "sm",
+  });
 }

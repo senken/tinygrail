@@ -1,1 +1,1 @@
-export { Sacrifice } from "./Sacrifice.jsx";
+export { Sacrifice, openSacrificeModal } from "./Sacrifice.jsx";

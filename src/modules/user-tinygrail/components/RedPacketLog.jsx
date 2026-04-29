@@ -1,11 +1,30 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getUserSendLog } from "@src/api/user.js";
-import { createRequestManager } from "@src/utils/requestManager.js";
-import { formatCurrency, formatDateTime } from "@src/utils/format.js";
-import { Modal } from "@src/components/Modal.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
-import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { unescapeHtml } from "@src/utils/escape";
+import { formatCurrency, formatDateTime } from "@src/utils/format.js";
+import { openModal } from "@src/utils/modalManager.js";
+import { createRequestManager } from "@src/utils/requestManager.js";
+
+/**
+ * 打开红包记录弹窗
+ * @param {Object} options
+ * @param {string} options.username - 用户名
+ * @param {string} options.nickname - 用户昵称（可选）
+ * @returns {string} 弹窗ID
+ */
+export function openRedPacketLogModal({ username, nickname = "" }) {
+  const modalId = `red-packet-log-${username}`;
+
+  openModal(modalId, {
+    title: nickname ? `「${nickname}」的红包记录` : "红包记录",
+    content: <RedPacketLog username={username} nickname={nickname} />,
+    size: "lg",
+  });
+
+  return modalId;
+}
 
 /**
  * 红包记录组件
@@ -60,11 +79,7 @@ export function RedPacketLog({ username, nickname = "" }) {
   };
 
   const { setState } = createMountedComponent(container, (state) => {
-    const {
-      redPacketLogData = null,
-      showUserModal = false,
-      userModalUsername = null,
-    } = state || {};
+    const { redPacketLogData = null } = state || {};
 
     if (!redPacketLogData) {
       return (
@@ -87,19 +102,6 @@ export function RedPacketLog({ username, nickname = "" }) {
       TotalPages: totalPages = 0,
       CurrentPage: currentPage = 1,
     } = redPacketLogData;
-
-    // 用户点击处理
-    const handleUserClick = (username) => {
-      setState({
-        showUserModal: true,
-        userModalUsername: username,
-      });
-    };
-
-    // 分页处理
-    const handlePageChange = (page) => {
-      loadRedPacketLogPage(page);
-    };
 
     return (
       <div>
@@ -126,7 +128,11 @@ export function RedPacketLog({ username, nickname = "" }) {
                     </div>
                     {/* 描述 */}
                     <div className="mt-1 text-xs text-gray-600 dark:text-gray-300">
-                      {renderDescription(item.Description, item.RelatedName, handleUserClick)}
+                      {renderDescription(
+                        item.Description,
+                        item.RelatedName,
+                        openUserTinygrailModal
+                      )}
                     </div>
                   </div>
                 );
@@ -135,18 +141,16 @@ export function RedPacketLog({ username, nickname = "" }) {
             {/* 分页 */}
             {totalPages > 1 && (
               <div className="mt-4">
-                <Pagination current={currentPage} total={totalPages} onChange={handlePageChange} />
+                <Pagination
+                  current={currentPage}
+                  total={totalPages}
+                  onChange={loadRedPacketLogPage}
+                />
               </div>
             )}
           </div>
         ) : (
           <div className="text-center text-gray-500">暂无记录</div>
-        )}
-        {/* 用户弹窗 */}
-        {showUserModal && userModalUsername && (
-          <Modal visible={showUserModal} onClose={() => setState({ showUserModal: false })}>
-            <UserTinygrail username={userModalUsername} stickyTop="-8px" />
-          </Modal>
         )}
       </div>
     );

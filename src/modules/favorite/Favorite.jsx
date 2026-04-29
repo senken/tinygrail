@@ -1,18 +1,18 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { Button } from "@src/components/Button.jsx";
-import { TrashIcon, SquarePenIcon, FolderIcon, ArrowUpIcon, ArrowDownIcon } from "@src/icons";
-import { Modal } from "@src/components/Modal.jsx";
+import { ArrowDownIcon, ArrowUpIcon, FolderIcon, SquarePenIcon, TrashIcon } from "@src/icons";
+import { openCharacterBoxModal } from "@src/modules/character-box";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { closeModal, openModal, openConfirmModal } from "@src/utils/modalManager.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 import { FavoriteDetail } from "./FavoriteDetail.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { normalizeAvatar } from "@src/utils/oos.js";
+import { FavoriteEdit } from "./FavoriteEdit.jsx";
 import {
   getFavorites,
-  saveFavorites,
   getVisibleFavorites,
   reindexFavorites,
+  saveFavorites,
 } from "./favoriteStorage.js";
-import { uploadToCloud, syncFromCloud } from "./favoriteSync.js";
-import { getCachedUserAssets } from "@src/utils/session.js";
+import { syncFromCloud, uploadToCloud } from "./favoriteSync.js";
 
 /**
  * 收藏夹管理组件
@@ -32,8 +32,6 @@ export function Favorite() {
     { name: "灰色", value: "bg-gray-500", text: "text-gray-500" },
   ];
 
-  let generatedDetailModalId = null;
-  let generatedCharacterModalId = null;
   const userAssets = getCachedUserAssets();
   const currentUserId = userAssets?.id;
 
@@ -45,10 +43,6 @@ export function Favorite() {
       editingFavoriteId = null,
       editingName = "",
       editingColor = colors[0],
-      showDetailModal = false,
-      showCharacterModal = false,
-      selectedFavorite = null,
-      selectedCharacterId = null,
     } = state || {};
 
     // 删除收藏夹
@@ -58,32 +52,36 @@ export function Favorite() {
 
       if (!favorite) return;
 
-      if (!confirm(`确定要删除收藏夹「${favorite.name}」吗？`)) return;
+      openConfirmModal({
+        title: "删除收藏夹",
+        message: `确定要删除收藏夹「${favorite.name}」吗？`,
+        onConfirm: () => {
+          const index = currentFavorites.findIndex((f) => f.id === favoriteId);
+          if (index > -1) {
+            // 只保留必要字段
+            const now = Date.now();
+            currentFavorites[index] = {
+              id: currentFavorites[index].id,
+              deleted: true,
+              deletedAt: now,
+              updatedAt: now,
+              userId: currentFavorites[index].userId,
+            };
 
-      const index = currentFavorites.findIndex((f) => f.id === favoriteId);
-      if (index > -1) {
-        // 只保留必要字段
-        const now = Date.now();
-        currentFavorites[index] = {
-          id: currentFavorites[index].id,
-          deleted: true,
-          deletedAt: now,
-          updatedAt: now,
-          userId: currentFavorites[index].userId,
-        };
+            // 重新索引当前用户的收藏夹order
+            reindexFavorites(currentFavorites, currentUserId);
 
-        // 重新索引当前用户的收藏夹order
-        reindexFavorites(currentFavorites, currentUserId);
+            saveFavorites(currentFavorites);
+            uploadToCloud(currentFavorites);
 
-        saveFavorites(currentFavorites);
-        uploadToCloud(currentFavorites);
-
-        const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
-        setState({
-          favorites: visibleFavorites,
-          statusMessage: "收藏夹已删除",
-        });
-      }
+            const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
+            setState({
+              favorites: visibleFavorites,
+              statusMessage: "收藏夹已删除",
+            });
+          }
+        },
+      });
     };
 
     // 上移收藏夹
@@ -160,18 +158,22 @@ export function Favorite() {
 
     // 开始编辑收藏夹
     const startEditFavorite = (favoriteId) => {
-      const currentFavorites = getFavorites();
-      const favorite = currentFavorites.find((f) => f.id === favoriteId);
-
-      if (!favorite) return;
-
-      const color = colors.find((c) => c.value === favorite.color) || colors[0];
-
-      setState({
-        isEditing: true,
-        editingFavoriteId: favoriteId,
-        editingName: favorite.name,
-        editingColor: color,
+      openModal(`edit-favorite-${favoriteId}`, {
+        title: "编辑收藏夹",
+        content: (
+          <FavoriteEdit
+            favoriteId={favoriteId}
+            onSave={() => {
+              loadFavorites();
+              closeModal(`edit-favorite-${favoriteId}`);
+              setState({ statusMessage: "收藏夹已更新" });
+            }}
+            onCancel={() => {
+              closeModal(`edit-favorite-${favoriteId}`);
+            }}
+          />
+        ),
+        size: "sm",
       });
     };
 
@@ -221,47 +223,23 @@ export function Favorite() {
 
     // 打开收藏夹详情
     const openFavoriteDetail = (favorite) => {
-      setState({
-        showDetailModal: true,
-        selectedFavorite: favorite,
+      openModal(`favorite-detail-${favorite.id}`, {
+        title: `收藏夹 - ${favorite.name}`,
+        content: (
+          <FavoriteDetail
+            favoriteId={favorite.id}
+            onCharacterClick={openCharacterBoxModal}
+            onDataChange={loadFavorites}
+          />
+        ),
+        size: "xl",
+        onClose: () => {
+          loadFavorites();
+        },
       });
-    };
-
-    // 关闭收藏夹详情
-    const closeFavoriteDetail = () => {
-      setState({
-        showDetailModal: false,
-        selectedFavorite: null,
-      });
-      // 刷新收藏夹列表
-      loadFavorites();
     };
 
     // 打开角色详情
-    const openCharacterDetail = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        selectedCharacterId: characterId,
-      });
-    };
-
-    // 关闭角色详情
-    const closeCharacterDetail = () => {
-      setState({
-        showCharacterModal: false,
-        selectedCharacterId: null,
-      });
-    };
-
-    // 检查Modal是否已存在
-    const isModalExist = (modalId) => {
-      return (
-        modalId &&
-        document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode ===
-          document.body
-      );
-    };
-
     // 渲染收藏夹列表
     const renderFavoriteList = () => {
       if (favorites.length === 0) {
@@ -269,7 +247,7 @@ export function Favorite() {
       }
 
       return (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-2">
           {favorites.map((favorite, index) => {
             const colorClass =
               colors.find((c) => c.value === favorite.color)?.text || "text-gray-500";
@@ -282,14 +260,14 @@ export function Favorite() {
             const isLast = index === favorites.length - 1;
 
             return (
-              <div className="relative">
+              <div className="relative p-1">
                 {/* 收藏夹卡片 */}
                 <div
-                  className="group relative cursor-pointer overflow-hidden rounded-lg border border-gray-200 bg-gray-50 transition-all hover:shadow-md dark:border-gray-600 dark:bg-gray-800"
+                  className="group card card-compact cursor-pointer overflow-hidden bg-base-100 shadow transition-all hover:shadow-md"
                   onClick={() => openFavoriteDetail(favorite)}
                 >
                   {/* 封面区域 */}
-                  <div className="relative aspect-square w-full">
+                  <figure className="relative aspect-square w-full">
                     {hasImages ? (
                       <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-0.5 bg-gray-200 dark:bg-gray-700">
                         {[0, 1, 2, 3].map((index) => {
@@ -354,17 +332,19 @@ export function Favorite() {
                         <TrashIcon className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />
                       </button>
                     </div>
-                  </div>
+                  </figure>
 
                   {/* 信息区域 */}
-                  <div className="flex items-center gap-2 p-2">
-                    <div className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${favorite.color}`} />
-                    <span className={`min-w-0 flex-1 truncate text-sm font-medium ${colorClass}`}>
-                      {favorite.name}
-                    </span>
-                    <span className="flex-shrink-0 text-xs opacity-60">
-                      {favorite.characters.length}
-                    </span>
+                  <div className="card-body">
+                    <div className="flex items-center gap-2">
+                      <div className={`h-2.5 w-2.5 flex-shrink-0 rounded-full ${favorite.color}`} />
+                      <span className={`min-w-0 flex-1 truncate text-sm font-medium ${colorClass}`}>
+                        {favorite.name}
+                      </span>
+                      <span className="flex-shrink-0 text-xs opacity-60">
+                        {favorite.characters.length}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -425,42 +405,6 @@ export function Favorite() {
 
         {/* 收藏夹列表或编辑表单 */}
         {isEditing ? renderEditForm() : renderFavoriteList()}
-
-        {/* 收藏夹详情Modal */}
-        {showDetailModal && selectedFavorite && !isModalExist(generatedDetailModalId) && (
-          <Modal
-            visible={showDetailModal}
-            onClose={closeFavoriteDetail}
-            title={`收藏夹 - ${selectedFavorite.name}`}
-            position="center"
-            maxWidth={1080}
-            modalId={generatedDetailModalId}
-            getModalId={(id) => {
-              generatedDetailModalId = id;
-            }}
-          >
-            <FavoriteDetail
-              favoriteId={selectedFavorite.id}
-              onCharacterClick={openCharacterDetail}
-              onDataChange={loadFavorites}
-            />
-          </Modal>
-        )}
-
-        {/* 角色详情Modal */}
-        {showCharacterModal && selectedCharacterId && !isModalExist(generatedCharacterModalId) && (
-          <Modal
-            visible={showCharacterModal}
-            onClose={closeCharacterDetail}
-            padding="p-6"
-            modalId={generatedCharacterModalId}
-            getModalId={(id) => {
-              generatedCharacterModalId = id;
-            }}
-          >
-            <CharacterBox characterId={selectedCharacterId} sticky={true} />
-          </Modal>
-        )}
       </div>
     );
   });

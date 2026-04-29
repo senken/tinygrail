@@ -1,13 +1,12 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { getRateRank, getRefineRank, getUserRank } from "@src/api/chara.js";
 import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
-import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
-import { getRefineRank, getUserRank, getRateRank } from "@src/api/chara.js";
+import { openCharacterBoxModal } from "@src/modules/character-box";
+import { openTempleModal } from "@src/modules/temple-detail/TempleDetail.jsx";
+import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { RateRank } from "./RateRank.jsx";
 import { RefineRank } from "./RefineRank.jsx";
 import { UserRank } from "./UserRank.jsx";
-import { RateRank } from "./RateRank.jsx";
 
 /**
  * 热门Tab组件
@@ -27,19 +26,6 @@ export function HotTab() {
     { value: "rateRank", label: "最高股息" },
   ];
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-  let generatedTempleModalId = null;
-  let generatedUserModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
     const {
       activeRanking = "refineRank",
@@ -51,12 +37,6 @@ export function HotTab() {
       rateRankData = null,
       rateRankLoading = true,
       rateRankPage = 1,
-      showCharacterModal = false,
-      characterModalId = null,
-      showTempleModal = false,
-      templeModalData = null,
-      showUserModal = false,
-      userModalUsername = null,
     } = state || {};
 
     // 标题栏
@@ -89,27 +69,11 @@ export function HotTab() {
       </div>
     );
 
-    // 角色点击处理
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
-
     // 圣殿点击处理
     const handleTempleClick = (temple) => {
-      setState({
-        showTempleModal: true,
-        templeModalData: temple,
-      });
-    };
-
-    // 用户点击处理
-    const handleUserClick = (username) => {
-      setState({
-        showUserModal: true,
-        userModalUsername: username,
+      openTempleModal({
+        temple,
+        characterName: temple.Name,
       });
     };
 
@@ -149,9 +113,9 @@ export function HotTab() {
             <RefineRank
               data={refineRankData}
               onPageChange={handleRefineRankPageChange}
-              onCharacterClick={handleCharacterClick}
+              onCharacterClick={openCharacterBoxModal}
               onTempleClick={handleTempleClick}
-              onUserClick={handleUserClick}
+              onUserClick={openUserTinygrailModal}
             />
           );
         case "userRank":
@@ -167,7 +131,7 @@ export function HotTab() {
               data={userRankData}
               currentPage={userRankPage}
               onPageChange={handleUserRankPageChange}
-              onUserClick={handleUserClick}
+              onUserClick={openUserTinygrailModal}
             />
           );
         case "rateRank":
@@ -183,7 +147,7 @@ export function HotTab() {
               data={rateRankData}
               currentPage={rateRankPage}
               onPageChange={handleRateRankPageChange}
-              onCharacterClick={handleCharacterClick}
+              onCharacterClick={openCharacterBoxModal}
             />
           );
         default:
@@ -191,9 +155,9 @@ export function HotTab() {
             <RefineRank
               data={refineRankData}
               onPageChange={handleRefineRankPageChange}
-              onCharacterClick={handleCharacterClick}
+              onCharacterClick={openCharacterBoxModal}
               onTempleClick={handleTempleClick}
-              onUserClick={handleUserClick}
+              onUserClick={openUserTinygrailModal}
             />
           );
       }
@@ -209,62 +173,6 @@ export function HotTab() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
-
-    // 圣殿弹窗
-    if (showTempleModal && templeModalData && !isModalExist(generatedTempleModalId)) {
-      const templeModal = (
-        <Modal
-          visible={showTempleModal}
-          onClose={() => setState({ showTempleModal: false })}
-          position="top"
-          maxWidth={1080}
-          padding="p-0"
-          scrollMode="outside"
-          modalId={generatedTempleModalId}
-          getModalId={(id) => {
-            generatedTempleModalId = id;
-          }}
-        >
-          <TempleDetail temple={templeModalData} characterName={templeModalData.Name} />
-        </Modal>
-      );
-      wrapper.appendChild(templeModal);
-    }
-
-    // 用户弹窗
-    if (showUserModal && userModalUsername && !isModalExist(generatedUserModalId)) {
-      const userModal = (
-        <Modal
-          visible={showUserModal}
-          onClose={() => setState({ showUserModal: false })}
-          modalId={generatedUserModalId}
-          getModalId={(id) => {
-            generatedUserModalId = id;
-          }}
-        >
-          <UserTinygrail username={userModalUsername} stickyTop="-8px" />
-        </Modal>
-      );
-      wrapper.appendChild(userModal);
-    }
 
     return wrapper;
   });

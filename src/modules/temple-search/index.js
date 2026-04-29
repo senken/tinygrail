@@ -1,1 +1,1 @@
-export { TempleSearch } from "./TempleSearch.jsx";
+export { TempleSearch, openTempleSearchModal } from "./TempleSearch.jsx";

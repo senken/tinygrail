@@ -1,8 +1,8 @@
-import { auctionCharacter, getAuctionList, cancelAuction } from "@src/api/chara.js";
-import { Button } from "@src/components/Button.jsx";
+import { auctionCharacter, cancelAuction, getAuctionList } from "@src/api/chara.js";
 import { Tooltip } from "@src/components/Tooltip.jsx";
 import { QuestionIcon } from "@src/icons";
 import { formatCurrency, formatNumber } from "@src/utils/format";
+import { openConfirmModal, openModal } from "@src/utils/modalManager.js";
 
 /**
  * 拍卖组件
@@ -10,8 +10,9 @@ import { formatCurrency, formatNumber } from "@src/utils/format";
  * @param {number} props.characterId - 角色ID
  * @param {number} props.basePrice - 底价
  * @param {number} props.maxAmount - 最大数量
+ * @param {Function} props.onSuccess - 成功回调
  */
-export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
+export function Auction({ characterId, basePrice = 0, maxAmount = 0, onSuccess }) {
   const minPrice = Math.ceil(basePrice);
   let price = minPrice.toString();
   let amount = maxAmount;
@@ -213,21 +214,27 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       return;
     }
 
-    if (!confirm("确定要取消竞拍吗？")) {
-      return;
-    }
+    openConfirmModal({
+      title: "取消竞拍",
+      message: "确定要取消竞拍吗？",
+      onConfirm: async () => {
+        updateStatus("处理中...", "");
 
-    updateStatus("处理中...", "");
+        const result = await cancelAuction(auctionData[0].Id);
 
-    const result = await cancelAuction(auctionData[0].Id);
-
-    if (result.success) {
-      updateStatus("取消竞拍成功", "success");
-      // 取消成功后刷新数据
-      await loadAuctionList(false);
-    } else {
-      updateStatus(result.message || "取消竞拍失败", "error");
-    }
+        if (result.success) {
+          updateStatus("取消竞拍成功", "success");
+          // 取消成功后刷新数据
+          await loadAuctionList(false);
+          // 调用成功回调
+          if (onSuccess) {
+            onSuccess();
+          }
+        } else {
+          updateStatus(result.message || "取消竞拍失败", "error");
+        }
+      },
+    });
   };
 
   /**
@@ -254,6 +261,10 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       updateStatus(result.data, "success");
       // 拍卖成功后刷新数据，不显示加载状态以保留成功消息
       await loadAuctionList(false);
+      // 调用成功回调
+      if (onSuccess) {
+        onSuccess();
+      }
     } else {
       updateStatus(result.message, "error");
     }
@@ -397,12 +408,45 @@ export function Auction({ characterId, basePrice = 0, maxAmount = 0 }) {
       {statusDiv}
 
       {/* 提交按钮 */}
-      <div className="flex justify-end gap-2">
-        <Button variant="outline" onClick={handleCancelAuction}>
+      <div className="flex justify-end gap-2 p-1">
+        <button className="btn btn-sm" onClick={handleCancelAuction}>
           取消竞拍
-        </Button>
-        <Button onClick={handleSubmit}>竞拍</Button>
+        </button>
+        <button className="btn-bgm btn btn-sm" onClick={handleSubmit}>
+          竞拍
+        </button>
       </div>
     </div>
   );
+}
+
+/**
+ * 打开拍卖弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {string} params.characterName - 角色名称
+ * @param {number} params.basePrice - 底价
+ * @param {number} params.maxAmount - 最大数量
+ * @param {Function} params.onSuccess - 成功回调
+ */
+export function openAuctionModal({
+  characterId,
+  characterName = "",
+  basePrice = 0,
+  maxAmount = 0,
+  onSuccess,
+}) {
+  openModal(`auction-${characterId}`, {
+    title: `拍卖 - #${characterId}「${characterName}」`,
+    content: (
+      <Auction
+        characterId={characterId}
+        basePrice={basePrice}
+        maxAmount={maxAmount}
+        onSuccess={onSuccess}
+      />
+    ),
+    size: "sm",
+    closeOnBackdropClick: false,
+  });
 }

@@ -10,7 +10,7 @@ import { Pagination } from "@src/components/Pagination.jsx";
  * @param {Function} props.onCharacterClick - 角色点击回调函数
  * @param {Function} props.onTempleClick - 圣殿点击回调函数
  */
-export function LinksTab({ data, onPageChange, onCharacterClick, onTempleClick }) {
+export function UserLinksTab({ data, onPageChange, onCharacterClick, onTempleClick }) {
   if (!data || !data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">

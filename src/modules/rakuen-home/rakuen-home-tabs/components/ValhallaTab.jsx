@@ -1,12 +1,11 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { Auction } from "@src/modules/auction/Auction.jsx";
-import { AuctionHistory } from "@src/modules/auction-history/AuctionHistory.jsx";
+import { getAuctionList, getUserCharas } from "@src/api/chara.js";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
+import { openAuctionHistoryModal } from "@src/modules/auction-history/AuctionHistory.jsx";
+import { openAuctionModal } from "@src/modules/auction/Auction.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box/utils/modalOpeners.jsx";
 import { CharacterPoolItem } from "@src/modules/rakuen-home/character-pool-item/CharacterPoolItem.jsx";
-import { getUserCharas, getAuctionList } from "@src/api/chara.js";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 
 /**
  * 英灵殿Tab组件
@@ -25,19 +24,6 @@ export function ValhallaTab() {
     { value: "gensokyo", label: "幻想乡" },
   ];
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-  let generatedAuctionModalId = null;
-  let generatedAuctionHistoryModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
     const {
       activeValhallaType = "valhalla",
@@ -48,16 +34,6 @@ export function ValhallaTab() {
       gensokyoData = null,
       gensokyoLoading = true,
       gensokyoPage = 1,
-      showCharacterModal = false,
-      characterModalId = null,
-      showAuctionModal = false,
-      auctionCharacterId = null,
-      auctionCharacterName = null,
-      auctionBasePrice = 0,
-      auctionMaxAmount = 0,
-      showAuctionHistoryModal = false,
-      auctionHistoryCharacterId = null,
-      auctionHistoryCharacterName = null,
     } = state || {};
 
     // 标题栏
@@ -90,31 +66,27 @@ export function ValhallaTab() {
       </div>
     );
 
-    // 角色点击处理
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
-
     // 拍卖按钮点击处理
     const handleAuctionClick = (item) => {
-      setState({
-        showAuctionModal: true,
-        auctionCharacterId: item.Id,
-        auctionCharacterName: item.Name,
-        auctionBasePrice: item.Price || 0,
-        auctionMaxAmount: item.State || 0,
+      openAuctionModal({
+        characterId: item.Id,
+        characterName: item.Name,
+        basePrice: item.Price || 0,
+        maxAmount: item.State || 0,
+        onSuccess: () => {
+          // 重新加载英灵殿拍卖信息
+          if (activeValhallaType === "valhalla") {
+            loadValhallaData(valhallaPage, false);
+          }
+        },
       });
     };
 
     // 往期按钮点击处理
     const handleHistoryClick = (item) => {
-      setState({
-        showAuctionHistoryModal: true,
-        auctionHistoryCharacterId: item.Id,
-        auctionHistoryCharacterName: item.Name,
+      openAuctionHistoryModal({
+        characterId: item.Id,
+        characterName: item.Name,
       });
     };
 
@@ -191,7 +163,7 @@ export function ValhallaTab() {
               auction={auction}
               showAuction={type === "valhalla"}
               showButtons={type === "valhalla"}
-              onClick={handleCharacterClick}
+              onClick={openCharacterBoxModal}
               onAuctionClick={handleAuctionClick}
               onHistoryClick={handleHistoryClick}
             />
@@ -253,78 +225,6 @@ export function ValhallaTab() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
-
-    // 拍卖弹窗
-    if (showAuctionModal && auctionCharacterId && !isModalExist(generatedAuctionModalId)) {
-      const modal = (
-        <Modal
-          visible={showAuctionModal}
-          onClose={() => {
-            setState({ showAuctionModal: false });
-            // 重新加载英灵殿拍卖信息
-            if (activeValhallaType === "valhalla") {
-              loadValhallaData(valhallaPage, false);
-            }
-          }}
-          title={`拍卖 - #${auctionCharacterId}「${auctionCharacterName}」`}
-          position="center"
-          maxWidth={480}
-          modalId={generatedAuctionModalId}
-          getModalId={(id) => {
-            generatedAuctionModalId = id;
-          }}
-        >
-          <Auction
-            characterId={auctionCharacterId}
-            basePrice={auctionBasePrice}
-            maxAmount={auctionMaxAmount}
-          />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
-
-    // 往期拍卖弹窗
-    if (
-      showAuctionHistoryModal &&
-      auctionHistoryCharacterId &&
-      !isModalExist(generatedAuctionHistoryModalId)
-    ) {
-      const modal = (
-        <Modal
-          visible={showAuctionHistoryModal}
-          onClose={() => setState({ showAuctionHistoryModal: false })}
-          title={`往期拍卖 - #${auctionHistoryCharacterId}「${auctionHistoryCharacterName}」`}
-          position="center"
-          maxWidth={800}
-          modalId={generatedAuctionHistoryModalId}
-          getModalId={(id) => {
-            generatedAuctionHistoryModalId = id;
-          }}
-        >
-          <AuctionHistory characterId={auctionHistoryCharacterId} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
 
     return wrapper;
   });

@@ -13,7 +13,7 @@ import { normalizeAvatar } from "@src/utils/oos.js";
 export function MyBids({ data, onPageChange, onCharacterClick }) {
   if (!data) {
     return (
-      <div className="tg-bg-content rounded-lg p-8 text-center">
+      <div className="p-8 text-center">
         <p className="text-sm opacity-60">加载中...</p>
       </div>
     );
@@ -21,7 +21,7 @@ export function MyBids({ data, onPageChange, onCharacterClick }) {
 
   if (!data.items || data.items.length === 0) {
     return (
-      <div className="tg-bg-content rounded-lg p-8 text-center">
+      <div className="p-8 text-center">
         <p className="text-sm opacity-60">暂无数据</p>
       </div>
     );
@@ -29,7 +29,7 @@ export function MyBids({ data, onPageChange, onCharacterClick }) {
 
   return (
     <div id="tg-my-bids-tab" className="flex w-full flex-col gap-4">
-      <div id="tg-my-bids-list" className="tg-bg-content rounded-lg">
+      <div id="tg-my-bids-list">
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {data.items.map((item, index) => {
             const fluctuation = item.Fluctuation || 0;

@@ -11,19 +11,19 @@ import { unescapeHtml } from "@src/utils/escape";
  * @param {Object} props.predicted - 计算后的ICO数据
  * @param {Function} props.loadUsersPage - 加载指定页用户数据的函数
  * @param {Function} props.openUserModal - 打开用户信息Modal的函数
- * @param {boolean} props.sticky - 是否启用粘性布局
- * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
+ * @param {string} props.headerBgClass - 标题背景色类名
  */
 export function IcoBoxUser({
   users,
   predicted,
   loadUsersPage,
   openUserModal,
-  sticky = false,
-  stickyTop = 0,
+  stickyTop,
+  headerBgClass = "",
 }) {
-  const stickyClass = sticky ? "sticky" : "";
-  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
+  const stickyClass = stickyTop !== undefined ? "sticky" : "";
+  const stickyStyle = stickyTop !== undefined ? { top: `${stickyTop}px` } : {};
 
   const {
     CurrentPage: currentPage = 1,
@@ -152,7 +152,7 @@ export function IcoBoxUser({
       {/* 标题 */}
       <div
         id="tg-ico-box-user-header"
-        className={`tg-bg-content z-10 mb-2 flex items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
+        className={`${headerBgClass} z-10 mb-2 flex items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
       >
         <span className="bgm-color text-sm font-semibold">

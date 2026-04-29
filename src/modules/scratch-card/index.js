@@ -1,1 +1,1 @@
-export { ScratchCard } from "./ScratchCard.jsx";
+export { ScratchCard, openScratchCardModal } from "./ScratchCard.jsx";

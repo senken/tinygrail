@@ -1,10 +1,9 @@
 import { getLatestLinks } from "@src/api/chara.js";
-import { Modal } from "@src/components/Modal.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { TempleLink } from "@src/components/TempleLink.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
-import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box";
+import { openTempleModal } from "@src/modules/temple-detail/TempleDetail.jsx";
+import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { unescapeHtml } from "@src/utils/escape";
 import { formatNumber } from "@src/utils/format.js";
@@ -20,62 +19,8 @@ export function LatestLinks() {
     />
   );
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-  let generatedTempleModalId = null;
-  let generatedUserModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
-    const {
-      linksData = null,
-      showCharacterModal = false,
-      characterModalId = null,
-      showTempleModal = false,
-      templeModalData = null,
-      showUserModal = false,
-      userModalName = null,
-    } = state || {};
-
-    /**
-     * 角色点击处理
-     * @param {number} characterId - 角色ID
-     */
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
-
-    /**
-     * 圣殿点击处理
-     * @param {Object} temple - 圣殿数据
-     */
-    const handleTempleClick = (temple) => {
-      setState({
-        showTempleModal: true,
-        templeModalData: temple,
-      });
-    };
-
-    /**
-     * 用户点击处理
-     * @param {string} username - 用户名
-     */
-    const handleUserClick = (username) => {
-      setState({
-        showUserModal: true,
-        userModalName: username,
-      });
-    };
+    const { linksData = null } = state || {};
 
     /**
      * 分页处理
@@ -143,15 +88,18 @@ export function LatestLinks() {
                   temple2={processedTemple2}
                   size={size}
                   onNameClick={(data) => {
-                    handleCharacterClick(data.CharacterId);
+                    openCharacterBoxModal(data.CharacterId);
                   }}
                   onCoverClick={(data) => {
-                    handleTempleClick(data);
+                    openTempleModal({
+                      temple: data,
+                      characterName: data.Name,
+                    });
                   }}
                 />
                 <div
                   className="tg-link cursor-pointer text-xs opacity-80 hover:opacity-100"
-                  onClick={() => handleUserClick(temple1.Name)}
+                  onClick={() => openUserTinygrailModal(temple1.Name)}
                 >
                   @{unescapeHtml(temple1.Nickname)} +{formatNumber(minAssets, 0)}
                 </div>
@@ -221,43 +169,6 @@ export function LatestLinks() {
       <div>
         {titleDiv}
         {contentDiv}
-        {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
-          <Modal
-            visible={showCharacterModal}
-            onClose={() => setState({ showCharacterModal: false })}
-            modalId={generatedCharacterModalId}
-            getModalId={(id) => {
-              generatedCharacterModalId = id;
-            }}
-            padding="p-6"
-          >
-            <CharacterBox characterId={characterModalId} sticky={true} />
-          </Modal>
-        )}
-        {showTempleModal && templeModalData && (
-          <Modal
-            visible={showTempleModal}
-            onClose={() => setState({ showTempleModal: false })}
-            position="top"
-            maxWidth={1080}
-            padding="p-0"
-            scrollMode="outside"
-          >
-            <TempleDetail temple={templeModalData} characterName={templeModalData.Name} />
-          </Modal>
-        )}
-        {showUserModal && userModalName && !isModalExist(generatedUserModalId) && (
-          <Modal
-            visible={showUserModal}
-            onClose={() => setState({ showUserModal: false })}
-            modalId={generatedUserModalId}
-            getModalId={(id) => {
-              generatedUserModalId = id;
-            }}
-          >
-            <UserTinygrail username={userModalName} stickyTop="-8px" />
-          </Modal>
-        )}
       </div>
     );
   });

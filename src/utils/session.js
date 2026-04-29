@@ -1,4 +1,5 @@
 import { getBangumiBonus } from "@src/api/event.js";
+import { openAlertModal } from "./modalManager";
 
 /**
  * 获取缓存的用户资产数据
@@ -33,7 +34,7 @@ export function performBangumiAuth(onSuccess) {
         // 获取奖励
         getBangumiBonus().then((result) => {
           if (result.success && result.message) {
-            alert(result.message);
+            openAlertModal(result.message);
           }
           if (onSuccess) {
             onSuccess();
@@ -61,6 +62,6 @@ export function isGameMaster() {
   if (!userAssets) {
     return false;
   }
-  
+
   return userAssets.type >= 999 || userAssets.id === 702;
 }

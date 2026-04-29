@@ -1,11 +1,12 @@
 import { cancelAuction, getAsksList, getAuctionList, getBidsList } from "@src/api/chara.js";
 import { getUserAuctions, getUserBalanceLog } from "@src/api/user.js";
-import { Modal } from "@src/components/Modal.jsx";
 import { Tabs } from "@src/components/Tabs.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box/utils/modalOpeners.jsx";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { openModal, openConfirmModal } from "@src/utils/modalManager.js";
 import { createRequestManager } from "@src/utils/requestManager.js";
 import { scrollToTop } from "@src/utils/scroll.js";
+import { showError, showSuccess } from "@src/utils/toastManager.jsx";
 import { BalanceLog } from "./components/BalanceLog.jsx";
 import { MyAsks } from "./components/MyAsks.jsx";
 import { MyAuctions } from "./components/MyAuctions.jsx";
@@ -28,17 +29,6 @@ export function UserAssetsLog() {
   let currentMyAuctionsPage = 1;
   let currentMyBidsPage = 1;
   let currentMyAsksPage = 1;
-
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
 
   /**
    * 加载我的拍卖数据
@@ -83,8 +73,6 @@ export function UserAssetsLog() {
         myAuctionsData = null,
         myBidsData = null,
         myAsksData = null,
-        showCharacterModal = false,
-        characterModalId = null,
       } = state || {};
 
       /**
@@ -130,9 +118,11 @@ export function UserAssetsLog() {
        * @param {number} characterId - 角色ID
        */
       const handleCharacterClick = (characterId) => {
-        setState({
-          showCharacterModal: true,
-          characterModalId: characterId,
+        openCharacterBoxModal(characterId, {
+          onClose: () => {
+            // 刷新当前tab数据
+            loadTabData(activeTab);
+          },
         });
       };
 
@@ -141,19 +131,21 @@ export function UserAssetsLog() {
        * @param {number} auctionId - 拍卖ID
        */
       const handleCancelAuction = async (auctionId) => {
-        if (!confirm("确定要取消竞拍吗？")) {
-          return;
-        }
+        openConfirmModal({
+          title: "取消竞拍",
+          message: "确定要取消竞拍吗？",
+          onConfirm: async () => {
+            const result = await cancelAuction(auctionId);
 
-        const result = await cancelAuction(auctionId);
-
-        if (result.success) {
-          alert("取消竞拍成功");
-          // 重新加载当前页数据
-          handleMyAuctionsPageChange(currentMyAuctionsPage);
-        } else {
-          alert(result.message || "取消竞拍失败");
-        }
+            if (result.success) {
+              showSuccess("取消竞拍成功");
+              // 重新加载当前页数据
+              handleMyAuctionsPageChange(currentMyAuctionsPage);
+            } else {
+              showError(result.message || "取消竞拍失败");
+            }
+          },
+        });
       };
 
       /**
@@ -255,26 +247,9 @@ export function UserAssetsLog() {
             sticky={true}
             size="small"
             padding="px-1 pt-0 pb-3"
-            navBgClass="tg-bg-content"
-            contentBgClass="tg-bg-content"
+            navBgClass="bg-base-100"
+            contentBgClass="bg-base-100"
           />
-          {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
-            <Modal
-              visible={showCharacterModal}
-              onClose={() => {
-                setState({ showCharacterModal: false });
-                // 刷新当前tab数据
-                loadTabData(activeTab);
-              }}
-              modalId={generatedCharacterModalId}
-              getModalId={(id) => {
-                generatedCharacterModalId = id;
-              }}
-              padding="p-6"
-            >
-              <CharacterBox characterId={characterModalId} sticky={true} />
-            </Modal>
-          )}
         </div>
       );
     },
@@ -337,4 +312,15 @@ export function UserAssetsLog() {
   loadTabData(0);
 
   return container;
+}
+
+/**
+ * 打开用户资产记录弹窗
+ */
+export function openUserAssetsLogModal() {
+  openModal("user-assets-log", {
+    title: "资产记录",
+    content: <UserAssetsLog />,
+    size: "lg",
+  });
 }

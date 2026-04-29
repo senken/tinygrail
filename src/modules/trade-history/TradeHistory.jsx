@@ -1,6 +1,7 @@
 import { getCharacterCharts } from "@src/api/chara.js";
 import { formatCurrency, formatDateTime, formatNumber } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { openModal } from "@src/utils/modalManager.js";
 
 /**
  * 交易记录组件
@@ -14,11 +15,11 @@ export function TradeHistory({ characterId }) {
 
   const loadingDiv = <div className="text-center text-gray-600 dark:text-gray-400">加载中...</div>;
   const headerDiv = (
-    <div className="grid grid-cols-4 gap-2 border-b border-gray-300 pb-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300">
-      <div>交易时间</div>
-      <div className="text-right">价格</div>
-      <div className="text-right">数量</div>
-      <div className="text-right">交易额</div>
+    <div className="grid grid-cols-[1fr_1fr_1fr_100px] gap-2 border-b border-gray-300 pb-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:text-gray-300">
+      <div>价格</div>
+      <div>数量</div>
+      <div>交易额</div>
+      <div className="text-right">交易时间</div>
     </div>
   );
   const resultContainer = <div className="flex flex-col gap-2" />;
@@ -71,18 +72,18 @@ export function TradeHistory({ characterId }) {
     records.forEach((record) => {
       const price = record.Amount > 0 ? record.Price / record.Amount : 0;
       const row = (
-        <div className="grid grid-cols-4 gap-2 text-sm">
-          <span className="text-gray-600 dark:text-gray-400" title="交易时间">
-            {formatDateTime(record.Time, "YYYY-MM-DD HH:mm")}
-          </span>
-          <span className="text-right text-gray-900 dark:text-gray-100" title="价格">
+        <div className="grid grid-cols-[1fr_1fr_1fr_100px] gap-2 text-sm">
+          <span className="text-gray-900 dark:text-gray-100" title="价格">
             {formatCurrency(price, "₵", 2, false)}
           </span>
-          <span className="text-right text-gray-900 dark:text-gray-100" title="数量">
+          <span className="text-gray-900 dark:text-gray-100" title="数量">
             {formatNumber(record.Amount, 0)}
           </span>
-          <span className="text-right text-gray-900 dark:text-gray-100" title="交易额">
+          <span className="text-gray-900 dark:text-gray-100" title="交易额">
             {formatCurrency(record.Price)}
+          </span>
+          <span className="text-right text-gray-600 dark:text-gray-400" title="交易时间">
+            {formatDateTime(record.Time, "YYYY-MM-DD HH:mm")}
           </span>
         </div>
       );
@@ -146,4 +147,17 @@ export function TradeHistory({ characterId }) {
       {paginationContainer}
     </div>
   );
+}
+
+/**
+ * 打开交易记录弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {string} params.characterName - 角色名称
+ */
+export function openTradeHistoryModal({ characterId, characterName = "" }) {
+  openModal(`trade-history-${characterId}`, {
+    title: `交易记录 - #${characterId}「${characterName}」`,
+    content: <TradeHistory characterId={characterId} />,
+  });
 }

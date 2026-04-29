@@ -92,7 +92,7 @@ export function Pagination({ current = 1, total = 1, onChange, type = "normal", 
 
   const prevButton = (
     <button
-      className={`flex items-center justify-center rounded-md border border-gray-300 p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`flex items-center justify-center rounded-l-md border border-gray-300 p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
         prevDisabled ? "" : "hover:bg-gray-100 dark:hover:bg-gray-700"
       } dark:border-gray-600`}
       onClick={() => onChange && onChange(current - 1)}
@@ -104,7 +104,7 @@ export function Pagination({ current = 1, total = 1, onChange, type = "normal", 
 
   const nextButton = (
     <button
-      className={`flex items-center justify-center rounded-md border border-gray-300 p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`flex items-center justify-center rounded-r-md border border-l-0 border-gray-300 p-1 transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
         nextDisabled ? "" : "hover:bg-gray-100 dark:hover:bg-gray-700"
       } dark:border-gray-600`}
       onClick={() => onChange && onChange(current + 1)}
@@ -115,59 +115,62 @@ export function Pagination({ current = 1, total = 1, onChange, type = "normal", 
   if (nextDisabled) nextButton.disabled = true;
 
   return (
-    <div id="tg-pagination" className={`flex flex-wrap items-center justify-center gap-1 ${className}`}>
-      {/* 上一页 */}
-      {prevButton}
+    <div id="tg-pagination" className={`flex flex-wrap items-center justify-center gap-2 ${className}`}>
+      {/* 分页按钮组 */}
+      <div className="inline-flex rounded-md">
+        {/* 上一页 */}
+        {prevButton}
 
-      {/* 页码 */}
-      {pageNumbers.map((page, index) => {
-        if (page === "...") {
-          // 判断是左侧还是右侧省略号
-          const isLeft = index < pageNumbers.length / 2;
-          const targetPage = isLeft
-            ? Math.max(1, current - 5)
-            : Math.min(total, current + 5);
+        {/* 页码 */}
+        {pageNumbers.map((page, index) => {
+          if (page === "...") {
+            // 判断是左侧还是右侧省略号
+            const isLeft = index < pageNumbers.length / 2;
+            const targetPage = isLeft
+              ? Math.max(1, current - 5)
+              : Math.min(total, current + 5);
 
-          const ellipsisButton = (
+            const ellipsisButton = (
+              <button
+                className="group flex min-w-[32px] items-center justify-center rounded-none border border-l-0 border-gray-300 px-2 py-1 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+                onClick={() => onChange && onChange(targetPage)}
+              >
+                <span className="block group-hover:hidden">
+                  <EllipsisIcon className="size-5" />
+                </span>
+                <span className="hidden group-hover:block">
+                  {isLeft ? <ChevronsLeftIcon className="size-5" /> : <ChevronsRightIcon className="size-5" />}
+                </span>
+              </button>
+            );
+
+            return ellipsisButton;
+          }
+
+          return (
             <button
-              className="group flex min-w-[32px] items-center justify-center rounded-md border border-gray-300 px-2 py-1 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-              onClick={() => onChange && onChange(targetPage)}
+              className={`min-w-[32px] rounded-none border border-l-0 px-2 py-1 text-sm transition-colors ${
+                page === current
+                  ? "bgm-border-color bgm-bg text-white"
+                  : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+              }`}
+              onClick={() => {
+                if (page !== current) {
+                  onChange && onChange(page);
+                }
+              }}
             >
-              <span className="block group-hover:hidden">
-                <EllipsisIcon className="size-5" />
-              </span>
-              <span className="hidden group-hover:block">
-                {isLeft ? <ChevronsLeftIcon className="size-5" /> : <ChevronsRightIcon className="size-5" />}
-              </span>
+              {page}
             </button>
           );
+        })}
 
-          return ellipsisButton;
-        }
-
-        return (
-          <button
-            className={`min-w-[32px] rounded-md border px-2 py-1 text-sm transition-colors ${
-              page === current
-                ? "bgm-border-color bgm-bg text-white"
-                : "border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-            }`}
-            onClick={() => {
-              if (page !== current) {
-                onChange && onChange(page);
-              }
-            }}
-          >
-            {page}
-          </button>
-        );
-      })}
-
-      {/* 下一页 */}
-      {nextButton}
+        {/* 下一页 */}
+        {nextButton}
+      </div>
 
       {/* 跳转输入框 */}
-      <div className="flex items-center gap-2 ml-2">
+      <div className="flex items-center gap-2">
         <span className="text-sm opacity-60">跳至</span>
         <input
           type="number"

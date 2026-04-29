@@ -1,1 +1,1 @@
-export { Guidepost } from "./Guidepost.jsx";
+export { Guidepost, openGuidepostModal } from "./Guidepost.jsx";

@@ -2,6 +2,10 @@ import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber, formatCurrency } from "@src/utils/format.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { openModal } from "@src/utils/modalManager.js";
+import { getTopWeekHistory } from "@src/api/chara.js";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { scrollToTop } from "@src/utils/scroll.js";
 
 /**
  * 往期萌王组件
@@ -136,4 +140,46 @@ export function TopWeekHistory({
   }
 
   return container;
+}
+
+/**
+ * 打开往期萌王弹窗
+ * @param {Object} params
+ * @param {Array} params.initialHistoryData - 初始往期萌王数据
+ * @param {number} params.initialPage - 初始页码
+ * @param {Function} params.onCharacterClick - 角色点击回调
+ */
+export function openTopWeekHistoryModal({ initialHistoryData, initialPage = 1, onCharacterClick }) {
+  const modalId = "top-week-history";
+  
+  const container = <div />;
+  
+  const { setState } = createMountedComponent(container, (state) => {
+    const { historyData = initialHistoryData, currentPage = initialPage } = state || {};
+    
+    const handlePageChange = async (page) => {
+      const result = await getTopWeekHistory(page);
+      if (result.success) {
+        setState({ historyData: result.data.items, currentPage: page });
+        
+        // 滚动到顶部
+        scrollToTop(container);
+      }
+    };
+    
+    return (
+      <TopWeekHistory
+        historyData={historyData}
+        currentPage={currentPage}
+        onPageChange={handlePageChange}
+        onCharacterClick={onCharacterClick}
+      />
+    );
+  }, true);
+
+  openModal(modalId, {
+    title: "往期萌王",
+    content: container,
+    size: "md",
+  });
 }

@@ -135,6 +135,7 @@ export function UserInfoBox(userData) {
               className="tg-link inline-flex items-center gap-1 text-sm font-semibold transition-colors"
             >
               <span>{nickname}</span>
+              <SquareArrowOutUpRightIcon className="h-3.5 w-3.5 flex-shrink-0" />
             </a>
             <button
               id="tg-rakuen-home-logout-button"

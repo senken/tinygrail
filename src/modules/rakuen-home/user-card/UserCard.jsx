@@ -1,30 +1,25 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { getUserAssets, logout } from "@src/api/user.js";
 import {
   checkHolidayBonus,
-  claimHolidayBonus,
   claimDailyBonus,
+  claimHolidayBonus,
   claimWeeklyBonus,
-  getShareBonusTest,
   getDailyEventCount,
-  scratchBonus,
 } from "@src/api/event.js";
-import { formatNumber } from "@src/utils/format.js";
-import { UserInfoBox } from "./components/UserInfoBox.jsx";
-import { LoginBox } from "./components/LoginBox.jsx";
-import { ScratchConfirm } from "./components/ScratchConfirm.jsx";
-import { Modal, closeModalById } from "@src/components/Modal.jsx";
-import { UserTinygrail } from "@src/modules/user-tinygrail";
-import { ScratchCard } from "@src/modules/scratch-card";
-import { UserAssetsLog } from "@src/modules/user-assets-log";
+import { getUserAssets, logout } from "@src/api/user.js";
 import { Favorite } from "@src/modules/favorite";
+import { openUserAssetsLogModal } from "@src/modules/user-assets-log";
+import { openUserTinygrailModal } from "@src/modules/user-tinygrail";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { openAlertModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
+import { showWarning } from "@src/utils/toastManager.jsx";
+import { LoginBox } from "./components/LoginBox.jsx";
+import { openScratchConfirmModal } from "./components/ScratchConfirm.jsx";
+import { openShareBonusModal } from "./components/ShareBonusModal.jsx";
+import { openTarotModal } from "./components/TarotModal.jsx";
+import { UserInfoBox } from "./components/UserInfoBox.jsx";
 
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
-
-  let generatedScratchModalId = null;
-  let generatedScratchResultModalId = null;
-  let generatedFavoriteModalId = null;
 
   const { setState } = createMountedComponent(container, (state, setState) => {
     const {
@@ -39,15 +34,6 @@ export function UserCard() {
       showWeekly,
       showHoliday,
       holidayName,
-      showModal,
-      showScratchModal = false,
-      showScratchResultModal = false,
-      showBalanceLogModal = false,
-      showFavoriteModal = false,
-      showTarotModal = false,
-      scratchResultData = null,
-      isLotus = false,
-      lotusCount = 0,
       abbreviateBalance = true,
     } = state || {};
 
@@ -91,117 +77,24 @@ export function UserCard() {
           onShareBonusTest={handleShareBonusTest}
           onScratch={handleOpenScratch}
           onAvatarClick={() => {
-            setState({ showModal: true });
+            openUserTinygrailModal(name);
           }}
           onToggleAbbreviate={() => {
             setState({ abbreviateBalance: !abbreviateBalance });
           }}
           onBalanceLog={() => {
-            setState({ showBalanceLogModal: true });
+            openUserAssetsLogModal();
           }}
           onFavorite={() => {
-            setState({ showFavoriteModal: true });
+            openModal("favorite-modal", {
+              title: "收藏夹",
+              content: <Favorite />,
+            });
           }}
           onTarot={() => {
-            setState({ showTarotModal: true });
+            openTarotModal();
           }}
         />
-
-        {showModal && (
-          <Modal visible={showModal} onClose={() => setState({ showModal: false })}>
-            <UserTinygrail username={name} stickyTop="-8px" />
-          </Modal>
-        )}
-
-        {showScratchModal && !isModalExist(generatedScratchModalId) && (
-          <Modal
-            visible={showScratchModal}
-            onClose={closeScratchModal}
-            title="彩票抽奖"
-            position="center"
-            maxWidth={400}
-            modalId={generatedScratchModalId}
-            getModalId={(id) => {
-              generatedScratchModalId = id;
-            }}
-          >
-            <ScratchConfirm
-              isLotus={isLotus}
-              lotusCount={lotusCount}
-              onConfirm={handleConfirmScratch}
-              onCancel={closeScratchModal}
-            />
-          </Modal>
-        )}
-
-        {showScratchResultModal &&
-          scratchResultData &&
-          !isModalExist(generatedScratchResultModalId) && (
-            <Modal
-              visible={showScratchResultModal}
-              onClose={closeScratchResultModal}
-              title="彩票抽奖"
-              position="center"
-              maxWidth={800}
-              modalId={generatedScratchResultModalId}
-              getModalId={(id) => {
-                generatedScratchResultModalId = id;
-              }}
-            >
-              <ScratchCard charas={scratchResultData} />
-            </Modal>
-          )}
-
-        {showBalanceLogModal && (
-          <Modal
-            visible={showBalanceLogModal}
-            onClose={() => setState({ showBalanceLogModal: false })}
-            title="交易记录"
-            position="center"
-            maxWidth={960}
-          >
-            <UserAssetsLog />
-          </Modal>
-        )}
-
-        {showFavoriteModal && !isModalExist(generatedFavoriteModalId) && (
-          <Modal
-            visible={showFavoriteModal}
-            onClose={() => setState({ showFavoriteModal: false })}
-            title="收藏夹"
-            position="center"
-            maxWidth={640}
-            modalId={generatedFavoriteModalId}
-            getModalId={(id) => {
-              generatedFavoriteModalId = id;
-            }}
-          >
-            <Favorite />
-          </Modal>
-        )}
-
-        {showTarotModal && (
-          <Modal
-            visible={showTarotModal}
-            onClose={() => setState({ showTarotModal: false })}
-            position="center"
-            maxWidth={480}
-            padding="p-0"
-          >
-            <div style={{ width: "440px", height: "80vh" }}>
-              <iframe
-                src="https://tinygrail.mange.cn/tarot2.html"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  border: "none",
-                  display: "block",
-                }}
-                title="塔罗占卜"
-              />
-            </div>
-          </Modal>
-        )}
       </div>
     );
   });
@@ -238,33 +131,22 @@ export function UserCard() {
 
   // 退出登录
   const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
-      setState({ authorized: false });
-    }
+    openConfirmModal({
+      title: "退出登录",
+      message: "确定要退出登录吗？",
+      confirmText: "退出",
+      onConfirm: async () => {
+        const result = await logout();
+        if (result.success) {
+          setState({ authorized: false });
+        }
+      },
+    });
   };
 
   // 股息预测
-  const handleShareBonusTest = async () => {
-    const result = await getShareBonusTest();
-
-    if (!result.success) {
-      alert(result.message);
-      return;
-    }
-
-    const { total, temples, daily, share, tax } = result.data;
-    const taxRate = share > 0 ? formatNumber((tax / share) * 100, 2) : 0;
-
-    if (daily) {
-      alert(
-        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，登录奖励₵${formatNumber(daily, 0)}，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}(${taxRate}%)，税后₵${formatNumber(share - tax, 0)}`
-      );
-    } else {
-      alert(
-        `本期计息股份共${formatNumber(total, 0)}股，圣殿${formatNumber(temples, 0)}座，预期股息₵${formatNumber(share, 0)}，需缴纳个人所得税₵${formatNumber(tax, 0)}(${taxRate}%)，税后₵${formatNumber(share - tax, 0)}`
-      );
-    }
+  const handleShareBonusTest = () => {
+    openShareBonusModal();
   };
 
   // 领取节日奖励
@@ -272,11 +154,14 @@ export function UserCard() {
     const result = await claimHolidayBonus();
 
     if (result.success) {
-      alert(result.data);
+      openAlertModal({
+        title: "节日奖励",
+        message: result.data,
+      });
       setState({ showHoliday: false });
       loadUserAssets();
     } else {
-      alert(result.message);
+      showWarning(result.message);
     }
   };
 
@@ -285,11 +170,14 @@ export function UserCard() {
     const result = await claimDailyBonus();
 
     if (result.success) {
-      alert(result.data);
+      openAlertModal({
+        title: "每日签到",
+        message: result.data,
+      });
       setState({ showDaily: false });
       loadUserAssets();
     } else {
-      alert(result.message);
+      showWarning(result.message);
     }
   };
 
@@ -298,11 +186,14 @@ export function UserCard() {
     const result = await claimWeeklyBonus();
 
     if (result.success) {
-      alert(result.data);
+      openAlertModal({
+        title: "每周分红",
+        message: result.data,
+      });
       setState({ showWeekly: false });
       loadUserAssets();
     } else {
-      alert(result.message);
+      showWarning(result.message);
     }
   };
 
@@ -312,46 +203,11 @@ export function UserCard() {
     const result = await getDailyEventCount();
     const count = result.success ? result.data : 0;
 
-    setState({
-      showScratchModal: true,
-      lotusCount: count,
+    openScratchConfirmModal({
       isLotus: false,
+      lotusCount: count,
+      onSuccess: loadUserAssets,
     });
-  };
-
-  // 关闭刮刮乐弹窗
-  const closeScratchModal = () => {
-    closeModalById(generatedScratchModalId);
-    setState({ showScratchModal: false });
-  };
-
-  // 关闭刮刮乐结果弹窗
-  const closeScratchResultModal = () => {
-    closeModalById(generatedScratchResultModalId);
-    setState({ showScratchResultModal: false, scratchResultData: null });
-  };
-
-  // 确认刮刮乐
-  const handleConfirmScratch = async (isLotusType) => {
-    // 调用刮刮乐API
-    const result = await scratchBonus(isLotusType);
-
-    if (!result.success) {
-      alert(result.message);
-      return;
-    }
-
-    // 关闭确认弹窗
-    closeScratchModal();
-
-    // 显示刮刮乐结果
-    setState({
-      showScratchResultModal: true,
-      scratchResultData: result.data,
-    });
-
-    // 刷新用户资产
-    loadUserAssets();
   };
 
   // 组件加载时请求用户资产信息

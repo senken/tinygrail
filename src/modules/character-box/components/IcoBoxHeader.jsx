@@ -48,11 +48,40 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   const restText = `${goal}${needUsers}${needMoney}`;
 
   // 倒计时元素
-  const countdownSpan = <span>剩余时间：计算中...</span>;
+  const daysSpan = <span style={{ "--value": 0 }}></span>;
+  const hoursSpan = <span style={{ "--value": 0 }}></span>;
+  const minutesSpan = <span style={{ "--value": 0 }}></span>;
+  const secondsSpan = <span style={{ "--value": 0 }}></span>;
+  const endTimeSpan = <span className="opacity-60"></span>;
+
+  const countdownContainer = (
+    <div className="flex items-center">
+      <div className="flex gap-1">
+        <div className="flex items-center gap-0.5">
+          <span className="countdown font-mono font-bold">{daysSpan}</span>
+          <span>天</span>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <span className="countdown font-mono font-bold">{hoursSpan}</span>
+          <span>时</span>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <span className="countdown font-mono font-bold">{minutesSpan}</span>
+          <span>分</span>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <span className="countdown font-mono font-bold">{secondsSpan}</span>
+          <span>秒</span>
+        </div>
+      </div>
+      {endTimeSpan}
+    </div>
+  );
 
   // 倒计时
   if (End) {
     const endTimeText = End ? formatDateTime(End, "YYYY-MM-DD HH:mm:ss") : "未知";
+    endTimeSpan.textContent = `（${endTimeText}）`;
 
     const updateCountdown = () => {
       const endDate = new Date(End);
@@ -60,7 +89,8 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
       const diff = endDate - now;
 
       if (diff <= 0) {
-        countdownSpan.textContent = "剩余时间：已结束";
+        countdownContainer.innerHTML = "";
+        countdownContainer.textContent = "剩余时间：已结束";
         return;
       }
 
@@ -69,14 +99,11 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-      let timeText = "剩余时间：";
-      timeText += `${days}天`;
-      timeText += `${hours}小时`;
-      timeText += `${minutes}分`;
-      timeText += `${seconds}秒`;
-      timeText += `（${endTimeText}）`;
-
-      countdownSpan.textContent = timeText;
+      // 更新每个 span 的 --value
+      daysSpan.style.setProperty("--value", days);
+      hoursSpan.style.setProperty("--value", hours);
+      minutesSpan.style.setProperty("--value", minutes);
+      secondsSpan.style.setProperty("--value", seconds);
     };
 
     updateCountdown();
@@ -104,7 +131,7 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
               href={`https://bgm.tv/character/${CharacterId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="tg-link flex min-w-0 flex-1 items-center gap-1 text-sm font-semibold"
+              className="tg-link inline-flex min-w-0 items-center gap-1 text-sm font-semibold"
             >
               <span className="truncate">
                 #{CharacterId} -「{Name}」
@@ -178,7 +205,7 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
       {/* 进度条 */}
       <div id="tg-ico-box-header-progress" className="flex flex-col gap-1">
         <div className="flex items-center justify-between text-xs opacity-60">
-          {countdownSpan}
+          {countdownContainer}
           <span>{percent}%</span>
         </div>
         <ProgressBar value={Total} max={predicted.Next} color="#64ee10" height="h-1" />

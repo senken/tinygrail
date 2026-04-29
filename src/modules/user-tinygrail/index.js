@@ -1,1 +1,1 @@
-export { UserTinygrail } from "./UserTinygrail.jsx";
+export { UserTinygrail, openUserTinygrailModal } from "./UserTinygrail.jsx";

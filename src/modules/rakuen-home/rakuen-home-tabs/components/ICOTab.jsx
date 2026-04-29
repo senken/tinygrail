@@ -1,7 +1,6 @@
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
@@ -30,17 +29,6 @@ export function ICOTab() {
     { value: "mostRecent", label: "即将结束" },
   ];
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
     const {
       activeICOType = "maxValue",
@@ -53,8 +41,6 @@ export function ICOTab() {
       mostRecentData = null,
       mostRecentLoading = true,
       mostRecentPage = 1,
-      showCharacterModal = false,
-      characterModalId = null,
     } = state || {};
 
     // 标题栏
@@ -92,14 +78,6 @@ export function ICOTab() {
       </div>
     );
 
-    // 角色点击处理
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
-
     /**
      * 渲染ICO项
      * @param {Object} item - ICO数据
@@ -112,7 +90,31 @@ export function ICOTab() {
       const displayPercent = percent > 100 ? 100 : percent;
 
       // 倒计时元素
-      const countdownSpan = <span className="text-xs opacity-60">计算中...</span>;
+      const daysSpan = <span style={{ "--value": 0 }}></span>;
+      const hoursSpan = <span style={{ "--value": 0 }}></span>;
+      const minutesSpan = <span style={{ "--value": 0 }}></span>;
+      const secondsSpan = <span style={{ "--value": 0 }}></span>;
+
+      const countdownContainer = (
+        <div className="flex gap-1 text-xs opacity-60">
+          <div className="flex items-center gap-0.5">
+            <span className="countdown font-mono font-bold">{daysSpan}</span>
+            <span>天</span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <span className="countdown font-mono font-bold">{hoursSpan}</span>
+            <span>时</span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <span className="countdown font-mono font-bold">{minutesSpan}</span>
+            <span>分</span>
+          </div>
+          <div className="flex items-center gap-0.5">
+            <span className="countdown font-mono font-bold">{secondsSpan}</span>
+            <span>秒</span>
+          </div>
+        </div>
+      );
 
       // 倒计时
       if (item.End) {
@@ -124,7 +126,8 @@ export function ICOTab() {
           const diff = endDate - now;
 
           if (diff <= 0) {
-            countdownSpan.textContent = "已结束";
+            countdownContainer.innerHTML = "";
+            countdownContainer.textContent = "已结束";
             return;
           }
 
@@ -133,13 +136,11 @@ export function ICOTab() {
           const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-          let timeText = "";
-          timeText += `${days}天`;
-          timeText += `${hours}小时`;
-          timeText += `${minutes}分`;
-          timeText += `${seconds}秒`;
-
-          countdownSpan.textContent = timeText;
+          // 更新每个 span 的 --value
+          daysSpan.style.setProperty("--value", days);
+          hoursSpan.style.setProperty("--value", hours);
+          minutesSpan.style.setProperty("--value", minutes);
+          secondsSpan.style.setProperty("--value", seconds);
         };
 
         updateCountdown();
@@ -160,7 +161,7 @@ export function ICOTab() {
         <div
           data-character-id={item.CharacterId}
           className="tg-bg-content flex min-w-0 cursor-pointer flex-col items-center gap-3 rounded-lg p-4"
-          onClick={() => handleCharacterClick(item.CharacterId)}
+          onClick={() => openCharacterBoxModal(item.CharacterId)}
         >
           {/* 头像 */}
           <div className="relative">
@@ -221,9 +222,9 @@ export function ICOTab() {
 
             {/* 进度条 */}
             <div className="flex w-full flex-col gap-1">
-              <div className="flex items-center justify-between text-xs opacity-60">
-                {countdownSpan}
-                <span>{percent}%</span>
+              <div className="flex items-center justify-between">
+                {countdownContainer}
+                <span className="text-xs opacity-60">{percent}%</span>
               </div>
               <ProgressBar value={item.Total} max={predicted.Next} color="#64ee10" height="h-1" />
             </div>
@@ -355,24 +356,6 @@ export function ICOTab() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
 
     return wrapper;
   });

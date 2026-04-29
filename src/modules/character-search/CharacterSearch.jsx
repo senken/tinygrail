@@ -1,8 +1,8 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getUserCharas, searchCharacter } from "@src/api/chara.js";
-import { Pagination } from "@src/components/Pagination.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { Button } from "@src/components/Button.jsx";
+import { Pagination } from "@src/components/Pagination.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { openModal } from "@src/utils/modalManager.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
 
 /**
@@ -63,31 +63,39 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
     };
 
     // 内容容器
-    const contentDiv = <div className="flex w-96 flex-col gap-2" />;
+    const contentDiv = <div className="flex w-full flex-col gap-2" />;
 
     // 搜索框区域
     const searchDiv = (
-      <div id="tg-character-search-input" className="flex gap-1 px-1">
-        <input
-          type="text"
-          className="tg-input flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 dark:border-gray-600"
-          placeholder="搜索角色（角色ID或名称）"
-          value={keyword}
-          onInput={(e) => {
-            currentInputValue = e.target.value;
-          }}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
-        />
-        <Button variant="solid" size="sm" onClick={handleSearch}>
-          搜索
-        </Button>
+      <div id="tg-character-search-input" className="sticky top-0 z-10 flex gap-1 bg-base-100 p-1">
+        <div className="join w-full">
+          <input
+            type="text"
+            className="input input-sm join-item input-bordered w-full !bg-base-100"
+            placeholder="搜索角色（角色ID或名称）"
+            value={keyword}
+            onInput={(e) => {
+              currentInputValue = e.target.value;
+            }}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+          />
+          <button className="btn-bgm btn join-item btn-sm" onClick={handleSearch}>
+            搜索
+          </button>
+        </div>
       </div>
     );
     contentDiv.appendChild(searchDiv);
+
+    // 自动聚焦输入框
+    setTimeout(() => {
+      const input = searchDiv.querySelector("input");
+      if (input) input.focus();
+    }, 100);
 
     // 加载状态
     if (loading) {
@@ -217,4 +225,20 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
   loadCharacters(1);
 
   return container;
+}
+
+/**
+ * 打开角色搜索弹窗
+ * @param {Object} params
+ * @param {string} params.title - 弹窗标题
+ * @param {string} params.username - 用户名
+ * @param {Function} params.onCharacterClick - 点击角色回调函数
+ */
+export function openCharacterSearchModal({ title, username, onCharacterClick }) {
+  const modalId = `character-search-${username}`;
+
+  openModal(modalId, {
+    title,
+    content: <CharacterSearch username={username} onCharacterClick={onCharacterClick} />,
+  });
 }

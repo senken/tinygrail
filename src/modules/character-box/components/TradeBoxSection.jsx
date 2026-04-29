@@ -1,6 +1,7 @@
-import { formatCurrency, formatDateTime, formatNumber, formatTimeAgo } from "@src/utils/format.js";
-import { bidCharacter, askCharacter, cancelBid, cancelAsk } from "@src/api/chara.js";
+import { askCharacter, bidCharacter, cancelAsk, cancelBid } from "@src/api/chara.js";
 import { ChevronDownIcon } from "@src/icons/index.js";
+import { formatCurrency, formatDateTime, formatNumber, formatTimeAgo } from "@src/utils/format.js";
+import { showError, showSuccess, showWarning } from "@src/utils/toastManager";
 
 /**
  * 交易区域组件
@@ -9,27 +10,27 @@ import { ChevronDownIcon } from "@src/icons/index.js";
  * @param {Object} props.userAssets - 用户资产数据
  * @param {Object} props.userCharacter - 用户角色数据
  * @param {Object} props.depth - 市场深度数据
- * @param {boolean} props.sticky - 是否启用粘性布局
- * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
  * @param {Function} props.onRefresh - 刷新数据的回调函数
  * @param {Function} props.setLoading - 设置全局加载状态的函数
  * @param {boolean} props.isCollapsed - 是否折叠
  * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
+ * @param {string} props.headerBgClass - 标题背景色类名
  */
 export function TradeBoxSection({
   characterData,
   userAssets,
   userCharacter,
   depth,
-  sticky = false,
-  stickyTop = 0,
+  stickyTop,
   onRefresh,
   setLoading,
   isCollapsed = false,
   onToggleCollapse,
+  headerBgClass = "",
 }) {
-  const stickyClass = sticky ? "sticky" : "";
-  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
+  const stickyClass = stickyTop !== undefined ? "sticky" : "";
+  const stickyStyle = stickyTop !== undefined ? { top: `${stickyTop}px` } : {};
 
   const { LastOrder: lastOrder = "", LastDeal: lastDeal = "" } = characterData || {};
 
@@ -111,7 +112,7 @@ export function TradeBoxSection({
     const amount = parseFloat(amountInput.value);
 
     if (!price || !amount || price <= 0 || amount <= 0) {
-      alert("请输入有效的价格和数量");
+      showWarning("请输入有效的价格和数量");
       return;
     }
 
@@ -127,10 +128,11 @@ export function TradeBoxSection({
       amountInput.value = "";
       const totalSpan = container.querySelector("#bid-total");
       if (totalSpan) totalSpan.textContent = "总计：₵0.00";
+      showSuccess("买入委托成功");
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
-      alert(result.message);
+      showError(result.message);
       // 失败时恢复输入框的值
       setTimeout(() => {
         const newContainer = document.querySelector("#trade-section");
@@ -140,7 +142,8 @@ export function TradeBoxSection({
           const newTotalSpan = newContainer.querySelector("#bid-total");
           if (newPriceInput) newPriceInput.value = price;
           if (newAmountInput) newAmountInput.value = amount;
-          if (newTotalSpan) newTotalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
+          if (newTotalSpan)
+            newTotalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
         }
       }, 0);
     }
@@ -158,7 +161,7 @@ export function TradeBoxSection({
     const amount = parseFloat(amountInput.value);
 
     if (!price || !amount || price <= 0 || amount <= 0) {
-      alert("请输入有效的价格和数量");
+      showWarning("请输入有效的价格和数量");
       return;
     }
 
@@ -174,10 +177,11 @@ export function TradeBoxSection({
       amountInput.value = "";
       const totalSpan = container.querySelector("#ask-total");
       if (totalSpan) totalSpan.textContent = "总计：₵0.00";
+      showSuccess("卖出委托成功");
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
-      alert(result.message);
+      showError(result.message);
       // 失败时恢复输入框的值
       setTimeout(() => {
         const newContainer = document.querySelector("#trade-section");
@@ -187,7 +191,8 @@ export function TradeBoxSection({
           const newTotalSpan = newContainer.querySelector("#ask-total");
           if (newPriceInput) newPriceInput.value = price;
           if (newAmountInput) newAmountInput.value = amount;
-          if (newTotalSpan) newTotalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
+          if (newTotalSpan)
+            newTotalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
         }
       }, 0);
     }
@@ -205,7 +210,7 @@ export function TradeBoxSection({
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
-      alert(result.message);
+      showError(result.message);
     }
   };
 
@@ -221,7 +226,7 @@ export function TradeBoxSection({
       // 刷新数据
       if (onRefresh) onRefresh();
     } else {
-      alert(result.message);
+      showError(result.message);
     }
   };
 
@@ -230,7 +235,7 @@ export function TradeBoxSection({
       {/* 标题 */}
       <div
         id="tg-trade-box-section-header"
-        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
+        className={`${headerBgClass} z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
         onClick={onToggleCollapse}
       >

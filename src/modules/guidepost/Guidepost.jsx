@@ -1,9 +1,10 @@
-import { Temple } from "@src/components/Temple.jsx";
-import { Button } from "@src/components/Button.jsx";
-import { ArrowBigRightIcon } from "@src/icons/ArrowBigRightIcon.js";
-import { normalizeAvatar } from "@src/utils/oos.js";
 import { guidepost } from "@src/api/magic.js";
+import { Temple } from "@src/components/Temple.jsx";
+import { ArrowBigRightIcon } from "@src/icons/ArrowBigRightIcon.js";
 import { formatNumber } from "@src/utils/format.js";
+import { openAlertModal, openModal } from "@src/utils/modalManager.js";
+import { normalizeAvatar } from "@src/utils/oos.js";
+import { showError } from "@src/utils/toastManager.jsx";
 
 /**
  * 虚空道标组件
@@ -21,20 +22,22 @@ export function Guidepost({ temple, character, onSuccess }) {
       const result = await guidepost(temple.CharacterId, character.Id);
 
       if (!result.success) {
-        alert(result.message);
+        showError(result.message);
         return;
       }
 
       const count = result.data.Amount;
       const price = formatNumber(count * result.data.SellPrice, 0);
-      alert(`成功获取「${character.Name}」${count}股，市值₵${price}`);
+      openAlertModal({
+        message: `成功获取「${character.Name}」${count}股，市值₵${price}`,
+      });
 
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
       console.error("虚空道标失败:", error);
-      alert("虚空道标失败");
+      showError("虚空道标失败");
     }
   };
 
@@ -77,11 +80,38 @@ export function Guidepost({ temple, character, onSuccess }) {
       </div>
 
       {/* 按钮 */}
-      <div id="tg-guidepost-action" className="flex justify-center">
-        <Button variant="solid" onClick={handleGuidepost}>
+      <div id="tg-guidepost-action" className="flex justify-center p-1">
+        <button className="btn-bgm btn btn-sm btn-block" onClick={handleGuidepost}>
           POST
-        </Button>
+        </button>
       </div>
     </div>
   );
+}
+
+/**
+ * 打开虚空道标弹窗
+ * @param {Object} params
+ * @param {Object} params.temple - 圣殿对象
+ * @param {Object} params.character - 角色对象
+ * @param {Function} params.onSuccess - 成功回调
+ */
+export function openGuidepostModal({ temple, character, onSuccess }) {
+  const modalId = `guidepost-${temple.CharacterId}-${character.Id}`;
+
+  openModal(modalId, {
+    title: "确定「虚空道标」获取的目标",
+    content: (
+      <Guidepost
+        temple={temple}
+        character={character}
+        onSuccess={() => {
+          if (onSuccess) {
+            onSuccess();
+          }
+        }}
+      />
+    ),
+    size: "sm",
+  });
 }

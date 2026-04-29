@@ -1,13 +1,14 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getCharacterList } from "@src/api/chara.js";
-import { normalizeAvatar } from "@src/utils/oos.js";
+import { Button } from "@src/components/Button.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
-import { Button } from "@src/components/Button.jsx";
 import { LoaderCircleIcon, TrashIcon } from "@src/icons";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { get } from "@src/utils/http.js";
+import { openConfirmModal } from "@src/utils/modalManager.js";
+import { normalizeAvatar } from "@src/utils/oos.js";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 import { uploadToCloud } from "./favoriteSync.js";
-import { get } from "@src/utils/http.js";
 
 // 角色名称缓存
 const characterNameCache = new Map();
@@ -177,39 +178,43 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
     const deleteSelectedCharacters = () => {
       if (selectedIds.length === 0) return;
 
-      if (!confirm(`确定要从「${favorite.name}」中移除 ${selectedIds.length} 个角色吗？`)) return;
+      openConfirmModal({
+        title: "移除角色",
+        message: `确定要从「${favorite.name}」中移除 ${selectedIds.length} 个角色吗？`,
+        onConfirm: () => {
+          const favorites = getFavorites();
+          const currentFavorite = favorites.find((f) => f.id === favoriteId);
 
-      const favorites = getFavorites();
-      const currentFavorite = favorites.find((f) => f.id === favoriteId);
+          if (!currentFavorite) return;
 
-      if (!currentFavorite) return;
+          // 从收藏夹中移除选中的角色
+          selectedIds.forEach((characterId) => {
+            const index = currentFavorite.characters.indexOf(characterId);
+            if (index > -1) {
+              currentFavorite.characters.splice(index, 1);
+            }
+          });
 
-      // 从收藏夹中移除选中的角色
-      selectedIds.forEach((characterId) => {
-        const index = currentFavorite.characters.indexOf(characterId);
-        if (index > -1) {
-          currentFavorite.characters.splice(index, 1);
-        }
+          // 更新时间戳
+          currentFavorite.updatedAt = Date.now();
+
+          saveFavorites(favorites);
+          uploadToCloud(favorites);
+
+          // 通知父组件数据变化
+          if (onDataChange) {
+            onDataChange();
+          }
+
+          // 重新加载当前页
+          setState({
+            isSelecting: false,
+            selectedIds: [],
+            favorite: currentFavorite,
+          });
+          loadCharacters(currentPage);
+        },
       });
-
-      // 更新时间戳
-      currentFavorite.updatedAt = Date.now();
-
-      saveFavorites(favorites);
-      uploadToCloud(favorites);
-
-      // 通知父组件数据变化
-      if (onDataChange) {
-        onDataChange();
-      }
-
-      // 重新加载当前页
-      setState({
-        isSelecting: false,
-        selectedIds: [],
-        favorite: currentFavorite,
-      });
-      loadCharacters(currentPage);
     };
 
     const contentDiv = <div className="flex flex-col gap-1" />;

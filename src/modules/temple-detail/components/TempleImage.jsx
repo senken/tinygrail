@@ -6,24 +6,33 @@ import { LoaderCircleIcon } from "@src/icons/index.js";
  * @param {string} props.imageUrl - 图片URL
  * @param {string} props.characterName - 角色名称
  * @param {string} props.line - 角色台词
- * @param {Function} props.onLoad - 图片加载完成回调
+ * @param {Function} props.onImageLoad - 图片加载完成回调，接收图片宽度作为参数
  */
-export function TempleImage({ imageUrl, characterName, line, onLoad }) {
-  const minWidth = 480;
-  const minHeight = 680;
+export function TempleImage({ imageUrl, characterName, line, onImageLoad }) {
+  const minWidth = 320;
+  const maxWidth = window.innerWidth * 0.9; // 最大宽度为视口宽度的90%，避免横向滚动条
+  const maxHeight = window.innerHeight * 0.6; // 最大高度为视口高度的60%
+  
   const img = (
     <img
       src={imageUrl}
       alt={characterName}
-      className="h-auto max-w-full"
-      style={{ display: "none" }}
+      className="mx-auto"
+      style={{ 
+        display: "none",
+      }}
     />
   );
+  
   const container = (
     <div
       id="tg-temple-image"
-      className="relative flex items-center justify-center bg-gray-100 dark:bg-gray-800"
-      style={{ width: `${minWidth}px`, minHeight: `${minHeight}px` }}
+      className="relative flex items-center justify-center w-full"
+      style={{
+        minWidth: `${minWidth}px`,
+        minHeight: "200px",
+        backgroundColor: "#1B1B1B",
+      }}
     />
   );
 
@@ -61,41 +70,69 @@ export function TempleImage({ imageUrl, characterName, line, onLoad }) {
   }
 
   const handleImageLoad = () => {
+    // 获取图片实际尺寸
     const naturalWidth = img.naturalWidth;
-    let finalWidth;
-
-    if (naturalWidth >= minWidth) {
-      finalWidth = naturalWidth;
-      container.style.width = `${naturalWidth}px`;
-      container.style.maxWidth = "100%";
-    } else {
-      finalWidth = minWidth;
-      container.style.width = `${minWidth}px`;
-      container.style.maxWidth = "100%";
-      img.style.width = `${minWidth}px`;
+    const naturalHeight = img.naturalHeight;
+    
+    if (naturalWidth === 0 || naturalHeight === 0) {
+      console.error("图片加载失败");
+      return;
     }
-
+    
+    // 计算最终显示尺寸
+    let finalWidth = naturalWidth;
+    let finalHeight = naturalHeight;
+    
+    // 如果图片宽度小于最小宽度，放大到最小宽度
+    if (finalWidth < minWidth) {
+      const scale = minWidth / finalWidth;
+      finalWidth = minWidth;
+      finalHeight = Math.round(finalHeight * scale);
+    }
+    
+    // 如果图片宽度超过最大宽度，缩小到最大宽度
+    if (finalWidth > maxWidth) {
+      const scale = maxWidth / finalWidth;
+      finalWidth = maxWidth;
+      finalHeight = Math.round(finalHeight * scale);
+    }
+    
+    // 如果图片高度超过最大高度，缩小到最大高度
+    if (finalHeight > maxHeight) {
+      const scale = maxHeight / finalHeight;
+      finalHeight = maxHeight;
+      finalWidth = Math.round(finalWidth * scale);
+      
+      // 确保缩小后宽度不小于最小宽度
+      if (finalWidth < minWidth) {
+        finalWidth = minWidth;
+      }
+    }
+    
+    // 设置图片尺寸
+    img.style.width = `${finalWidth}px`;
+    img.style.height = `${finalHeight}px`;
+    img.style.objectFit = "contain";
+    
+    // 设置容器尺寸
+    container.style.minHeight = "0";
+    container.style.width = `${finalWidth}px`;
+    container.style.height = `${finalHeight}px`;
+    container.style.maxWidth = "none";
+    
     // 移除加载状态，显示图片
-    container.style.minHeight = "auto";
-    container.style.background = "none";
-    container.classList.remove(
-      "flex",
-      "items-center",
-      "justify-center",
-      "bg-gray-100",
-      "dark:bg-gray-800"
-    );
+    container.classList.remove("flex", "items-center", "justify-center");
     loader.remove();
     img.style.display = "block";
+    
+    // 修改父组件宽度
+    if (onImageLoad && finalWidth > 0) {
+      onImageLoad(finalWidth);
+    }
 
     // 添加台词和角色名称覆盖层
     if (lineOverlay) {
       container.appendChild(lineOverlay);
-    }
-
-    // 通知父组件
-    if (onLoad) {
-      onLoad(finalWidth);
     }
   };
 

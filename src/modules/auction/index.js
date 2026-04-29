@@ -1,1 +1,1 @@
-export { Auction } from "./Auction.jsx";
+export { Auction, openAuctionModal } from "./Auction.jsx";

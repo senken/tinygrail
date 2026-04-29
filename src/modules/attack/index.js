@@ -1,1 +1,1 @@
-export { Attack } from "./Attack.jsx";
+export { Attack, openAttackModal } from "./Attack.jsx";

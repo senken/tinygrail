@@ -1,11 +1,12 @@
-import { UserCard } from "./user-card";
-import { RakuenHomeTabs } from "./rakuen-home-tabs";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterSearch } from "@src/modules/character-search/CharacterSearch.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
 import { SearchIcon } from "@src/icons";
+import { openCharacterBoxModal } from "@src/modules/character-box";
+import {
+  openCharacterSearchModal
+} from "@src/modules/character-search/CharacterSearch.jsx";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import { RakuenHomeTabs } from "./rakuen-home-tabs";
 import stylesCSS from "./styles.css?inline";
+import { UserCard } from "./user-card";
 
 /**
  * 加载样式
@@ -34,15 +35,7 @@ export function RakuenHome() {
   window.addEventListener("message", (event) => {
     if (event.data.type === "openCharacterModal") {
       const characterId = event.data.characterId;
-
-      // 创建角色弹窗
-      const characterModal = (
-        <Modal visible={true} padding="p-6">
-          <CharacterBox characterId={characterId} sticky={true} />
-        </Modal>
-      );
-      document.body.appendChild(characterModal);
-      document.body.style.overflow = "hidden";
+      openCharacterBoxModal(characterId);
     }
   });
 
@@ -54,24 +47,13 @@ export function RakuenHome() {
     }
     const username = userAssets.name || "";
 
-    const characterSearchModal = (
-      <Modal visible={true} title="搜索角色" maxWidth={640}>
-        <CharacterSearch
-          username={username}
-          onCharacterClick={(character) => {
-            const characterModal = (
-              <Modal visible={true} padding="p-6">
-                <CharacterBox characterId={character.Id} sticky={true} />
-              </Modal>
-            );
-            document.body.appendChild(characterModal);
-            document.body.style.overflow = "hidden";
-          }}
-        />
-      </Modal>
-    );
-    document.body.appendChild(characterSearchModal);
-    document.body.style.overflow = "hidden";
+    openCharacterSearchModal({
+      title: "搜索角色",
+      username,
+      onCharacterClick: (character) => {
+        openCharacterBoxModal(character.Id);
+      },
+    });
   };
 
   // 清空body并创建容器

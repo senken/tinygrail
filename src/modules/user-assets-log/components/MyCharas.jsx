@@ -13,7 +13,7 @@ import { LevelBadge } from "@src/components/LevelBadge.jsx";
 export function MyCharas({ data, onPageChange, onCharacterClick }) {
   if (!data || !data.items || data.items.length === 0) {
     return (
-      <div className="tg-bg-content rounded-lg p-8 text-center">
+      <div className="p-8 text-center">
         <p className="text-lg opacity-60">暂无持仓</p>
       </div>
     );
@@ -29,7 +29,7 @@ export function MyCharas({ data, onPageChange, onCharacterClick }) {
 
     const itemDiv = (
       <div
-        className="tg-bg-content flex min-w-0 cursor-pointer items-start gap-3 border-b border-gray-200 px-3 py-1 last:border-b-0 dark:border-gray-700"
+        className="flex min-w-0 cursor-pointer items-start gap-3 border-b border-gray-200 px-3 py-1 last:border-b-0 dark:border-gray-700"
         onClick={() => {
           if (onCharacterClick) {
             onCharacterClick(item.CharacterId);

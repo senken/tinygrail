@@ -6,6 +6,7 @@ import { formatCurrency, formatDateTime } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { unescapeHtml } from "@src/utils/escape.js";
 import { scrollToTop } from "@src/utils/scroll.js";
+import { openModal } from "@src/utils/modalManager.js";
 
 /**
  * GM交易记录组件
@@ -144,4 +145,25 @@ export function GMTradeHistory({ userId, characterId, onUserClick, onCharacterCl
   loadTradeHistoryPage(1);
 
   return container;
+}
+
+/**
+ * 打开GM交易记录弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {string} params.characterName - 角色名称
+ * @param {Function} params.onUserClick - 用户点击回调
+ * @param {Function} params.onCharacterClick - 角色点击回调
+ */
+export function openGMTradeHistoryModal({ characterId, characterName = "", onUserClick, onCharacterClick }) {
+  openModal(`gm-trade-history-${characterId}`, {
+    title: `交易记录(GM) - #${characterId}「${characterName}」`,
+    content: (
+      <GMTradeHistory
+        characterId={characterId}
+        onUserClick={onUserClick}
+        onCharacterClick={onCharacterClick}
+      />
+    ),
+  });
 }

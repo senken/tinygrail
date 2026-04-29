@@ -1,10 +1,9 @@
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { getUserTemples } from "@src/api/chara.js";
+import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { Temple } from "@src/components/Temple.jsx";
-import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { Button } from "@src/components/Button.jsx";
-import { formatNumber } from "@src/utils/format.js";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { openModal } from "@src/utils/modalManager.js";
 
 /**
  * 圣殿搜索组件
@@ -111,28 +110,30 @@ export function TempleSearch({ username, onTempleClick, className = "" }) {
     };
 
     // 主容器
-    const contentDiv = <div id="tg-temple-search-content" className="flex w-full flex-col gap-4" />;
+    const contentDiv = <div id="tg-temple-search-content" className="flex w-full flex-col gap-2" />;
 
     // 搜索框
     const searchDiv = (
-      <div id="tg-temple-search-input" className="flex gap-2">
-        <input
-          type="text"
-          className="tg-input flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-blue-500 dark:border-gray-600"
-          placeholder="搜索圣殿（角色ID或名称）"
-          value={keyword}
-          onInput={(e) => {
-            currentInputValue = e.target.value;
-          }}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
-              handleSearch();
-            }
-          }}
-        />
-        <Button variant="solid" size="sm" onClick={handleSearch}>
-          搜索
-        </Button>
+      <div id="tg-temple-search-input" className="sticky top-0 z-10 flex gap-2 bg-base-100 p-1">
+        <div className="join w-full">
+          <input
+            type="text"
+            className="input input-sm join-item input-bordered w-full !bg-base-100"
+            placeholder="搜索圣殿（角色ID或名称）"
+            value={keyword}
+            onInput={(e) => {
+              currentInputValue = e.target.value;
+            }}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
+          />
+          <button className="btn-bgm btn join-item btn-sm" onClick={handleSearch}>
+            搜索
+          </button>
+        </div>
       </div>
     );
     contentDiv.appendChild(searchDiv);
@@ -213,4 +214,21 @@ export function TempleSearch({ username, onTempleClick, className = "" }) {
   loadTemples("", 1);
 
   return container;
+}
+
+/**
+ * 打开圣殿搜索弹窗
+ * @param {Object} params
+ * @param {string} params.title - 弹窗标题
+ * @param {string} params.username - 用户名
+ * @param {Function} params.onTempleClick - 点击圣殿回调
+ */
+export function openTempleSearchModal({ title, username, onTempleClick }) {
+  const modalId = `temple-search-${username}`;
+
+  openModal(modalId, {
+    title,
+    content: <TempleSearch username={username} onTempleClick={onTempleClick} />,
+    size: "lg",
+  });
 }

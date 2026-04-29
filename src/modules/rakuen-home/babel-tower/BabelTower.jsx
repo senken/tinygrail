@@ -1,15 +1,13 @@
 import { getBabelTower, getStarLog } from "@src/api/chara.js";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { createHubConnection } from "@src/utils/signalr-loader.js";
-import { loadFireworks } from "@src/utils/fireworks-loader.js";
 import { SegmentedControl } from "@src/components/SegmentedControl.jsx";
 import { ChevronRightIcon } from "@src/icons/ChevronRightIcon.js";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box";
+import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { loadFireworks } from "@src/utils/fireworks-loader.js";
+import { createHubConnection } from "@src/utils/signalr-loader.js";
+import { BabelTowerLog, openBabelTowerLogModal } from "./components/BabelTowerLog.jsx";
 import { BabelTowerMain } from "./components/BabelTowerMain.jsx";
-import { BabelTowerLog } from "./components/BabelTowerLog.jsx";
-import { scrollToTop } from "@src/utils/scroll.js";
 
 /**
  * 通天塔组件
@@ -22,18 +20,8 @@ export function BabelTower() {
     />
   );
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-  let generatedUserModalId = null;
-  let generatedLogModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
+  // 存储更新日志弹窗数据的函数
+  let updateLogModalData = null;
 
   // 数据量选项
   const dataOptions = [
@@ -47,15 +35,10 @@ export function BabelTower() {
 
   // 打开角色弹窗的方法
   const openCharacter = (characterId) => {
-    setState({ showCharacterModal: true, characterModalId: characterId });
+    openCharacterBoxModal(characterId);
   };
 
-  // 打开用户弹窗的方法
-  const openUser = (userName) => {
-    setState({ showUserModal: true, userModalName: userName });
-  };
-
-  // SignalR连接(只创建一次)
+  // SignalR连接
   let signalRConnection = null;
 
   // 保存当前state，用于SignalR回调中访问
@@ -74,11 +57,6 @@ export function BabelTower() {
       data = null,
       loading = true,
       dataCount = 24,
-      showCharacterModal = false,
-      characterModalId = null,
-      showUserModal = false,
-      userModalName = null,
-      showLogModal = false,
       logData = null,
     } = state || {};
 
@@ -104,7 +82,16 @@ export function BabelTower() {
       const logButton = (
         <button
           className="flex items-center gap-0.5 rounded-full border border-gray-300 px-2 py-0.5 text-xs transition-colors hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-          onClick={() => setState({ showLogModal: true })}
+          onClick={() => {
+            updateLogModalData = openBabelTowerLogModal({
+              initialLogData: logData,
+              onOpenCharacter: openCharacter,
+              onOpenUser: openUserTinygrailModal,
+              onSyncLogData: (newLogData) => {
+                setState({ logData: newLogData });
+              },
+            });
+          }}
         >
           <span>通天塔日志</span>
           <span className="opacity-60">
@@ -153,7 +140,7 @@ export function BabelTower() {
         <BabelTowerLog
           logData={logData}
           onOpenCharacter={openCharacter}
-          onOpenUser={openUser}
+          onOpenUser={openUserTinygrailModal}
           onPageChange={(page) => loadBabelTowerLogData(page)}
         />
       );
@@ -167,64 +154,6 @@ export function BabelTower() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
-
-    // 用户弹窗
-    if (showUserModal && userModalName && !isModalExist(generatedUserModalId)) {
-      const userModal = (
-        <Modal
-          visible={showUserModal}
-          onClose={() => setState({ showUserModal: false })}
-          modalId={generatedUserModalId}
-          getModalId={(id) => {
-            generatedUserModalId = id;
-          }}
-        >
-          <UserTinygrail username={userModalName} stickyTop="-8px" />
-        </Modal>
-      );
-      wrapper.appendChild(userModal);
-    }
-
-    // 日志弹窗
-    if (showLogModal && !isModalExist(generatedLogModalId)) {
-      const logModal = (
-        <Modal
-          visible={showLogModal}
-          onClose={() => setState({ showLogModal: false })}
-          title="通天塔日志"
-          modalId={generatedLogModalId}
-          getModalId={(id) => {
-            generatedLogModalId = id;
-          }}
-        >
-          <BabelTowerLog
-            logData={logData}
-            onOpenCharacter={openCharacter}
-            onOpenUser={openUser}
-            onPageChange={(page) => loadBabelTowerLogData(page)}
-          />
-        </Modal>
-      );
-      wrapper.appendChild(logModal);
-    }
 
     return wrapper;
   });
@@ -259,24 +188,9 @@ export function BabelTower() {
       const newLogData = result.data;
       setState({ logData: newLogData });
 
-      // 如果日志Modal是打开的，手动更新Modal内容
-      if (currentState.showLogModal && generatedLogModalId) {
-        const modalContent = document.querySelector(
-          `#tg-modal[data-modal-id="${generatedLogModalId}"] #tg-modal-content`
-        );
-        if (modalContent) {
-          modalContent.innerHTML = "";
-          const newLogComponent = (
-            <BabelTowerLog
-              logData={newLogData}
-              onOpenCharacter={openCharacter}
-              onOpenUser={openUser}
-              onPageChange={(page) => loadBabelTowerLogData(page)}
-            />
-          );
-          modalContent.appendChild(newLogComponent);
-          scrollToTop(modalContent);
-        }
+      // 如果日志弹窗是打开的，更新弹窗数据
+      if (updateLogModalData) {
+        updateLogModalData(newLogData);
       }
     }
   };
@@ -311,13 +225,20 @@ export function BabelTower() {
             newItems.length = 30;
           }
 
+          const updatedLogData = {
+            ...currentLogData,
+            Items: newItems,
+          };
+
           // 更新logData
           setState({
-            logData: {
-              ...currentLogData,
-              Items: newItems,
-            },
+            logData: updatedLogData,
           });
+
+          // 如果日志弹窗是打开的，也更新弹窗数据
+          if (updateLogModalData) {
+            updateLogModalData(updatedLogData);
+          }
         }
 
         // 触发烟花效果（Type 3: 精炼成功, Type 4: 精炼失败）

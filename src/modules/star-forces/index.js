@@ -1,1 +1,1 @@
-export { StarForces } from "./StarForces.jsx";
+export { StarForces, openStarForcesModal } from "./StarForces.jsx";

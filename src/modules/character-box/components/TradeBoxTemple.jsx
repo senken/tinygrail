@@ -26,10 +26,10 @@ function getTempleLevelBonus(level) {
  * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
  * @param {boolean} props.hideDuplicates - 是否隐藏重复
  * @param {Function} props.onToggleDuplicates - 切换显示/隐藏重复的回调
- * @param {boolean} props.sticky - 是否启用粘性布局
- * @param {number} props.stickyTop - 粘性布局的top值
+ * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
  * @param {boolean} props.isCollapsed - 是否折叠
  * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
+ * @param {string} props.headerBgClass - 标题背景色类名
  */
 export function TradeBoxTemple({
   characterData,
@@ -39,13 +39,13 @@ export function TradeBoxTemple({
   openTempleModal,
   hideDuplicates = true,
   onToggleDuplicates,
-  sticky = false,
-  stickyTop = 0,
+  stickyTop,
   isCollapsed = false,
   onToggleCollapse,
+  headerBgClass = "",
 }) {
-  const stickyClass = sticky ? "sticky" : "";
-  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
+  const stickyClass = stickyTop !== undefined ? "sticky" : "";
+  const stickyStyle = stickyTop !== undefined ? { top: `${stickyTop}px` } : {};
 
   // Switch 按钮样式
   const baseTrackClass = "relative inline-block h-4 w-8 rounded-full transition-colors";
@@ -138,7 +138,7 @@ export function TradeBoxTemple({
       {/* 标题 */}
       <div
         id="tg-trade-box-temple-header"
-        className={`tg-bg-content z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
+        className={`${headerBgClass} z-10 mb-2 flex cursor-pointer items-center justify-between border-b border-gray-200 py-2 dark:border-gray-700 ${stickyClass}`}
         style={stickyStyle}
         onClick={onToggleCollapse}
       >

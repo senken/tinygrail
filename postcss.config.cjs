@@ -3,6 +3,8 @@ module.exports = {
     'postcss-nesting': {},
     tailwindcss: {},
     autoprefixer: {},
+    // 替换prefers-color-scheme为data-theme
+    './postcss-replace-prefers-color-scheme.cjs': {},
     // 给所有样式添加.tinygrail前缀
     'postcss-prefix-selector': {
       prefix: '.tinygrail',

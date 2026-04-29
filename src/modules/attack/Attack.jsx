@@ -1,8 +1,9 @@
-import { Temple } from "@src/components/Temple.jsx";
-import { Button } from "@src/components/Button.jsx";
-import { ArrowBigRightIcon } from "@src/icons/ArrowBigRightIcon.js";
-import { normalizeAvatar } from "@src/utils/oos.js";
 import { starbreak } from "@src/api/magic.js";
+import { Temple } from "@src/components/Temple.jsx";
+import { ArrowBigRightIcon } from "@src/icons/ArrowBigRightIcon.js";
+import { closeModal, openAlertModal, openModal } from "@src/utils/modalManager.js";
+import { normalizeAvatar } from "@src/utils/oos.js";
+import { showError } from "@src/utils/toastManager.jsx";
 
 /**
  * 闪光结晶组件
@@ -19,17 +20,19 @@ export function Attack({ temple, character, onSuccess }) {
     try {
       const result = await starbreak(temple.CharacterId, character.Id);
       if (!result.success) {
-        alert(result.message);
+        showError(result.message);
         return;
       }
 
-      alert(result.data);
+      openAlertModal({
+        message: result.data,
+      });
       if (onSuccess) {
         onSuccess();
       }
     } catch (error) {
       console.error("闪光结晶失败:", error);
-      alert("闪光结晶失败");
+      showError("闪光结晶失败");
     }
   };
 
@@ -68,11 +71,39 @@ export function Attack({ temple, character, onSuccess }) {
       </div>
 
       {/* 按钮 */}
-      <div className="flex justify-center">
-        <Button variant="solid" onClick={handleAttack}>
+      <div className="flex justify-center p-1">
+        <button className="btn-bgm btn btn-sm btn-block" onClick={handleAttack}>
           ATTACK
-        </Button>
+        </button>
       </div>
     </div>
   );
+}
+
+/**
+ * 打开闪光结晶弹窗
+ * @param {Object} params
+ * @param {Object} params.temple - 圣殿对象
+ * @param {Object} params.character - 角色对象
+ * @param {Function} params.onSuccess - 成功回调
+ */
+export function openAttackModal({ temple, character, onSuccess }) {
+  const modalId = `attack-${temple.CharacterId}-${character.Id}`;
+
+  openModal(modalId, {
+    title: "确定「闪光结晶」攻击的目标",
+    content: (
+      <Attack
+        temple={temple}
+        character={character}
+        onSuccess={() => {
+          if (onSuccess) {
+            onSuccess();
+          }
+          closeModal(modalId);
+        }}
+      />
+    ),
+    size: "sm",
+  });
 }

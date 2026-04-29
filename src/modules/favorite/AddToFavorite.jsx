@@ -1,9 +1,16 @@
-import { Button } from "@src/components/Button.jsx";
-import { TrashIcon, StarIcon } from "@src/icons";
+import { StarIcon, TrashIcon } from "@src/icons";
+import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { getFavorites, saveFavorites, reindexFavorites, getVisibleFavorites } from "./favoriteStorage.js";
-import { uploadToCloud } from "./favoriteSync.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import { showSuccess } from "@src/utils/toastManager.jsx";
+import { FavoriteCreate } from "./FavoriteCreate.jsx";
+import {
+  getFavorites,
+  getVisibleFavorites,
+  reindexFavorites,
+  saveFavorites,
+} from "./favoriteStorage.js";
+import { uploadToCloud } from "./favoriteSync.js";
 
 /**
  * 添加到收藏夹组件
@@ -36,10 +43,10 @@ export function AddToFavorite({ characterData }) {
 
     if (index > -1) {
       favorite.characters.splice(index, 1);
-      statusDiv.textContent = `已从「${favorite.name}」移除`;
+      showSuccess(`已从「${favorite.name}」移除`);
     } else {
       favorite.characters.unshift(characterId); // 添加到数组头部
-      statusDiv.textContent = `已添加到「${favorite.name}」`;
+      showSuccess(`已添加到「${favorite.name}」`);
     }
 
     // 对当前收藏夹去重
@@ -71,39 +78,24 @@ export function AddToFavorite({ characterData }) {
     renderFavoriteList();
   };
 
-  // 创建新收藏夹
-  const createFavorite = (name, color) => {
-    const userAssets = getCachedUserAssets();
-    const userId = userAssets?.id;
-    
-    if (!userId) {
-      statusDiv.textContent = "创建失败：无法获取用户信息";
-      return null;
-    }
-    
-    const favorites = getFavorites();
-    const now = Date.now();
-    
-    // 重新索引当前用户的收藏夹order
-    reindexFavorites(favorites, userId);
-    
-    // 获取当前用户未删除的收藏夹数量
-    const userFavoritesCount = favorites.filter(f => !f.deleted && f.userId === userId).length;
-    
-    const newFavorite = {
-      id: now,
-      name,
-      color,
-      characters: [],
-      order: userFavoritesCount,
-      createdAt: now,
-      updatedAt: now,
-      userId, // 添加创建者用户ID
-    };
-    favorites.push(newFavorite);
-    saveFavorites(favorites);
-    uploadToCloud(favorites);
-    return newFavorite;
+  // 打开创建收藏夹弹窗
+  const openCreateFavoriteModal = () => {
+    openModal("create-favorite", {
+      title: "创建收藏夹",
+      content: (
+        <FavoriteCreate
+          onSave={(newFavorite) => {
+            closeModal("create-favorite");
+            renderFavoriteList();
+            showSuccess("收藏夹创建成功");
+          }}
+          onCancel={() => {
+            closeModal("create-favorite");
+          }}
+        />
+      ),
+      size: "sm",
+    });
   };
 
   // 删除收藏夹
@@ -115,36 +107,35 @@ export function AddToFavorite({ characterData }) {
 
     if (!favorite) return;
 
-    if (!confirm(`确定要删除收藏夹「${favorite.name}」吗？`)) return;
+    openConfirmModal({
+      title: "删除收藏夹",
+      message: `确定要删除收藏夹「${favorite.name}」吗？`,
+      onConfirm: () => {
+        const index = favorites.findIndex((f) => f.id === favoriteId);
+        if (index > -1) {
+          // 只保留必要字段
+          const now = Date.now();
+          favorites[index] = {
+            id: favorites[index].id,
+            deleted: true,
+            deletedAt: now,
+            updatedAt: now,
+            userId: favorites[index].userId,
+          };
 
-    const index = favorites.findIndex((f) => f.id === favoriteId);
-    if (index > -1) {
-      // 只保留必要字段
-      const now = Date.now();
-      favorites[index] = {
-        id: favorites[index].id,
-        deleted: true,
-        deletedAt: now,
-        updatedAt: now,
-        userId: favorites[index].userId,
-      };
+          // 重新索引当前用户的收藏夹order
+          reindexFavorites(favorites, currentUserId);
 
-      // 重新索引当前用户的收藏夹order
-      reindexFavorites(favorites, currentUserId);
-
-      saveFavorites(favorites);
-      uploadToCloud(favorites);
-      renderFavoriteList();
-      statusDiv.textContent = "收藏夹已删除";
-    }
+          saveFavorites(favorites);
+          uploadToCloud(favorites);
+          renderFavoriteList();
+          showSuccess("收藏夹已删除");
+        }
+      },
+    });
   };
 
-  const statusDiv = <div className="text-center text-xs opacity-60" />;
   const favoriteListDiv = <div className="flex flex-col gap-2" />;
-  const createFormDiv = <div className="hidden flex-col gap-2" />;
-
-  // 初始化createFormDiv的display样式
-  createFormDiv.style.display = "none";
 
   // 可选颜色
   const colors = [
@@ -157,9 +148,6 @@ export function AddToFavorite({ characterData }) {
     { name: "粉色", value: "bg-pink-500", text: "text-pink-500" },
     { name: "灰色", value: "bg-gray-500", text: "text-gray-500" },
   ];
-
-  let selectedColor = colors[0];
-  let newFavoriteName = "";
 
   // 渲染收藏夹列表
   const renderFavoriteList = () => {
@@ -215,120 +203,35 @@ export function AddToFavorite({ characterData }) {
     });
   };
 
-  // 渲染创建表单
-  const nameInput = (
-    <input
-      type="text"
-      className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
-      placeholder="收藏夹名称（最多20字）"
-      maxLength="20"
-      onInput={(e) => {
-        newFavoriteName = e.target.value;
-      }}
-    />
-  );
-
-  const colorSelectDiv = <div className="flex flex-wrap gap-2" />;
-
-  colors.forEach((color) => {
-    const colorBtn = (
-      <button
-        type="button"
-        className={`h-8 w-8 rounded-full border-2 transition-all ${color.value} ${
-          selectedColor === color ? "border-gray-800 dark:border-gray-200" : "border-transparent"
-        }`}
-        onClick={() => {
-          selectedColor = color;
-          // 更新所有颜色按钮的边框
-          colorSelectDiv.querySelectorAll("button").forEach((btn, index) => {
-            if (colors[index] === color) {
-              btn.className = `h-8 w-8 rounded-full border-2 transition-all ${color.value} border-gray-800 dark:border-gray-200`;
-            } else {
-              btn.className = `h-8 w-8 rounded-full border-2 transition-all ${colors[index].value} border-transparent`;
-            }
-          });
-        }}
-        title={color.name}
-      />
-    );
-    colorSelectDiv.appendChild(colorBtn);
-  });
-
-  const createBtn = (
-    <Button
-      onClick={() => {
-        const trimmedName = newFavoriteName.trim();
-        if (!trimmedName) {
-          statusDiv.textContent = "请输入收藏夹名称";
-          return;
-        }
-        if (trimmedName.length > 20) {
-          statusDiv.textContent = "收藏夹名称不能超过20个字";
-          return;
-        }
-        const newFavorite = createFavorite(trimmedName, selectedColor.value);
-        if (newFavorite) {
-          nameInput.value = "";
-          newFavoriteName = "";
-          createFormDiv.style.display = "none";
-          renderFavoriteList();
-          statusDiv.textContent = "收藏夹创建成功";
-        }
-      }}
-    >
-      创建
-    </Button>
-  );
-
-  const cancelBtn = (
-    <Button
-      variant="outline"
-      onClick={() => {
-        createFormDiv.style.display = "none";
-        nameInput.value = "";
-        newFavoriteName = "";
-      }}
-    >
-      取消
-    </Button>
-  );
-
-  createFormDiv.appendChild(nameInput);
-  createFormDiv.appendChild(<div className="text-xs opacity-60">选择颜色：</div>);
-  createFormDiv.appendChild(colorSelectDiv);
-  createFormDiv.appendChild(
-    <div className="flex justify-end gap-2">
-      {createBtn}
-      {cancelBtn}
-    </div>
-  );
-
   const toggleCreateFormBtn = (
-    <Button
-      variant="outline"
-      onClick={() => {
-        if (createFormDiv.style.display === "none") {
-          createFormDiv.style.display = "flex";
-        } else {
-          createFormDiv.style.display = "none";
-          nameInput.value = "";
-          newFavoriteName = "";
-        }
-      }}
-    >
+    <button className="btn-bgm btn btn-sm btn-block" onClick={openCreateFavoriteModal}>
       新建收藏夹
-    </Button>
+    </button>
   );
 
   // 初始渲染
   renderFavoriteList();
 
   return (
-    <div id="tg-add-to-favorite" className="flex min-w-64 flex-col gap-3">
-      {statusDiv}
+    <div id="tg-add-to-favorite" className="flex min-w-64 flex-col gap-3 p-1">
       {favoriteListDiv}
       {toggleCreateFormBtn}
-      {createFormDiv}
     </div>
   );
+}
+
+/**
+ * 打开添加到收藏夹弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {Object} params.characterData - 角色数据
+ * @param {Function} params.onClose - 关闭回调
+ */
+export function openAddToFavoriteModal({ characterId, characterData, onClose }) {
+  openModal(`favorite-${characterId}`, {
+    title: `收藏 - #${characterData?.CharacterId ?? ""}「${characterData?.Name ?? ""}」`,
+    content: <AddToFavorite characterData={characterData} />,
+    size: "sm",
+    onClose,
+  });
 }

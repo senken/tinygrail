@@ -1,1 +1,1 @@
-export { Fisheye } from "./Fisheye.jsx";
+export { Fisheye, openFisheyeModal } from "./Fisheye.jsx";

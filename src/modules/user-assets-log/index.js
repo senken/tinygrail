@@ -1,1 +1,1 @@
-export { UserAssetsLog } from "./UserAssetsLog.jsx";
+export { UserAssetsLog, openUserAssetsLogModal } from "./UserAssetsLog.jsx";

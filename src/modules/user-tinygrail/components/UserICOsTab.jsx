@@ -11,7 +11,7 @@ import { getCachedUserAssets } from "@src/utils/session.js";
  * @param {Function} props.onPageChange - 页码变化回调函数
  * @param {Function} props.onCharacterClick - 角色点击回调函数
  */
-export function ICOsTab({ data, onPageChange, onCharacterClick }) {
+export function UserICOsTab({ data, onPageChange, onCharacterClick }) {
   if (!data || !data.items || data.items.length === 0) {
     return (
       <div className="tg-bg-content rounded-lg p-8 text-center">
@@ -56,8 +56,8 @@ export function ICOsTab({ data, onPageChange, onCharacterClick }) {
         <div
           className={`flex min-w-0 cursor-pointer items-start gap-2 ${
             isMobile
-              ? "tg-bg-content border-b border-gray-200 p-3 px-3 py-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700"
-              : "tg-bg-content rounded-lg"
+              ? "border-b border-gray-200 p-3 px-3 py-3 first:pt-0 last:border-b-0 last:pb-0 dark:border-gray-700"
+              : "rounded-lg"
           }`}
           onClick={() => {
             if (onCharacterClick) {

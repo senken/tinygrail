@@ -1,1 +1,1 @@
-export { GMTradeHistory } from "./GMTradeHistory.jsx";
+export { GMTradeHistory, openGMTradeHistoryModal } from "./GMTradeHistory.jsx";

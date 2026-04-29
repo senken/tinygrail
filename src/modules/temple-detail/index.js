@@ -1,1 +1,1 @@
-export { TempleDetail } from "./TempleDetail.jsx";
+export { TempleDetail, openTempleModal } from "./TempleDetail.jsx";

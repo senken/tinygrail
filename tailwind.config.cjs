@@ -5,4 +5,10 @@ module.exports = {
     extend: {},
   },
   plugins: [require("@tailwindcss/container-queries"), require("daisyui")],
+  daisyui: {
+    logs: false,
+    styled: true,
+    base: false,
+    utils: true,
+  },
 };

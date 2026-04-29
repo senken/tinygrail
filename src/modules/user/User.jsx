@@ -1,5 +1,5 @@
 import { getUserAssets } from "@src/api/user.js";
-import { UserTinygrail } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
+import { UserTinygrail } from "@src/modules/user-tinygrail";
 
 /**
  * 用户页面组件
@@ -89,7 +89,7 @@ export function User() {
     });
 
     const userTinygrail = (
-      <div className="pt-2">
+      <div className="rounded-xl">
         <UserTinygrail username={username} />
       </div>
     );

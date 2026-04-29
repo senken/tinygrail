@@ -1,6 +1,5 @@
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { CharacterPoolItem } from "@src/modules/rakuen-home/character-pool-item/CharacterPoolItem.jsx";
 import { getDelistCharas } from "@src/api/chara.js";
@@ -16,25 +15,8 @@ export function STTab() {
     />
   );
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
-    const {
-      stData = null,
-      stLoading = true,
-      stPage = 1,
-      showCharacterModal = false,
-      characterModalId = null,
-    } = state || {};
+    const { stData = null, stLoading = true, stPage = 1 } = state || {};
 
     // 标题栏
     const headerDiv = (
@@ -44,14 +26,6 @@ export function STTab() {
         </div>
       </div>
     );
-
-    // 角色点击处理
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
 
     /**
      * 渲染ST内容
@@ -100,7 +74,7 @@ export function STTab() {
               auction={null}
               showAuction={false}
               showButtons={false}
-              onClick={handleCharacterClick}
+              onClick={openCharacterBoxModal}
             />
           );
 
@@ -168,24 +142,6 @@ export function STTab() {
     const wrapper = <div />;
     wrapper.appendChild(headerDiv);
     wrapper.appendChild(contentDiv);
-
-    // 角色弹窗
-    if (showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId)) {
-      const modal = (
-        <Modal
-          visible={showCharacterModal}
-          onClose={() => setState({ showCharacterModal: false })}
-          modalId={generatedCharacterModalId}
-          getModalId={(id) => {
-            generatedCharacterModalId = id;
-          }}
-          padding="p-6"
-        >
-          <CharacterBox characterId={characterModalId} sticky={true} />
-        </Modal>
-      );
-      wrapper.appendChild(modal);
-    }
 
     return wrapper;
   });

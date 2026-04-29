@@ -1,6 +1,7 @@
 import { getAuctionHistory } from "@src/api/chara.js";
 import { formatCurrency, formatNumber, formatDateTime } from "@src/utils/format.js";
 import { Pagination } from "@src/components/Pagination.jsx";
+import { openModal } from "@src/utils/modalManager.js";
 
 /**
  * 往期拍卖组件
@@ -133,4 +134,18 @@ export function AuctionHistory({ characterId }) {
       {paginationContainer}
     </div>
   );
+}
+
+/**
+ * 打开往期拍卖弹窗
+ * @param {Object} params
+ * @param {number} params.characterId - 角色ID
+ * @param {string} params.characterName - 角色名称
+ */
+export function openAuctionHistoryModal({ characterId, characterName = "" }) {
+  openModal(`auction-history-${characterId}`, {
+    title: `往期拍卖 - #${characterId}「${characterName}」`,
+    content: <AuctionHistory characterId={characterId} />,
+    size: "sm",
+  });
 }

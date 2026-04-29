@@ -3,6 +3,7 @@ import { formatNumber } from "@src/utils/format.js";
 import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
 import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import { LevelBadge } from "@src/components/LevelBadge.jsx";
 
 /**
  * 交易盒子头像和基本信息组件
@@ -19,7 +20,7 @@ export function TradeBoxHeaderInfo(props) {
     return null;
   }
 
-  const { CharacterId, Name, Icon } = characterData;
+  const { CharacterId, Name, Icon, Level, ZeroCount } = characterData;
   const avatarUrl = normalizeAvatar(Icon);
 
   // 获取包含当前角色的收藏夹
@@ -35,29 +36,38 @@ export function TradeBoxHeaderInfo(props) {
   return (
     <div id="tg-trade-box-header-info" className="flex gap-3 pb-2">
       {/* 头像 */}
-      <div
-        id="tg-trade-box-header-avatar"
-        className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30"
-      >
+      <div className="relative">
         <div
-          className="tg-avatar size-14 bg-cover bg-top"
-          style={{ backgroundImage: `url(${avatarUrl})` }}
-        />
+          id="tg-trade-box-header-avatar"
+          className="tg-avatar-border flex-shrink-0 border-2 border-gray-300 dark:border-white/30"
+        >
+          <div
+            className="tg-avatar size-14 bg-cover bg-top"
+            style={{ backgroundImage: `url(${avatarUrl})` }}
+          />
+        </div>
+        {Level !== undefined && (
+          <div className="absolute -left-2 -top-1">
+            <LevelBadge level={Level} zeroCount={ZeroCount} size="sm" />
+          </div>
+        )}
       </div>
 
       {/* 名称和ID */}
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        <a
-          href={`https://bgm.tv/character/${CharacterId}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="tg-link flex min-w-0 items-center text-sm font-semibold leading-tight"
-        >
-          <span className="truncate">
-            #{CharacterId} -「{Name}」
-          </span>
-          <SquareArrowOutUpRightIcon className="h-3.5 w-3.5 flex-shrink-0" />
-        </a>
+        <div className="flex min-w-0 items-center">
+          <a
+            href={`https://bgm.tv/character/${CharacterId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tg-link inline-flex min-w-0 items-center text-sm font-semibold leading-tight"
+          >
+            <span className="truncate">
+              #{CharacterId} -「{Name}」
+            </span>
+            <SquareArrowOutUpRightIcon className="h-3.5 w-3.5 flex-shrink-0" />
+          </a>
+        </div>
         <div className="truncate text-xs text-gray-600 dark:text-gray-400">
           <span>持股：{userCharacter ? formatNumber(userCharacter.Amount, 0) : "..."}股</span>
           <span className="mx-2">•</span>

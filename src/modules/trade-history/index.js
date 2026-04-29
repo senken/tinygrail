@@ -1,1 +1,1 @@
-export { TradeHistory } from "./TradeHistory.jsx";
+export { TradeHistory, openTradeHistoryModal } from "./TradeHistory.jsx";

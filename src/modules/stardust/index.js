@@ -1,1 +1,1 @@
-export { Stardust } from "./Stardust.jsx";
+export { Stardust, openStardustModal } from "./Stardust.jsx";

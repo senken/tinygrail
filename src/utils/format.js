@@ -5,7 +5,7 @@
  * @returns {string} 格式化后的字符串
  */
 export function formatNumber(num, decimals = 2) {
-  if (num == null || isNaN(num)) return "0.00";
+  if (num == null || isNaN(num)) return "0";
 
   // 转换为数字并保留小数位
   const number = Number(num).toFixed(decimals);
@@ -16,8 +16,13 @@ export function formatNumber(num, decimals = 2) {
   // 添加千分位分隔符
   const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-  // 组合整数和小数部分
-  return decimal ? `${formattedInteger}.${decimal}` : formattedInteger;
+  // 移除小数部分末尾的0
+  if (decimal) {
+    const trimmedDecimal = decimal.replace(/0+$/, "");
+    return trimmedDecimal ? `${formattedInteger}.${trimmedDecimal}` : formattedInteger;
+  }
+
+  return formattedInteger;
 }
 
 /**
@@ -29,7 +34,7 @@ export function formatNumber(num, decimals = 2) {
  * @returns {string} 格式化后的货币字符串
  */
 export function formatCurrency(amount, symbol = "₵", decimals = 2, abbreviate = true) {
-  if (amount == null || isNaN(amount)) return `${symbol}0.00`;
+  if (amount == null || isNaN(amount)) return `${symbol}0`;
 
   const absAmount = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";

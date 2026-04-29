@@ -1,8 +1,8 @@
-import { TradeBoxHeaderInfo } from "./TradeBoxHeaderInfo.jsx";
-import { TradeBoxHeaderDetails } from "./TradeBoxHeaderDetails.jsx";
 import { TradeBoxHeaderActions } from "./TradeBoxHeaderActions.jsx";
-import { TradeBoxSection } from "./TradeBoxSection.jsx";
+import { TradeBoxHeaderDetails } from "./TradeBoxHeaderDetails.jsx";
+import { TradeBoxHeaderInfo } from "./TradeBoxHeaderInfo.jsx";
 import { TradeBoxLink } from "./TradeBoxLink.jsx";
+import { TradeBoxSection } from "./TradeBoxSection.jsx";
 import { TradeBoxTemple } from "./TradeBoxTemple.jsx";
 import { TradeBoxUser } from "./TradeBoxUser.jsx";
 
@@ -26,6 +26,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Function} props.openUserModal - 打开用户信息Modal的函数
  * @param {Function} props.openCharacterModal - 打开角色信息Modal的函数
  * @param {Function} props.openSacrificeModal - 打开资产重组Modal的函数
+ * @param {Function} props.openFavoriteModal - 打开收藏Modal的函数
  * @param {Function} props.openAuctionModal - 打开拍卖Modal的函数
  * @param {Function} props.openAuctionHistoryModal - 打开往期拍卖Modal的函数
  * @param {Function} props.openChangeAvatarModal - 打开更换头像Modal的函数
@@ -33,8 +34,6 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Function} props.openGMTradeHistoryModal - 打开GM交易记录Modal的函数
  * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
  * @param {boolean} props.canChangeAvatar - 是否可以更换头像
- * @param {boolean} props.sticky - 是否启用粘性布局
- * @param {number} props.stickyTop - 粘性布局的top值
  * @param {boolean} props.hideDuplicates - 是否隐藏重复圣殿
  * @param {Function} props.onToggleDuplicates - 切换隐藏重复圣殿的回调函数
  * @param {boolean} props.isLinkCollapsed - LINK区域是否折叠
@@ -45,6 +44,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Function} props.onToggleTempleCollapse - 切换圣殿区域折叠状态的回调函数
  * @param {boolean} props.isUserCollapsed - 用户区域是否折叠
  * @param {Function} props.onToggleUserCollapse - 切换用户区域折叠状态的回调函数
+ * @returns {HTMLElement} 完整的组件容器
  */
 export function TradeBox(props) {
   const {
@@ -73,8 +73,6 @@ export function TradeBox(props) {
     openGMTradeHistoryModal,
     openTempleModal,
     canChangeAvatar,
-    sticky = false,
-    stickyTop = 0,
     hideDuplicates = true,
     onToggleDuplicates,
     isLinkCollapsed = false,
@@ -88,91 +86,81 @@ export function TradeBox(props) {
   } = props || {};
 
   if (!characterData) {
-    return null;
+    return <div />;
   }
 
-  const stickyClass = sticky ? "sticky z-20" : "";
-  const stickyStyle = sticky ? { top: `${stickyTop}px` } : {};
-  
-  // 其他区域的stickyTop需要加上TradeBoxHeaderInfo的高度
-  const otherStickyTop = stickyTop + 60;
-
   return (
-    <div id="tg-trade-box" data-character-id={characterData.CharacterId}>
-      <div 
-        className={`tg-bg-content ${stickyClass}`}
-        style={stickyStyle}
-      >
-        <TradeBoxHeaderInfo 
-          characterData={characterData} 
-          userCharacter={userCharacter} 
-          fixedAssets={fixedAssets} 
+    <div>
+      <div>
+        <TradeBoxHeaderInfo
+          characterData={characterData}
+          userCharacter={userCharacter}
+          fixedAssets={fixedAssets}
           onFavoriteClick={openFavoriteModal}
         />
-      </div>
-      <TradeBoxHeaderDetails characterData={characterData} pool={pool} tinygrailCharacter={tinygrailCharacter} gensokyoCharacter={gensokyoCharacter} />
-      <TradeBoxHeaderActions
-        tinygrailCharacter={tinygrailCharacter}
-        canChangeAvatar={canChangeAvatar}
-        onSacrificeClick={openSacrificeModal}
-        onAuctionClick={openAuctionModal}
-        onAuctionHistoryClick={openAuctionHistoryModal}
-        onChangeAvatarClick={openChangeAvatarModal}
-        onTradeHistoryClick={openTradeHistoryModal}
-        onGMTradeHistoryClick={openGMTradeHistoryModal}
-      />
-      <TradeBoxSection
-        characterData={characterData}
-        userAssets={userAssets}
-        userCharacter={userCharacter}
-        depth={depth}
-        sticky={sticky}
-        stickyTop={otherStickyTop}
-        onRefresh={onRefresh}
-        setLoading={setLoading}
-        isCollapsed={isSectionCollapsed}
-        onToggleCollapse={onToggleSectionCollapse}
-      />
-      {links && links.length > 0 && (
-        <TradeBoxLink
+        <TradeBoxHeaderDetails
           characterData={characterData}
-          links={links}
-          openUserModal={openUserModal}
-          openCharacterModal={openCharacterModal}
-          openTempleModal={openTempleModal}
-          sticky={sticky}
-          stickyTop={otherStickyTop}
-          isCollapsed={isLinkCollapsed}
-          onToggleCollapse={onToggleLinkCollapse}
+          pool={pool}
+          tinygrailCharacter={tinygrailCharacter}
+          gensokyoCharacter={gensokyoCharacter}
         />
-      )}
-      {temples && temples.length > 0 && (
-        <TradeBoxTemple
+        <TradeBoxHeaderActions
+          tinygrailCharacter={tinygrailCharacter}
+          canChangeAvatar={canChangeAvatar}
+          onSacrificeClick={openSacrificeModal}
+          onAuctionClick={openAuctionModal}
+          onAuctionHistoryClick={openAuctionHistoryModal}
+          onChangeAvatarClick={openChangeAvatarModal}
+          onTradeHistoryClick={openTradeHistoryModal}
+          onGMTradeHistoryClick={openGMTradeHistoryModal}
+        />
+      </div>
+      <div>
+        <TradeBoxSection
           characterData={characterData}
           userAssets={userAssets}
-          temples={temples}
-          openUserModal={openUserModal}
-          openTempleModal={openTempleModal}
-          sticky={sticky}
-          stickyTop={otherStickyTop}
-          hideDuplicates={hideDuplicates}
-          onToggleDuplicates={onToggleDuplicates}
-          isCollapsed={isTempleCollapsed}
-          onToggleCollapse={onToggleTempleCollapse}
+          userCharacter={userCharacter}
+          depth={depth}
+          onRefresh={onRefresh}
+          setLoading={setLoading}
+          isCollapsed={isSectionCollapsed}
+          onToggleCollapse={onToggleSectionCollapse}
         />
-      )}
-      {users && (
-        <TradeBoxUser
-          characterData={characterData}
-          users={users}
-          loadUsersPage={loadUsersPage}
-          openUserModal={openUserModal}
-          sticky={sticky}
-          stickyTop={otherStickyTop}
-          isCollapsed={isUserCollapsed}
-          onToggleCollapse={onToggleUserCollapse}
-        />
-      )}
+        {links && links.length > 0 && (
+          <TradeBoxLink
+            characterData={characterData}
+            links={links}
+            openUserModal={openUserModal}
+            openCharacterModal={openCharacterModal}
+            openTempleModal={openTempleModal}
+            isCollapsed={isLinkCollapsed}
+            onToggleCollapse={onToggleLinkCollapse}
+          />
+        )}
+        {temples && temples.length > 0 && (
+          <TradeBoxTemple
+            characterData={characterData}
+            userAssets={userAssets}
+            temples={temples}
+            openUserModal={openUserModal}
+            openTempleModal={openTempleModal}
+            hideDuplicates={hideDuplicates}
+            onToggleDuplicates={onToggleDuplicates}
+            isCollapsed={isTempleCollapsed}
+            onToggleCollapse={onToggleTempleCollapse}
+          />
+        )}
+        {users && (
+          <TradeBoxUser
+            characterData={characterData}
+            users={users}
+            loadUsersPage={loadUsersPage}
+            openUserModal={openUserModal}
+            isCollapsed={isUserCollapsed}
+            onToggleUserCollapse={onToggleUserCollapse}
+          />
+        )}
+      </div>
     </div>
   );
 }

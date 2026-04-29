@@ -1,17 +1,14 @@
-import { getTopWeek, getTopWeekHistory } from "@src/api/chara.js";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { getCover, normalizeAvatar } from "@src/utils/oos.js";
-import { formatCurrency, formatNumber } from "@src/utils/format.js";
+import { getAuctionList, getTopWeek, getTopWeekHistory } from "@src/api/chara.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { Button } from "@src/components/Button.jsx";
-import { Modal } from "@src/components/Modal.jsx";
-import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
-import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
-import { Auction } from "@src/modules/auction/Auction.jsx";
-import { RefreshCwIcon } from "@src/icons/RefreshCwIcon.js";
 import { ChevronRightIcon } from "@src/icons/ChevronRightIcon.js";
-import { TopWeekHistory } from "./components/TopWeekHistory.jsx";
-import { scrollToTop } from "@src/utils/scroll.js";
+import { RefreshCwIcon } from "@src/icons/RefreshCwIcon.js";
+import { openAuctionModal } from "@src/modules/auction/Auction.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box/utils/modalOpeners.jsx";
+import { openTempleModal } from "@src/modules/temple-detail/TempleDetail.jsx";
+import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { formatCurrency, formatNumber } from "@src/utils/format.js";
+import { getCover, normalizeAvatar } from "@src/utils/oos.js";
+import { openTopWeekHistoryModal } from "./components/TopWeekHistory.jsx";
 
 /**
  * 每周萌王组件
@@ -24,33 +21,8 @@ export function TopWeek() {
     />
   );
 
-  // 存储Modal生成的ID
-  let generatedCharacterModalId = null;
-  let generatedAuctionModalId = null;
-  let generatedHistoryModalId = null;
-
-  // 检查Modal是否已存在
-  const isModalExist = (modalId) => {
-    return (
-      modalId &&
-      document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode === document.body
-    );
-  };
-
   const { setState } = createMountedComponent(container, (state) => {
-    const {
-      topWeekData = null,
-      showCharacterModal = false,
-      characterModalId = null,
-      showTempleModal = false,
-      templeModalData = null,
-      showAuctionModal = false,
-      auctionData = null,
-      isRefreshing = false,
-      showHistoryModal = false,
-      historyData = null,
-      historyCurrentPage = 1,
-    } = state || {};
+    const { topWeekData = null, isRefreshing = false } = state || {};
 
     /**
      * 刷新数据处理
@@ -63,24 +35,14 @@ export function TopWeek() {
     };
 
     /**
-     * 角色点击处理
-     * @param {number} characterId - 角色ID
-     */
-    const handleCharacterClick = (characterId) => {
-      setState({
-        showCharacterModal: true,
-        characterModalId: characterId,
-      });
-    };
-
-    /**
      * 圣殿图片点击处理
      * @param {Object} temple - 圣殿数据
      */
     const handleTempleClick = (temple) => {
-      setState({
-        showTempleModal: true,
-        templeModalData: temple,
+      openTempleModal({
+        temple,
+        characterName: temple.Name,
+        imageOnly: true,
       });
     };
 
@@ -89,9 +51,14 @@ export function TopWeek() {
      * @param {Object} item - 每周萌王数据
      */
     const handleAuctionClick = (item) => {
-      setState({
-        showAuctionModal: true,
-        auctionData: item,
+      openAuctionModal({
+        characterId: item.CharacterId,
+        characterName: item.CharacterName,
+        basePrice: item.Price ?? 0,
+        maxAmount: item.Sacrifices ?? 0,
+        onSuccess: () => {
+          handleRefresh();
+        },
       });
     };
 
@@ -99,60 +66,15 @@ export function TopWeek() {
      * 往期萌王按钮点击处理
      */
     const handleHistoryClick = async () => {
-      setState({
-        showHistoryModal: true,
-        historyData: null,
-        historyCurrentPage: 1,
-      });
       const result = await getTopWeekHistory(1);
       if (result.success) {
-        setState({
-          historyData: result.data.items,
-          historyCurrentPage: result.data.currentPage,
+        openTopWeekHistoryModal({
+          initialHistoryData: result.data.items,
+          initialPage: result.data.currentPage,
+          onCharacterClick: (characterId) => {
+            openCharacterBoxModal(characterId);
+          },
         });
-      }
-    };
-
-    /**
-     * 往期萌王分页处理
-     * @param {number} page - 页码
-     */
-    const handleHistoryPageChange = async (page) => {
-      const result = await getTopWeekHistory(page);
-      if (result.success) {
-        const newHistoryData = result.data.items;
-        const newCurrentPage = result.data.currentPage;
-
-        setState({
-          historyData: newHistoryData,
-          historyCurrentPage: newCurrentPage,
-        });
-
-        // 手动更新Modal内容
-        if (generatedHistoryModalId) {
-          const modalContent = document.querySelector(
-            `#tg-modal[data-modal-id="${generatedHistoryModalId}"] #tg-modal-content`
-          );
-          if (modalContent) {
-            modalContent.innerHTML = "";
-            const newHistoryComponent = (
-              <TopWeekHistory
-                historyData={newHistoryData}
-                currentPage={newCurrentPage}
-                onPageChange={handleHistoryPageChange}
-                onCharacterClick={(characterId) => {
-                  setState({
-                    showHistoryModal: false,
-                    showCharacterModal: true,
-                    characterModalId: characterId,
-                  });
-                }}
-              />
-            );
-            modalContent.appendChild(newHistoryComponent);
-            scrollToTop(modalContent);
-          }
-        }
       }
     };
 
@@ -289,7 +211,7 @@ export function TopWeek() {
                 <div className="flex items-center justify-between gap-1 text-sm">
                   <span
                     className="tg-link cursor-pointer truncate font-semibold opacity-80 hover:opacity-100"
-                    onClick={() => handleCharacterClick(item.CharacterId)}
+                    onClick={() => openCharacterBoxModal(item.CharacterId)}
                     title={item.CharacterName}
                   >
                     {item.CharacterName}
@@ -317,9 +239,16 @@ export function TopWeek() {
                         (item.Assets || 1)
                     )}
                   </div>
-                  <Button size="sm" rounded="full" onClick={() => handleAuctionClick(item)}>
-                    竞拍
-                  </Button>
+                  <button
+                    className={
+                      item.auction?.Price > 0 && item.auction?.Amount > 0
+                        ? "btn btn-xs rounded-full border-green-500 bg-green-500 text-white hover:border-green-600 hover:bg-green-600"
+                        : "btn-bgm btn btn-xs rounded-full"
+                    }
+                    onClick={() => handleAuctionClick(item)}
+                  >
+                    {item.auction?.Price > 0 && item.auction?.Amount > 0 ? "改价" : "竞拍"}
+                  </button>
                 </div>
               </div>
             </div>
@@ -368,84 +297,6 @@ export function TopWeek() {
       <div>
         {titleDiv}
         {contentDiv}
-        {showCharacterModal && characterModalId && !isModalExist(generatedCharacterModalId) && (
-          <Modal
-            visible={showCharacterModal}
-            onClose={() => setState({ showCharacterModal: false })}
-            modalId={generatedCharacterModalId}
-            getModalId={(id) => {
-              generatedCharacterModalId = id;
-            }}
-            padding="p-6"
-          >
-            <CharacterBox characterId={characterModalId} sticky={true} />
-          </Modal>
-        )}
-        {showTempleModal && templeModalData && (
-          <Modal
-            visible={showTempleModal}
-            onClose={() => setState({ showTempleModal: false })}
-            position="top"
-            maxWidth={1080}
-            padding="p-0"
-            scrollMode="outside"
-          >
-            <TempleDetail
-              temple={templeModalData}
-              characterName={templeModalData.Name}
-              imageOnly={true}
-            />
-          </Modal>
-        )}
-        {showAuctionModal && auctionData && !isModalExist(generatedAuctionModalId) && (
-          <Modal
-            visible={showAuctionModal}
-            onClose={() => {
-              setState({ showAuctionModal: false });
-              handleRefresh();
-            }}
-            title={`拍卖 - #${auctionData.CharacterId ?? ""}「${auctionData.CharacterName ?? ""}」`}
-            position="center"
-            maxWidth={480}
-            modalId={generatedAuctionModalId}
-            getModalId={(id) => {
-              generatedAuctionModalId = id;
-            }}
-          >
-            <Auction
-              characterId={auctionData.CharacterId}
-              basePrice={auctionData.Price ?? 0}
-              maxAmount={auctionData.Sacrifices ?? 0}
-            />
-          </Modal>
-        )}
-        {showHistoryModal && historyData && !isModalExist(generatedHistoryModalId) && (
-          <Modal
-            visible={showHistoryModal}
-            onClose={() => setState({ showHistoryModal: false })}
-            title="往期萌王"
-            position="center"
-            maxWidth={600}
-            padding="p-4"
-            modalId={generatedHistoryModalId}
-            getModalId={(id) => {
-              generatedHistoryModalId = id;
-            }}
-          >
-            <TopWeekHistory
-              historyData={historyData}
-              currentPage={historyCurrentPage}
-              onPageChange={handleHistoryPageChange}
-              onCharacterClick={(characterId) => {
-                setState({
-                  showHistoryModal: false,
-                  showCharacterModal: true,
-                  characterModalId: characterId,
-                });
-              }}
-            />
-          </Modal>
-        )}
       </div>
     );
   });
@@ -454,7 +305,23 @@ export function TopWeek() {
   const loadTopWeekData = async () => {
     const result = await getTopWeek();
     if (result.success) {
-      setState({ topWeekData: result.data });
+      // 获取所有CharacterId并调用getAuctionList
+      const characterIds = result.data.map((item) => item.CharacterId);
+      const auctionResult = await getAuctionList(characterIds);
+
+      // 合并数据
+      const mergedData = result.data.map((item) => {
+        const auctionData =
+          auctionResult.success && auctionResult.data
+            ? auctionResult.data.find((auction) => auction.CharacterId === item.CharacterId)
+            : null;
+        return {
+          ...item,
+          auction: auctionData,
+        };
+      });
+
+      setState({ topWeekData: mergedData });
     } else {
       setState({ topWeekData: [] });
     }

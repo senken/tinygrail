@@ -1,7 +1,6 @@
-import { getLargeCover } from "@src/utils/oos.js";
-import { formatNumber } from "@src/utils/format.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
-import { Button } from "@src/components/Button.jsx";
+import { formatNumber } from "@src/utils/format.js";
+import { getLargeCover } from "@src/utils/oos.js";
 
 /**
  * 刮刮乐卡片项组件
@@ -98,43 +97,37 @@ export function ScratchCardItem({
       style={{ maxHeight: "0", opacity: "0" }}
     >
       {chara.SellPrice > 0 && chara.SellAmount > 0 && (
-        <Button
-          variant="solid"
-          size="sm"
-          className="w-full"
+        <button
+          className="btn-bgm btn btn-sm btn-block"
           onClick={(e) => {
             e.stopPropagation();
             onSell && onSell(chara);
           }}
         >
           出售 (₵{formatNumber(chara.SellPrice, 0)})
-        </Button>
+        </button>
       )}
       {chara.Amount > 0 && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
+        <button
+          className="btn-bgm btn btn-outline btn-sm btn-block"
           onClick={(e) => {
             e.stopPropagation();
             onFinance && onFinance(chara);
           }}
         >
           融资
-        </Button>
+        </button>
       )}
       {chara.Amount > 0 && !isCharged && (
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
+        <button
+          className="btn-bgm btn btn-outline btn-sm btn-block"
           onClick={(e) => {
             e.stopPropagation();
             onCharge && onCharge(chara);
           }}
         >
           充能
-        </Button>
+        </button>
       )}
     </div>
   );
@@ -143,7 +136,7 @@ export function ScratchCardItem({
     <div
       id="tg-scratch-card-item"
       data-character-id={chara.Id}
-      className="relative w-40"
+      className="relative w-40 p-1"
       data-id={chara.Id}
       style={{
         perspective: "1000px",

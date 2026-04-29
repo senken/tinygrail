@@ -1,5 +1,33 @@
-import { Button } from "@src/components/Button.jsx";
 import { sendRedPacket } from "@src/api/event.js";
+import { closeModal, openModal } from "@src/utils/modalManager.js";
+
+/**
+ * 打开发送红包弹窗
+ * @param {Object} options
+ * @param {string} options.username - 用户名
+ * @param {string} options.nickname - 用户昵称（可选）
+ * @param {Function} options.onSuccess - 发送成功回调（可选）
+ * @returns {string} 弹窗ID
+ */
+export function openSendRedPacketModal({ username, nickname = "", onSuccess }) {
+  const modalId = `send-red-packet-${username}`;
+
+  openModal(modalId, {
+    title: nickname ? `发送红包给「${nickname}」` : "发送红包",
+    content: (
+      <SendRedPacket
+        username={username}
+        onSuccess={() => {
+          closeModal(modalId);
+          onSuccess?.();
+        }}
+      />
+    ),
+    size: "sm",
+  });
+
+  return modalId;
+}
 
 /**
  * 发送红包组件
@@ -13,27 +41,27 @@ export function SendRedPacket({ username, onSuccess }) {
   let statusMessage = "";
   let statusType = "";
 
-  const messageInput = (
-    <input
-      type="text"
-      className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
-      placeholder="请输入祝福留言"
-      onInput={(e) => {
-        message = e.target.value;
-      }}
-    />
-  );
-
   const amountInput = (
     <input
       type="number"
-      className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
+      className="input input-sm input-bordered w-full"
       placeholder="请输入红包金额"
       onInput={(e) => {
         amount = e.target.value;
       }}
       min="0"
       step="1000"
+    />
+  );
+
+  const messageInput = (
+    <input
+      type="text"
+      className="input input-sm input-bordered w-full !bg-base-100"
+      placeholder="请输入祝福留言"
+      onInput={(e) => {
+        message = e.target.value;
+      }}
     />
   );
 
@@ -83,21 +111,22 @@ export function SendRedPacket({ username, onSuccess }) {
   statusDiv.style.display = "none";
 
   return (
-    <div id="tg-send-red-packet" className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4">
+    <div id="tg-send-red-packet" className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {/* 红包金额 */}
-        <div className="flex flex-col gap-2">{amountInput}</div>
-
+        <div className="p-1">{amountInput}</div>
         {/* 祝福留言 */}
-        <div className="flex flex-col gap-2">{messageInput}</div>
+        <div className="p-1">{messageInput}</div>
         {/* 状态消息 */}
         {statusDiv}
       </div>
 
       <div>
         {/* 按钮 */}
-        <div className="flex justify-end gap-2">
-          <Button onClick={handleSubmit}>发送</Button>
+        <div className="flex justify-end gap-2 p-1">
+          <button className="btn-bgm btn btn-sm btn-block" onClick={handleSubmit}>
+            发送
+          </button>
         </div>
       </div>
     </div>
