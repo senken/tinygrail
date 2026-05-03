@@ -38,7 +38,7 @@ function getGlobalTinygrailContainer() {
  * @param {Function} options.onClose - 关闭回调
  * @param {string} options.size - 弹窗大小：'sm' | 'md' | 'lg' | 'xl' | 'full' | 'fit'（默认md）
  * @param {string} options.position - 弹窗位置：'middle' | 'bottom' | 'top' | 'responsive'（默认middle）
- * @param {Object} options.modalBoxProps - modalBox div 的额外属性（如 id, className, dataset 等）
+ * @param {Object} options.modalBoxProps - modalBox的额外属性
  * @returns {Object} 弹窗控制对象
  */
 export function openModal(id, options = {}) {
@@ -123,16 +123,12 @@ export function openModal(id, options = {}) {
   // 检查是否在iframe内部
   const isInIframe = window.self !== window.top;
 
-  // 如果是bottom或responsive位置，且在iframe内部，添加底部内边距
-  const paddingClass =
-    (position === "bottom" || position === "responsive") && isInIframe ? " pb-12 sm:pb-6" : "";
-
   // 根据borderless设置类名
   if (borderless) {
     // 无边框模式
     modalBox.className = "modal-box max-w-full w-auto flex flex-col p-0";
   } else {
-    modalBox.className = sizeClass + paddingClass + " flex flex-col overflow-hidden";
+    modalBox.className = sizeClass + " flex flex-col overflow-hidden";
   }
 
   // 如果外部传入了额外的className，追加到现有className
@@ -232,8 +228,42 @@ export function openModal(id, options = {}) {
   const container = getGlobalTinygrailContainer();
   container.appendChild(dialog);
 
+  // 监听dialog的close事件
+  dialog.addEventListener("close", () => {
+    // 只有当前dialog实例还在modals中时才处理
+    const currentModal = modals.get(id);
+    if (currentModal && currentModal.dialog === dialog) {
+      // 从Map中删除
+      modals.delete(id);
+      
+      // 如果在iframe内且没有其他弹窗，显示父页面的dock元素
+      if (isInIframe && modals.size === 0) {
+        try {
+          const parentDock = window.parent.document.getElementById("dock");
+          if (parentDock) {
+            parentDock.style.display = "";
+          }
+        } catch (e) {
+          console.error("无法访问父页面dock元素:", e);
+        }
+      }
+    }
+  });
+
   // 打开弹窗
   dialog.showModal();
+
+  // 如果在iframe内，隐藏父页面的dock元素
+  if (isInIframe) {
+    try {
+      const parentDock = window.parent.document.getElementById("dock");
+      if (parentDock) {
+        parentDock.style.display = "none";
+      }
+    } catch (e) {
+      console.error("无法隐藏父页面dock元素:", e);
+    }
+  }
 
   // 保存弹窗实例
   const modalInstance = {
@@ -271,6 +301,19 @@ export function closeModal(id) {
 
   // 从Map中删除
   modals.delete(id);
+
+  // 如果在iframe内且没有其他弹窗，显示父页面的dock元素
+  const isInIframe = window.self !== window.top;
+  if (isInIframe && modals.size === 0) {
+    try {
+      const parentDock = window.parent.document.getElementById("dock");
+      if (parentDock) {
+        parentDock.style.display = "";
+      }
+    } catch (e) {
+      console.error("无法显示父页面dock元素:", e);
+    }
+  }
 }
 
 /**
