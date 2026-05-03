@@ -1,5 +1,6 @@
 import { sendRedPacket } from "@src/api/event.js";
 import { closeModal, openModal } from "@src/utils/modalManager.js";
+import { showSuccess, showError, showWarning } from "@src/utils/toastManager.jsx";
 
 /**
  * 打开发送红包弹窗
@@ -38,8 +39,7 @@ export function openSendRedPacketModal({ username, nickname = "", onSuccess }) {
 export function SendRedPacket({ username, onSuccess }) {
   let message = "";
   let amount = "";
-  let statusMessage = "";
-  let statusType = "";
+  let isLoading = false;
 
   const amountInput = (
     <input
@@ -65,50 +65,41 @@ export function SendRedPacket({ username, onSuccess }) {
     />
   );
 
-  const statusDiv = <div />;
-
-  const updateStatus = (msg, type) => {
-    statusMessage = msg;
-    statusType = type;
-
-    if (msg) {
-      let className = "rounded-lg text-xs";
-      if (type === "success") {
-        className += "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300";
-      } else if (type === "error") {
-        className += "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300";
-      } else {
-        className += "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300";
-      }
-      statusDiv.className = className;
-      statusDiv.textContent = msg;
-      statusDiv.style.display = "block";
-    } else {
-      statusDiv.style.display = "none";
-    }
-  };
+  const loadingSpinner = <span className="loading loading-spinner loading-sm"></span>;
+  const submitButton = <button className="btn-bgm btn btn-sm btn-block">发送</button>;
 
   const handleSubmit = async () => {
     // 验证输入
     if (!amount || isNaN(amount) || Number(amount) <= 0) {
-      updateStatus("请输入有效的红包金额", "error");
+      showWarning("请输入有效的红包金额");
       return;
     }
 
-    updateStatus("发送中...", "");
+    if (isLoading) return;
+
+    isLoading = true;
+    submitButton.disabled = true;
+    submitButton.insertBefore(loadingSpinner, submitButton.firstChild);
 
     const result = await sendRedPacket(username, Number(amount), message);
 
-    updateStatus(result.message, result.success ? "success" : "error");
+    isLoading = false;
+    submitButton.disabled = false;
+    loadingSpinner.remove();
 
-    if (result.success && onSuccess) {
-      setTimeout(() => {
-        onSuccess();
-      }, 500);
+    if (result.success) {
+      showSuccess(result.message);
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess();
+        }, 500);
+      }
+    } else {
+      showError(result.message);
     }
   };
 
-  statusDiv.style.display = "none";
+  submitButton.onclick = handleSubmit;
 
   return (
     <div id="tg-send-red-packet" className="flex flex-col gap-2">
@@ -117,17 +108,11 @@ export function SendRedPacket({ username, onSuccess }) {
         <div className="p-1">{amountInput}</div>
         {/* 祝福留言 */}
         <div className="p-1">{messageInput}</div>
-        {/* 状态消息 */}
-        {statusDiv}
       </div>
 
       <div>
         {/* 按钮 */}
-        <div className="flex justify-end gap-2 p-1">
-          <button className="btn-bgm btn btn-sm btn-block" onClick={handleSubmit}>
-            发送
-          </button>
-        </div>
+        <div className="flex justify-end gap-2 p-1">{submitButton}</div>
       </div>
     </div>
   );
