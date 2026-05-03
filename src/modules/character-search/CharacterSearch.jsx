@@ -91,10 +91,13 @@ export function CharacterSearch({ username, onCharacterClick, className = "" }) 
     );
     contentDiv.appendChild(searchDiv);
 
-    // 自动聚焦输入框
+    // 自动聚焦输入框并将光标移到末尾
     setTimeout(() => {
       const input = searchDiv.querySelector("input");
-      if (input) input.focus();
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
     }, 100);
 
     // 加载状态

@@ -138,6 +138,15 @@ export function TempleSearch({ username, onTempleClick, className = "" }) {
     );
     contentDiv.appendChild(searchDiv);
 
+    // 自动聚焦输入框并将光标移到末尾
+    setTimeout(() => {
+      const input = searchDiv.querySelector("input");
+      if (input) {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      }
+    }, 100);
+
     // 加载状态
     if (loading) {
       const loadingDiv = <div className="py-8 text-center text-sm opacity-60">加载中...</div>;
