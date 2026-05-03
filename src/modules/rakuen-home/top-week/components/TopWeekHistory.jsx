@@ -67,7 +67,7 @@ export function TopWeekHistory({
   const itemsContainer = <div id="tg-rakuen-home-top-week-history-list" className="divide-y divide-gray-200 dark:divide-gray-700" />;
 
   // 渲染所有数据
-  [...historyData].reverse().forEach((item) => {
+  [...historyData].sort((a, b) => a.Level - b.Level).forEach((item) => {
     const avatarUrl = normalizeAvatar(item.Avatar);
     const rank = item.Level;
 
