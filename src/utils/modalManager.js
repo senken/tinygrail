@@ -233,9 +233,14 @@ export function openModal(id, options = {}) {
     // 只有当前dialog实例还在modals中时才处理
     const currentModal = modals.get(id);
     if (currentModal && currentModal.dialog === dialog) {
+      // 调用关闭回调
+      if (currentModal.onClose) {
+        currentModal.onClose();
+      }
+
       // 从Map中删除
       modals.delete(id);
-      
+
       // 如果在iframe内且没有其他弹窗，显示父页面的dock元素
       if (isInIframe && modals.size === 0) {
         try {
