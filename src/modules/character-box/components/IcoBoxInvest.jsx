@@ -32,7 +32,7 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
     <input
       id="tg-ico-box-invest-input"
       type="number"
-      className="input input-sm input-bordered w-full"
+      className="input input-sm join-item input-bordered w-full"
       placeholder="请输入注资金额"
       min="5000"
       value="5000"
@@ -54,10 +54,10 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
       </div>
 
       {/* 输入框和按钮 */}
-      <div className="flex items-center gap-2">
+      <div className="join flex items-center">
         {input}
         <button
-          className="btn-bgm btn btn-sm"
+          className="btn-bgm btn join-item btn-sm"
           onClick={() => {
             const amount = parseFloat(input.value);
             if (isNaN(amount) || amount < 5000) {
