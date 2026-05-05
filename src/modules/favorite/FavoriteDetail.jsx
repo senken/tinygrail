@@ -105,15 +105,15 @@ async function fetchCharacterName(characterId) {
 export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
   const container = <div id="tg-favorite-detail" className="flex min-w-96 flex-col gap-3" />;
 
-  const pageSize = 48;
+  const PAGE_SIZE = 48;
 
   // 计算列数的函数
   const calculateLayout = (width) => {
-    const minCellWidth = 80;
-    const gap = 12;
+    const MIN_CELL_WIDTH = 80;
+    const GAP = 12;
 
     // 计算可以容纳的最大列数
-    let cols = Math.floor((width + gap) / (minCellWidth + gap));
+    let cols = Math.floor((width + GAP) / (MIN_CELL_WIDTH + GAP));
 
     // 确保列数是48的因数
     const divisors = [48, 24, 16, 12, 8, 6, 4, 3, 2, 1];
@@ -123,6 +123,31 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
       }
     }
     return 1;
+  };
+
+  /**
+   * 渲染骨架屏网格
+   * @param {HTMLElement} targetDiv - 目标容器
+   * @param {number} cols - 列数
+   * @param {number} count - 骨架项数量
+   */
+  const renderSkeletonGrid = (targetDiv, cols, count) => {
+    targetDiv.innerHTML = "";
+    targetDiv.style.display = "grid";
+    targetDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    targetDiv.style.gap = "0.75rem";
+
+    for (let i = 0; i < count; i++) {
+      const skeletonItem = (
+        <div className="flex flex-col items-center gap-2 p-2">
+          <div className="flex-shrink-0 border-2 border-transparent">
+            <div className="tg-avatar skeleton size-14" />
+          </div>
+          <div className="skeleton my-0.5 h-4 w-16 rounded" />
+        </div>
+      );
+      targetDiv.appendChild(skeletonItem);
+    }
   };
 
   const { setState } = createMountedComponent(container, (state) => {
@@ -136,61 +161,6 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
       isSelecting = false,
       selectedIds = [],
     } = state || {};
-
-    if (loading && !favorite) {
-      // 首次加载显示完整骨架屏
-      const skeletonDiv = <div className="flex flex-col gap-1" />;
-
-      // 工具栏骨架
-      const toolbarSkeleton = (
-        <div className="flex items-center justify-between gap-2 p-1">
-          <div className="skeleton h-8 w-32 rounded-full" />
-          <div className="skeleton h-8 w-16 rounded-full" />
-        </div>
-      );
-
-      // 网格骨架
-      const gridSkeleton = <div className="grid w-full p-1" />;
-
-      // 渲染骨架屏网格
-      const renderSkeleton = (cols) => {
-        gridSkeleton.innerHTML = "";
-        gridSkeleton.style.display = "grid";
-        gridSkeleton.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        gridSkeleton.style.gap = "0.75rem";
-
-        for (let i = 0; i < 48; i++) {
-          const skeletonItem = (
-            <div className="flex flex-col items-center gap-2 p-2">
-              <div className="flex-shrink-0 border-2 border-transparent">
-                <div className="tg-avatar skeleton size-14" />
-              </div>
-              <div className="skeleton my-0.5 h-4 w-16 rounded" />
-            </div>
-          );
-          gridSkeleton.appendChild(skeletonItem);
-        }
-      };
-
-      // 初始渲染
-      const initialCols = calculateLayout(container.offsetWidth || 800);
-      renderSkeleton(initialCols);
-
-      // 监听容器宽度变化
-      const observer = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          const width = entry.contentRect.width;
-          const cols = calculateLayout(width);
-          renderSkeleton(cols);
-        }
-      });
-      observer.observe(container);
-
-      skeletonDiv.appendChild(toolbarSkeleton);
-      skeletonDiv.appendChild(gridSkeleton);
-
-      return skeletonDiv;
-    }
 
     if (error) {
       return <div className="py-8 text-center text-sm opacity-60">加载失败：{error}</div>;
@@ -415,26 +385,6 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
     const contentDiv = <div className={`flex flex-col gap-1 ${isSelecting ? "pb-9" : ""}`} />;
     const gridDiv = <div className="grid w-full p-1" />;
 
-    // 渲染骨架屏函数
-    const renderSkeleton = (cols) => {
-      gridDiv.innerHTML = "";
-      gridDiv.style.display = "grid";
-      gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-      gridDiv.style.gap = "0.75rem";
-
-      for (let i = 0; i < 48; i++) {
-        const skeletonItem = (
-          <div className="flex flex-col items-center gap-2 p-2">
-            <div className="flex-shrink-0 border-2 border-transparent">
-              <div className="tg-avatar skeleton size-14" />
-            </div>
-            <div className="skeleton my-0.5 h-4 w-16 rounded" />
-          </div>
-        );
-        gridDiv.appendChild(skeletonItem);
-      }
-    };
-
     // 渲染实际内容函数
     const renderItems = (cols) => {
       gridDiv.innerHTML = "";
@@ -534,7 +484,12 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
     // 初始渲染
     const initialCols = calculateLayout(container.offsetWidth || 800);
     if (loading) {
-      renderSkeleton(initialCols);
+      // 计算当前页应该显示的数据量
+      const totalCharacters = favorite?.characters?.length || 0;
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = Math.min(startIndex + PAGE_SIZE, totalCharacters);
+      const pageCount = Math.max(0, endIndex - startIndex);
+      renderSkeletonGrid(gridDiv, initialCols, pageCount || PAGE_SIZE);
     } else {
       renderItems(initialCols);
     }
@@ -545,7 +500,12 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
         const width = entry.contentRect.width;
         const cols = calculateLayout(width);
         if (loading) {
-          renderSkeleton(cols);
+          // 计算当前页应该显示的数据量
+          const totalCharacters = favorite?.characters?.length || 0;
+          const startIndex = (currentPage - 1) * PAGE_SIZE;
+          const endIndex = Math.min(startIndex + PAGE_SIZE, totalCharacters);
+          const pageCount = Math.max(0, endIndex - startIndex);
+          renderSkeletonGrid(gridDiv, cols, pageCount || PAGE_SIZE);
         } else {
           renderItems(cols);
         }
@@ -675,9 +635,9 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
 
     // 计算分页
     const totalCharacters = favorite.characters.length;
-    const totalPages = Math.ceil(totalCharacters / pageSize);
-    const startIndex = (page - 1) * pageSize;
-    const endIndex = Math.min(startIndex + pageSize, totalCharacters);
+    const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
+    const startIndex = (page - 1) * PAGE_SIZE;
+    const endIndex = Math.min(startIndex + PAGE_SIZE, totalCharacters);
     const pageCharacterIds = favorite.characters.slice(startIndex, endIndex);
 
     const result = await getCharacterList(pageCharacterIds);
