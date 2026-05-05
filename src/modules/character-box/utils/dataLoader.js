@@ -131,6 +131,16 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
     userCharacterResult,
   });
 
+  // 合并links和temples数据
+  let mergedTemples = null;
+  if (templesResult.success && linksResult.success) {
+    mergedTemples = [...(templesResult.data || []), ...(linksResult.data || [])];
+  } else if (templesResult.success) {
+    mergedTemples = templesResult.data;
+  } else if (linksResult.success) {
+    mergedTemples = linksResult.data;
+  }
+
   return {
     pool: poolResult.success ? poolResult.data : null,
     userCharacter: userCharacterResult.success ? userCharacterResult.data : null,
@@ -138,7 +148,7 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
     gensokyoCharacter: gensokyoCharacterResult.success ? gensokyoCharacterResult.data : null,
     depth: depthResult.success ? depthResult.data : null,
     links: linksResult.success ? linksResult.data : null,
-    temples: templesResult.success ? templesResult.data : null,
+    temples: mergedTemples,
     users: usersResult.success ? usersResult.data : null,
     canChangeAvatar,
     fixedAssets,
