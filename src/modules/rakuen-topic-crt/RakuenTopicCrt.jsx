@@ -1,4 +1,5 @@
 import { CharacterBox } from "@src/modules/character-box/CharacterBox.jsx";
+import { openCharacterBoxModal } from "../character-box";
 
 /**
  * 超展开角色话题页面组件
@@ -64,6 +65,14 @@ export function RakuenTopicCrt() {
     toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
     // 保存到 localStorage
     localStorage.setItem(storageKey, isCollapsed);
+  });
+
+  // 监听来自侧边栏iframe的消息
+  window.addEventListener("message", (event) => {
+    if (event.data.type === "openCharacterModal") {
+      const characterId = event.data.characterId;
+      openCharacterBoxModal(characterId);
+    }
   });
 
   const characterBox = (
