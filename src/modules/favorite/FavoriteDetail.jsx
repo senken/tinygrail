@@ -5,6 +5,7 @@ import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { get } from "@src/utils/http.js";
 import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
+import { scrollToTop } from "@src/utils/scroll.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { showSuccess } from "@src/utils/toastManager.jsx";
 import { getFavorites, getVisibleFavorites, saveFavorites } from "./favoriteStorage.js";
@@ -205,6 +206,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
 
     // 处理分页变化
     const handlePageChange = (page) => {
+      scrollToTop(container);
       loadCharacters(page);
     };
 
@@ -554,7 +556,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
 
     // 添加工具栏
     const toolbarDiv = (
-      <div className="flex items-center justify-between gap-2 p-1">
+      <div className="sticky top-0 z-10 flex items-center justify-between gap-2 bg-base-100 p-1">
         <div className="flex items-center gap-2">
           <div className="inline-flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1.5 dark:bg-gray-800">
             {!isSelecting && (
