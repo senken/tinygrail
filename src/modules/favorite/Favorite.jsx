@@ -1,9 +1,9 @@
-import { Button } from "@src/components/Button.jsx";
 import { ArrowDownIcon, ArrowUpIcon, FolderIcon, SquarePenIcon, TrashIcon } from "@src/icons";
 import { openCharacterBoxModal } from "@src/modules/character-box";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { closeModal, openModal, openConfirmModal } from "@src/utils/modalManager.js";
+import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import { showSuccess } from "@src/utils/toastManager.jsx";
 import { FavoriteDetail } from "./FavoriteDetail.jsx";
 import { FavoriteEdit } from "./FavoriteEdit.jsx";
 import {
@@ -38,11 +38,6 @@ export function Favorite() {
   const { setState } = createMountedComponent(container, (state) => {
     const {
       favorites = [],
-      statusMessage = "",
-      isEditing = false,
-      editingFavoriteId = null,
-      editingName = "",
-      editingColor = colors[0],
     } = state || {};
 
     // 删除收藏夹
@@ -75,10 +70,8 @@ export function Favorite() {
             uploadToCloud(currentFavorites);
 
             const visibleFavorites = getVisibleFavorites(currentFavorites, currentUserId);
-            setState({
-              favorites: visibleFavorites,
-              statusMessage: "收藏夹已删除",
-            });
+            setState({ favorites: visibleFavorites });
+            showSuccess("收藏夹已删除");
           }
         },
       });
@@ -166,7 +159,7 @@ export function Favorite() {
             onSave={() => {
               loadFavorites();
               closeModal(`edit-favorite-${favoriteId}`);
-              setState({ statusMessage: "收藏夹已更新" });
+              showSuccess("收藏夹已更新");
             }}
             onCancel={() => {
               closeModal(`edit-favorite-${favoriteId}`);
@@ -178,49 +171,6 @@ export function Favorite() {
     };
 
     // 保存编辑
-    const saveEdit = () => {
-      const trimmedName = editingName.trim();
-
-      if (!trimmedName) {
-        setState({ statusMessage: "请输入收藏夹名称" });
-        return;
-      }
-      if (trimmedName.length > 20) {
-        setState({ statusMessage: "收藏夹名称不能超过20个字" });
-        return;
-      }
-
-      const currentFavorites = getFavorites();
-      const favorite = currentFavorites.find((f) => f.id === editingFavoriteId);
-
-      if (!favorite) return;
-
-      favorite.name = trimmedName;
-      favorite.color = editingColor.value;
-      favorite.updatedAt = Date.now();
-
-      saveFavorites(currentFavorites);
-      uploadToCloud(currentFavorites);
-      setState({
-        favorites: getVisibleFavorites(currentFavorites, currentUserId),
-        isEditing: false,
-        editingFavoriteId: null,
-        editingName: "",
-        editingColor: colors[0],
-        statusMessage: "收藏夹已更新",
-      });
-    };
-
-    // 取消编辑
-    const cancelEdit = () => {
-      setState({
-        isEditing: false,
-        editingFavoriteId: null,
-        editingName: "",
-        editingColor: colors[0],
-      });
-    };
-
     // 打开收藏夹详情
     const openFavoriteDetail = (favorite) => {
       openModal(`favorite-detail-${favorite.id}`, {
@@ -354,57 +304,10 @@ export function Favorite() {
       );
     };
 
-    // 渲染编辑表单
-    const renderEditForm = () => {
-      return (
-        <div className="flex flex-col gap-2">
-          <div className="text-sm font-medium">编辑收藏夹</div>
-          <input
-            type="text"
-            className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
-            placeholder="收藏夹名称（最多20字）"
-            maxLength="20"
-            value={editingName}
-            onInput={(e) => {
-              setState({ editingName: e.target.value });
-            }}
-          />
-          <div className="text-xs opacity-60">选择颜色：</div>
-          <div className="flex flex-wrap gap-2">
-            {colors.map((color) => (
-              <button
-                type="button"
-                className={`h-8 w-8 rounded-full border-2 transition-all ${color.value} ${
-                  editingColor.value === color.value
-                    ? "border-gray-800 dark:border-gray-200"
-                    : "border-transparent"
-                }`}
-                onClick={() => {
-                  setState({ editingColor: color });
-                }}
-                title={color.name}
-              />
-            ))}
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button onClick={saveEdit}>保存</Button>
-            <Button variant="outline" onClick={cancelEdit}>
-              取消
-            </Button>
-          </div>
-        </div>
-      );
-    };
-
     return (
       <div>
-        {/* 状态消息 */}
-        {statusMessage && (
-          <div className="mb-2 text-center text-xs opacity-60">{statusMessage}</div>
-        )}
-
-        {/* 收藏夹列表或编辑表单 */}
-        {isEditing ? renderEditForm() : renderFavoriteList()}
+        {/* 收藏夹列表 */}
+        {renderFavoriteList()}
       </div>
     );
   });
