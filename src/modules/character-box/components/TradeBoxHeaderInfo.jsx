@@ -1,9 +1,11 @@
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatNumber } from "@src/utils/format.js";
-import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
+import { SquareArrowOutUpRightIcon, PlusIcon, ChevronRightIcon } from "@src/icons";
 import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { openFavoriteDetail } from "@src/modules/favorite/FavoriteDetail.jsx";
+import { openCharacterBoxModal } from "@src/modules/character-box/index.js";
 
 /**
  * 交易盒子头像和基本信息组件
@@ -74,11 +76,11 @@ export function TradeBoxHeaderInfo(props) {
           <span>固定资产：{fixedAssets ?? "..."}</span>
         </div>
         {/* 收藏夹标签 */}
-        <div className="flex items-center gap-1 overflow-hidden">
+        <div className="flex flex-wrap items-center gap-1">
           {/* 收藏按钮 */}
           <button
             type="button"
-            className="inline-flex h-4 flex-shrink-0 items-center justify-center gap-0.5 rounded-md border border-gray-300 px-1 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800"
+            className="inline-flex h-4 flex-shrink-0 items-center justify-center gap-0.5 rounded-full border border-gray-300 px-1 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800"
             onClick={onFavoriteClick}
             title="添加到收藏夹"
           >
@@ -87,11 +89,17 @@ export function TradeBoxHeaderInfo(props) {
           </button>
           {/* 收藏夹标签列表 */}
           {characterFavorites.map((favorite) => (
-            <span
-              className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+            <button
+              type="button"
+              className={`inline-flex flex-shrink-0 items-center gap-0.5 rounded-full py-0 pl-1.5 pr-0.5 text-[10px] font-semibold leading-4 text-white transition-opacity hover:opacity-80 ${favorite.color}`}
+              onClick={() => {
+                openFavoriteDetail(favorite, openCharacterBoxModal);
+              }}
+              title={`打开收藏夹「${favorite.name}」`}
             >
-              {favorite.name}
-            </span>
+              <span className="max-w-16 truncate">{favorite.name}</span>
+              <ChevronRightIcon className="h-3 w-3 flex-shrink-0" />
+            </button>
           ))}
         </div>
       </div>

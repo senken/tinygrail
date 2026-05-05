@@ -1,10 +1,12 @@
 import { normalizeAvatar } from "@src/utils/oos.js";
 import { formatCurrency, formatNumber, formatDateTime } from "@src/utils/format.js";
-import { SquareArrowOutUpRightIcon, PlusIcon } from "@src/icons";
+import { SquareArrowOutUpRightIcon, PlusIcon, ChevronRightIcon } from "@src/icons";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
+import { openFavoriteDetail } from "@src/modules/favorite/FavoriteDetail";
+import { openCharacterBoxModal } from "@src/modules/character-box/index.js";
 
 /**
  * ICO盒子头部组件
@@ -156,11 +158,11 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
             </div>
           </div>
           {/* 收藏夹标签 */}
-          <div className="flex items-center gap-1 overflow-hidden">
+          <div className="flex flex-wrap items-center gap-1">
             {/* 收藏按钮 */}
             <button
               type="button"
-              className="inline-flex h-4 flex-shrink-0 items-center justify-center gap-0.5 rounded-md border border-gray-300 px-1 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800"
+              className="inline-flex h-4 flex-shrink-0 items-center justify-center gap-0.5 rounded-full border border-gray-300 px-1 transition-colors hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-800"
               onClick={onFavoriteClick}
               title="添加到收藏夹"
             >
@@ -169,11 +171,17 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
             </button>
             {/* 收藏夹标签列表 */}
             {characterFavorites.map((favorite) => (
-              <span
-                className={`inline-block flex-shrink-0 rounded-md px-1.5 py-0 text-[10px] font-semibold leading-4 text-white ${favorite.color}`}
+              <button
+                type="button"
+                className={`inline-flex flex-shrink-0 items-center gap-0.5 rounded-full py-0 pl-1.5 pr-0.5 text-[10px] font-semibold leading-4 text-white transition-opacity hover:opacity-80 ${favorite.color}`}
+                onClick={() => {
+                  openFavoriteDetail(favorite, openCharacterBoxModal);
+                }}
+                title={`打开收藏夹「${favorite.name}」`}
               >
-                {favorite.name}
-              </span>
+                <span className="max-w-16 truncate">{favorite.name}</span>
+                <ChevronRightIcon className="h-3 w-3 flex-shrink-0" />
+              </button>
             ))}
           </div>
         </div>
