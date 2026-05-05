@@ -579,43 +579,50 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
           <button className="btn btn-sm rounded-full px-4" onClick={toggleSelectMode}>
             {isSelecting ? "取消" : "选择"}
           </button>
-          {isSelecting && (
-            <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-base-300 bg-base-100/80 shadow-lg backdrop-blur-md">
-              <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-                <button className="btn btn-ghost btn-sm rounded-full" onClick={toggleSelectAll}>
-                  {characters.every((c) => selectedIds.includes(c.CharacterId))
-                    ? "取消全选"
-                    : "全选"}
-                </button>
-                <div className="flex gap-2">
-                  <button
-                    className={`btn btn-primary btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
-                    onClick={moveSelectedCharacters}
-                  >
-                    移动到
-                  </button>
-                  <button
-                    className={`btn btn-secondary btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
-                    onClick={copySelectedCharacters}
-                  >
-                    复制到
-                  </button>
-                  <button
-                    className={`btn btn-error btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
-                    onClick={deleteSelectedCharacters}
-                  >
-                    删除
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
 
+    // 底部操作栏
+    const bottomBarDiv = isSelecting ? (
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-base-300 bg-base-100/80 shadow-lg backdrop-blur-md">
+        <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
+          <button className="btn btn-ghost btn-sm rounded-full" onClick={toggleSelectAll}>
+            {characters.every((c) => selectedIds.includes(c.CharacterId))
+              ? "取消全选"
+              : "全选"}
+          </button>
+          <div className="flex gap-2">
+            <button
+              className={`btn btn-primary btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
+              onClick={moveSelectedCharacters}
+            >
+              移动到
+            </button>
+            <button
+              className={`btn btn-secondary btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
+              onClick={copySelectedCharacters}
+            >
+              复制到
+            </button>
+            <button
+              className={`btn btn-error btn-sm rounded-full text-white ${selectedIds.length === 0 ? "btn-disabled" : ""}`}
+              onClick={deleteSelectedCharacters}
+            >
+              删除
+            </button>
+          </div>
+        </div>
+      </div>
+    ) : null;
+
     contentDiv.appendChild(toolbarDiv);
     contentDiv.appendChild(gridDiv);
+
+    // 添加底部操作栏
+    if (bottomBarDiv) {
+      contentDiv.appendChild(bottomBarDiv);
+    }
 
     // 添加分页
     if (totalPages > 1) {
