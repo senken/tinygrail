@@ -1,9 +1,9 @@
-import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { ChangeBadge } from "@src/components/ChangeBadge.jsx";
-import { Button } from "@src/components/Button.jsx";
+import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { GavelIcon, HistoryIcon } from "@src/icons";
+import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { formatCurrency } from "@src/utils/format.js";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 
 /**
@@ -171,26 +171,26 @@ export function CharacterPoolItem({
           {/* 拍卖按钮 */}
           {showButtons && (
             <div className="flex w-full min-w-0 items-center justify-center gap-2">
-              <Button
-                variant="solid"
-                size="sm"
+              <button
+                className="btn-bgm btn btn-xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   onAuctionClick && onAuctionClick(item);
                 }}
               >
-                出价
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
+                <GavelIcon className="h-3.5 w-3.5" />
+                竞拍
+              </button>
+              <button
+                className="btn-bgm btn btn-outline btn-xs"
                 onClick={(e) => {
                   e.stopPropagation();
                   onHistoryClick && onHistoryClick(item);
                 }}
               >
+                <HistoryIcon className="h-3.5 w-3.5" />
                 往期
-              </Button>
+              </button>
             </div>
           )}
         </div>

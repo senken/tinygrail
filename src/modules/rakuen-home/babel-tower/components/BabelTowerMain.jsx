@@ -1,7 +1,6 @@
-import { normalizeAvatar } from "@src/utils/oos.js";
-import { formatNumber } from "@src/utils/format.js";
 import { StarLevelIcons } from "@src/components/StarLevelIcons.jsx";
-import { Button } from "@src/components/Button.jsx";
+import { formatNumber } from "@src/utils/format.js";
+import { normalizeAvatar } from "@src/utils/oos.js";
 
 /**
  * 通天塔主体组件
@@ -42,12 +41,11 @@ export function BabelTowerMain({ data, loading, onOpenCharacter }) {
   let currentOpenInfoBox = null;
 
   // 检测是否为触摸设备
-  const isTouchDevice =
-    "ontouchstart" in window || window.matchMedia("(pointer: coarse)").matches;
+  const isTouchDevice = "ontouchstart" in window || window.matchMedia("(pointer: coarse)").matches;
 
   data.forEach((item, index) => {
     // 判断是否在左半部分(信息框靠右显示)
-    const isLeftHalf = (index % cols) < cols / 2;
+    const isLeftHalf = index % cols < cols / 2;
 
     const itemDiv = (
       <div
@@ -65,7 +63,7 @@ export function BabelTowerMain({ data, loading, onOpenCharacter }) {
     // 信息框
     const infoBox = (
       <div
-        className={`absolute top-full mt-2 hidden w-48 rounded-lg bg-white p-3 shadow-xl dark:bg-gray-800 ${
+        className={`absolute top-full mt-2 hidden w-52 rounded-lg bg-white p-3 shadow-xl dark:bg-gray-800 ${
           isLeftHalf ? "left-0" : "right-0"
         }`}
         style={{ zIndex: 1000 }}
@@ -90,18 +88,14 @@ export function BabelTowerMain({ data, loading, onOpenCharacter }) {
     infoContent.appendChild(nameDiv);
 
     // 星之力
-    const forceDiv = (
-      <div className="opacity-60">星之力 +{formatNumber(item.StarForces, 0)}</div>
-    );
+    const forceDiv = <div className="opacity-60">星之力 +{formatNumber(item.StarForces, 0)}</div>;
     infoContent.appendChild(forceDiv);
 
     // 查看角色按钮(仅触摸设备显示)
     if (isTouchDevice) {
       const viewButton = (
-        <Button
-          variant="solid"
-          size="sm"
-          className="mt-1 w-full"
+        <button
+          className="btn-bgm btn btn-xs btn-block"
           onClick={(e) => {
             e.stopPropagation();
             if (onOpenCharacter) {
@@ -110,7 +104,7 @@ export function BabelTowerMain({ data, loading, onOpenCharacter }) {
           }}
         >
           查看角色
-        </Button>
+        </button>
       );
       infoContent.appendChild(viewButton);
     }

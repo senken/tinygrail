@@ -1,4 +1,3 @@
-import { Button } from "@src/components/Button.jsx";
 
 /**
  * 圣殿操作区域组件
@@ -128,13 +127,12 @@ export function TempleActions({
   return (
     <div id="tg-temple-actions" className="flex flex-wrap gap-2 p-4 pt-2">
       {visibleButtons.map((btn, index) => (
-        <Button
-          variant={btn.label === "拆除" ? "solid" : "outline"}
+        <button
+          className={`btn btn-xs ${btn.label === "拆除" ? "btn-error text-white" : "btn-bgm btn-outline"}`}
           onClick={btn.onClick}
-          className={btn.label === "拆除" ? "!bg-red-500 hover:!bg-red-600" : ""}
         >
           {btn.label}
-        </Button>
+        </button>
       ))}
     </div>
   );

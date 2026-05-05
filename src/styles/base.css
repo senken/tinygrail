@@ -70,6 +70,18 @@
       color: color-mix(in oklab, var(--primary-color, #f09199) 20%, transparent);
     }
 
+    /* 自定义toggle-bgm样式 */
+    .toggle-bgm:checked {
+      --tw-border-opacity: 1;
+      --tw-bg-opacity: 1;
+      border-color: var(--primary-color, #f09199);
+      background-color: var(--primary-color, #f09199);
+    }
+
+    .toggle-bgm:focus-visible {
+      outline-color: var(--primary-color, #f09199);
+    }
+
     .bgm-color {
       color: var(--primary-color, #f09199);
     }

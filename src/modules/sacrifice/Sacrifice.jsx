@@ -1,5 +1,4 @@
 import { sacrificeCharacter } from "@src/api/chara.js";
-import { Button } from "@src/components/Button.jsx";
 import { formatCurrency } from "@src/utils/format.js";
 import { openConfirmModal, openModal } from "@src/utils/modalManager.js";
 
@@ -17,7 +16,7 @@ export function Sacrifice({ characterId, availableAmount = 0, onSuccess }) {
   const amountInput = (
     <input
       type="number"
-      className="tg-bg-content rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition-colors focus:border-blue-500 dark:border-gray-600"
+      className="input input-sm input-bordered w-full"
       placeholder="请输入数量"
       value="500"
       onInput={(e) => {
@@ -31,7 +30,7 @@ export function Sacrifice({ characterId, availableAmount = 0, onSuccess }) {
   const createQuickButton = (text, value) => (
     <button
       type="button"
-      className="bgm-color hover:bgm-bg w-fit whitespace-nowrap rounded-full border border-current px-2 py-0.5 text-xs font-medium transition-all hover:border-transparent hover:text-white"
+      className="btn-bgm btn btn-outline btn-xs rounded-full"
       onClick={() => {
         amount = String(value);
         amountInput.value = String(value);
@@ -61,55 +60,35 @@ export function Sacrifice({ characterId, availableAmount = 0, onSuccess }) {
     </div>
   );
 
-  const switchTrack = (
-    <div className="relative inline-block h-6 w-11 rounded-full bg-gray-300 transition-colors dark:bg-gray-600" />
-  );
-  const switchThumb = (
-    <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform" />
-  );
+  const toggleInput = <input type="checkbox" className="toggle-bgm toggle" />;
 
-  switchTrack.appendChild(switchThumb);
+  // 监听toggle变化
+  toggleInput.addEventListener("change", () => {
+    sacrificeType = toggleInput.checked ? "equity" : "restructure";
+    const isEquity = sacrificeType === "equity";
 
-  const switchButton = (
-    <button
-      type="button"
-      className="flex items-center gap-2 outline-none"
-      onClick={() => {
-        sacrificeType = sacrificeType === "restructure" ? "equity" : "restructure";
-        const isEquity = sacrificeType === "equity";
+    // 重置数量为500
+    amount = "500";
+    amountInput.value = "500";
 
-        // 重置数量为 500
-        amount = "500";
-        amountInput.value = "500";
-
-        // 更新开关样式和按钮文本
-        if (isEquity) {
-          switchTrack.className =
-            "relative inline-block h-6 w-11 rounded-full bgm-bg transition-colors";
-          switchThumb.style.transform = "translateX(20px)";
-          descriptionDiv.textContent = "将股份出售给幻想乡，立刻获取现金。";
-          submitButton.textContent = "股权融资";
-          // 股权融资只显示 max 按钮
-          quickButtonsDiv.innerHTML = "";
-          quickButtonsDiv.appendChild(maxButton);
-        } else {
-          switchTrack.className =
-            "relative inline-block h-6 w-11 rounded-full bg-gray-300 transition-colors dark:bg-gray-600";
-          switchThumb.style.transform = "translateX(0)";
-          descriptionDiv.textContent = "将股份转化为固定资产，同时获得现金奖励并掉落道具。";
-          submitButton.textContent = "资产重组";
-          // 资产重组显示所有按钮
-          quickButtonsDiv.innerHTML = "";
-          quickButtonsDiv.appendChild(button500);
-          quickButtonsDiv.appendChild(button2500);
-          quickButtonsDiv.appendChild(button12500);
-          quickButtonsDiv.appendChild(maxButton);
-        }
-      }}
-    >
-      {switchTrack}
-    </button>
-  );
+    // 更新描述和按钮文本
+    if (isEquity) {
+      descriptionDiv.textContent = "将股份出售给幻想乡，立刻获取现金。";
+      submitButton.textContent = "股权融资";
+      // 股权融资只显示 max 按钮
+      quickButtonsDiv.innerHTML = "";
+      quickButtonsDiv.appendChild(maxButton);
+    } else {
+      descriptionDiv.textContent = "将股份转化为固定资产，同时获得现金奖励并掉落道具。";
+      submitButton.textContent = "资产重组";
+      // 资产重组显示所有按钮
+      quickButtonsDiv.innerHTML = "";
+      quickButtonsDiv.appendChild(button500);
+      quickButtonsDiv.appendChild(button2500);
+      quickButtonsDiv.appendChild(button12500);
+      quickButtonsDiv.appendChild(maxButton);
+    }
+  });
 
   const statusDiv = <div />;
 
@@ -189,30 +168,36 @@ export function Sacrifice({ characterId, availableAmount = 0, onSuccess }) {
 
   statusDiv.style.display = "none";
 
-  const submitButton = <Button onClick={handleSubmit}>资产重组</Button>;
+  const submitButton = (
+    <button className="btn-bgm btn btn-sm" onClick={handleSubmit}>
+      资产重组
+    </button>
+  );
 
   return (
     <div id="tg-sacrifice" className="flex min-w-64 flex-col gap-2">
-      {/* 类型切换 */}
-      <div id="tg-sacrifice-type-switch" className="flex items-center gap-3">
-        {switchButton}
-        <span className="text-sm opacity-60">股权融资</span>
+      <div className="flex flex-col gap-2 px-1">
+        {/* 类型切换 */}
+        <div id="tg-sacrifice-type-switch" className="flex items-center gap-3">
+          {toggleInput}
+          <span className="text-sm opacity-60">股权融资</span>
+        </div>
+
+        {/* 类型描述 */}
+        {descriptionDiv}
+
+        {/* 数量输入 */}
+        <div id="tg-sacrifice-amount-input" className="flex flex-col gap-2">
+          {amountInput}
+          {quickButtonsDiv}
+        </div>
+
+        {/* 状态消息 */}
+        {statusDiv}
       </div>
-
-      {/* 类型描述 */}
-      {descriptionDiv}
-
-      {/* 数量输入 */}
-      <div id="tg-sacrifice-amount-input" className="flex flex-col gap-2">
-        {amountInput}
-        {quickButtonsDiv}
-      </div>
-
-      {/* 状态消息 */}
-      {statusDiv}
 
       {/* 提交按钮 */}
-      <div id="tg-sacrifice-submit" className="flex justify-end">
+      <div id="tg-sacrifice-submit" className="flex justify-end p-1">
         {submitButton}
       </div>
     </div>
