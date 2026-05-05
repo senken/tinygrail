@@ -96,13 +96,35 @@ async function fetchCharacterName(characterId) {
 }
 
 /**
+ * 打开收藏夹详情弹窗
+ * @param {Object} favorite - 收藏夹对象
+ * @param {Function} onCharacterClick - 角色点击回调
+ * @param {Function} onDataChange - 数据变化回调
+ * @param {Function} onClose - 弹窗关闭回调
+ */
+export function openFavoriteDetail(favorite, onCharacterClick, onDataChange, onClose) {
+  openModal(`favorite-detail-${favorite.id}`, {
+    title: `收藏夹 - ${favorite.name}`,
+    content: (
+      <FavoriteDetail
+        favoriteId={favorite.id}
+        onCharacterClick={onCharacterClick}
+        onDataChange={onDataChange}
+      />
+    ),
+    size: "xl",
+    onClose: onClose,
+  });
+}
+
+/**
  * 收藏夹详情组件
  * @param {Object} props
  * @param {number} props.favoriteId - 收藏夹ID
  * @param {Function} props.onCharacterClick - 角色点击回调
  * @param {Function} props.onDataChange - 数据变化回调
  */
-export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
+function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
   const container = <div id="tg-favorite-detail" className="flex min-w-96 flex-col gap-3" />;
 
   const PAGE_SIZE = 48;
@@ -548,9 +570,7 @@ export function FavoriteDetail({ favoriteId, onCharacterClick, onDataChange }) {
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-base-300 bg-base-100/80 shadow-lg backdrop-blur-md">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
           <button className="btn btn-ghost btn-sm rounded-full" onClick={toggleSelectAll}>
-            {characters.every((c) => selectedIds.includes(c.CharacterId))
-              ? "取消全选"
-              : "全选"}
+            {characters.every((c) => selectedIds.includes(c.CharacterId)) ? "取消全选" : "全选"}
           </button>
           <div className="flex gap-2">
             <button

@@ -1,11 +1,11 @@
 import { ArrowDownIcon, ArrowUpIcon, FolderIcon, SquarePenIcon, TrashIcon } from "@src/icons";
 import { openCharacterBoxModal } from "@src/modules/character-box";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
-import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
+import { openConfirmModal } from "@src/utils/modalManager.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { showSuccess } from "@src/utils/toastManager.jsx";
-import { FavoriteDetail } from "./FavoriteDetail.jsx";
-import { FavoriteEdit } from "./FavoriteEdit.jsx";
+import { openFavoriteDetail } from "./FavoriteDetail.jsx";
+import { openEditFavorite } from "./FavoriteEdit.jsx";
 import {
   getFavorites,
   getVisibleFavorites,
@@ -36,9 +36,7 @@ export function Favorite() {
   const currentUserId = userAssets?.id;
 
   const { setState } = createMountedComponent(container, (state) => {
-    const {
-      favorites = [],
-    } = state || {};
+    const { favorites = [] } = state || {};
 
     // 删除收藏夹
     const deleteFavorite = (favoriteId) => {
@@ -149,47 +147,6 @@ export function Favorite() {
       loadFavorites();
     };
 
-    // 开始编辑收藏夹
-    const startEditFavorite = (favoriteId) => {
-      openModal(`edit-favorite-${favoriteId}`, {
-        title: "编辑收藏夹",
-        content: (
-          <FavoriteEdit
-            favoriteId={favoriteId}
-            onSave={() => {
-              loadFavorites();
-              closeModal(`edit-favorite-${favoriteId}`);
-              showSuccess("收藏夹已更新");
-            }}
-            onCancel={() => {
-              closeModal(`edit-favorite-${favoriteId}`);
-            }}
-          />
-        ),
-        size: "sm",
-      });
-    };
-
-    // 保存编辑
-    // 打开收藏夹详情
-    const openFavoriteDetail = (favorite) => {
-      openModal(`favorite-detail-${favorite.id}`, {
-        title: `收藏夹 - ${favorite.name}`,
-        content: (
-          <FavoriteDetail
-            favoriteId={favorite.id}
-            onCharacterClick={openCharacterBoxModal}
-            onDataChange={loadFavorites}
-          />
-        ),
-        size: "xl",
-        onClose: () => {
-          loadFavorites();
-        },
-      });
-    };
-
-    // 打开角色详情
     // 渲染收藏夹列表
     const renderFavoriteList = () => {
       if (favorites.length === 0) {
@@ -214,7 +171,14 @@ export function Favorite() {
                 {/* 收藏夹卡片 */}
                 <div
                   className="group card card-compact cursor-pointer overflow-hidden bg-base-100 shadow transition-all hover:shadow-md"
-                  onClick={() => openFavoriteDetail(favorite)}
+                  onClick={() =>
+                    openFavoriteDetail(
+                      favorite,
+                      openCharacterBoxModal,
+                      loadFavorites,
+                      loadFavorites
+                    )
+                  }
                 >
                   {/* 封面区域 */}
                   <figure className="relative aspect-square w-full">
@@ -268,7 +232,7 @@ export function Favorite() {
                       <button
                         type="button"
                         className="flex items-center justify-center rounded-full bg-white/90 p-1.5 shadow-sm transition-all hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800"
-                        onClick={() => startEditFavorite(favorite.id)}
+                        onClick={() => openEditFavorite(favorite.id, loadFavorites)}
                         title="编辑收藏夹"
                       >
                         <SquarePenIcon className="h-3.5 w-3.5 text-gray-600 dark:text-gray-400" />

@@ -1,12 +1,38 @@
-import { showError } from "@src/utils/toastManager.jsx";
+import { openModal } from "@src/utils/modalManager.js";
+import { showError, showSuccess } from "@src/utils/toastManager.jsx";
 import { FavoriteForm } from "./FavoriteForm.jsx";
 import { getFavorites, saveFavorites } from "./favoriteStorage.js";
 import { uploadToCloud } from "./favoriteSync.js";
 
 /**
+ * 打开编辑收藏夹弹窗
+ * @param {number} favoriteId - 收藏夹ID
+ * @param {Function} onSave - 保存成功回调
+ */
+export function openEditFavorite(favoriteId, onSave) {
+  const { close } = openModal(`edit-favorite-${favoriteId}`, {
+    title: "编辑收藏夹",
+    content: (
+      <FavoriteEdit
+        favoriteId={favoriteId}
+        onSave={() => {
+          if (onSave) onSave();
+          close();
+          showSuccess("收藏夹已更新");
+        }}
+        onCancel={() => {
+          close();
+        }}
+      />
+    ),
+    size: "sm",
+  });
+}
+
+/**
  * 编辑收藏夹组件
  */
-export function FavoriteEdit({ favoriteId, onSave, onCancel }) {
+function FavoriteEdit({ favoriteId, onSave, onCancel }) {
   const currentFavorites = getFavorites();
   const favorite = currentFavorites.find((f) => f.id === favoriteId);
 
