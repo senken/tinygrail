@@ -3,6 +3,10 @@ import { RakuenTopiclist } from "@src/modules/rakuen-topiclist";
 import { RakuenTopicCrt } from "@src/modules/rakuen-topic-crt";
 import { User } from "@src/modules/user";
 import { Character } from "@src/modules/character";
+import { loadECharts } from "@src/utils/echarts-loader.js";
+import { loadSignalR } from "@src/utils/signalr-loader.js";
+import { loadFireworks } from "@src/utils/fireworks-loader.js";
+import { loadMD5 } from "@src/utils/md5-loader.js";
 
 const routes = [
   {
@@ -37,6 +41,14 @@ export function matchRoute(path) {
   if (matchedRoute && matchedRoute.component) {
     const Component = matchedRoute.component;
     Component();
+
+    // 预加载
+    setTimeout(() => {
+      loadECharts();
+      loadSignalR();
+      loadFireworks();
+      loadMD5();
+    }, 1000);
   }
 }
 
