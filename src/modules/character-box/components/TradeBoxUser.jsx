@@ -1,7 +1,7 @@
 import { Avatar } from "@src/components/Avatar.jsx";
 import { Pagination } from "@src/components/Pagination.jsx";
 import { normalizeAvatar } from "@src/utils/oos.js";
-import { formatNumber, getTimeDiff } from "@src/utils/format.js";
+import { formatCurrency, formatNumber, getTimeDiff } from "@src/utils/format.js";
 import { unescapeHtml } from "@src/utils/escape";
 import { ChevronDownIcon } from "@src/icons/index.js";
 
@@ -10,6 +10,7 @@ import { ChevronDownIcon } from "@src/icons/index.js";
  * @param {Object} props
  * @param {Object} props.characterData - 角色数据
  * @param {Object} props.users - 持股用户数据
+ * @param {Array} props.temples - 圣殿数据
  * @param {Function} props.loadUsersPage - 加载指定页用户数据的函数
  * @param {Function} props.openUserModal - 打开用户信息Modal的函数
  * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
@@ -20,6 +21,7 @@ import { ChevronDownIcon } from "@src/icons/index.js";
 export function TradeBoxUser({
   characterData,
   users,
+  temples = [],
   loadUsersPage,
   openUserModal,
   stickyTop,
@@ -63,13 +65,13 @@ export function TradeBoxUser({
       const isBanned = user.State === 666;
 
       // Balance为0显示"--"
-      const displayBalance = user.Balance > 0 ? formatNumber(user.Balance, 0) : "--";
+      const displayBalance = user.Balance > 0 ? formatNumber(user.Balance, 0) : "???";
 
       // 计算持股百分比
       const displayPercentage =
         user.Balance > 0 && characterData.Total > 0
-          ? `(${((user.Balance / characterData.Total) * 100).toFixed(2)}%)`
-          : "(??%)";
+          ? `（${((user.Balance / characterData.Total) * 100).toFixed(2)}%）`
+          : "";
 
       // 计算用户是否不活跃（超过5天未活跃）
       const timeDiff = getTimeDiff(user.LastActiveDate);
@@ -79,20 +81,25 @@ export function TradeBoxUser({
       const daysSinceActive = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
       const activeTooltip = daysSinceActive < 1 ? "最近活跃" : `${daysSinceActive}天前活跃`;
 
+      // 查找用户的圣殿信息
+      const userTemple = temples.find((temple) => temple.Name === user.Name);
+      const templeAssets = userTemple?.Assets || 0;
+      const templeSacrifices = userTemple?.Sacrifices || 0;
+
       // 根据序列号和活跃天数决定颜色
-      let badgeStyle = {};
+      let badgeColor = "";
       if (isInactive) {
         // 超过5天未活跃，灰色
-        badgeStyle = { backgroundColor: "#d2d2d2", color: "#fff" };
+        badgeColor = "#d2d2d2";
       } else if (serialNumber === 1) {
         // 第1名，金色
-        badgeStyle = { backgroundColor: "#FFC107", color: "#fff" };
+        badgeColor = "#FFC107";
       } else if (serialNumber >= 2 && serialNumber <= 9) {
         // 2-9名，紫色
-        badgeStyle = { backgroundColor: "#d965ff", color: "#fff" };
+        badgeColor = "#d965ff";
       } else {
         // 其他，绿色
-        badgeStyle = { backgroundColor: "#45d216", color: "#fff" };
+        badgeColor = "#45d216";
       }
 
       const itemContainer = (
@@ -114,14 +121,14 @@ export function TradeBoxUser({
           />
 
           {/* 用户信息 */}
-          <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             {/* 昵称 */}
             <div className="flex min-w-0 items-center gap-1">
-              <span className="flex-shrink-0 text-sm font-semibold text-gray-400 dark:text-gray-500">
+              <span className="flex-shrink-0 text-xs font-semibold text-gray-400 dark:text-gray-500">
                 {displayNumber}
               </span>
               <span
-                className={`flex min-w-0 items-center gap-1 text-sm ${isBanned ? "text-red-500" : ""}`}
+                className={`flex min-w-0 items-center gap-1 text-xs font-semibold ${isBanned ? "text-red-500" : ""}`}
               >
                 <span className="min-w-0 truncate">{unescapeHtml(user.Nickname)}</span>
               </span>
@@ -129,12 +136,23 @@ export function TradeBoxUser({
 
             {/* 持股数 */}
             <div
-              className="inline-block rounded px-1.5 py-1 text-[10px] font-bold leading-none"
-              style={badgeStyle}
+              className="text-[10px] font-bold"
+              style={{ color: badgeColor }}
               title={activeTooltip}
             >
-              {displayBalance} {displayPercentage}
+              {displayBalance}{displayPercentage}
             </div>
+
+            {/* 圣殿信息 */}
+            {userTemple && (
+              <div
+                className="text-[10px] opacity-60"
+                title={`固定资产：${formatNumber(templeAssets)} / ${formatNumber(templeSacrifices)}`}
+              >
+                {formatCurrency(templeAssets, "", 2, true)} /{" "}
+                {formatCurrency(templeSacrifices, "", 2, true)}
+              </div>
+            )}
           </div>
         </div>
       );

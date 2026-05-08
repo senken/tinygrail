@@ -230,6 +230,7 @@ function createTradeBoxModalContent(options) {
         <TradeBoxUser
           characterData={characterData}
           users={users}
+          temples={temples}
           loadUsersPage={loadUsersPage}
           openUserModal={openUserModal}
           stickyTop={0}

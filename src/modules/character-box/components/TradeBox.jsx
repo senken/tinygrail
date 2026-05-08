@@ -154,6 +154,7 @@ export function TradeBox(props) {
           <TradeBoxUser
             characterData={characterData}
             users={users}
+            temples={temples}
             loadUsersPage={loadUsersPage}
             openUserModal={openUserModal}
             isCollapsed={isUserCollapsed}

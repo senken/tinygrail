@@ -71,7 +71,7 @@ export function TradeBoxHeaderInfo(props) {
           </a>
         </div>
         <div className="truncate text-xs text-gray-600 dark:text-gray-400">
-          <span>持股：{userCharacter ? formatNumber(userCharacter.Amount, 0) : "..."}股</span>
+          <span>可用：{userCharacter ? formatNumber(userCharacter.Amount, 0) : "..."}股</span>
           <span className="mx-2">•</span>
           <span>固定资产：{fixedAssets ?? "..."}</span>
         </div>
