@@ -74,8 +74,18 @@ export function TradeBoxHeaderActions(props) {
    */
   const scroll = (container, direction) => {
     const scrollAmount = 200;
-    container.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
+    const currentScroll = container.scrollLeft;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    
+    let targetScroll;
+    if (direction === "left") {
+      targetScroll = Math.max(0, currentScroll - scrollAmount);
+    } else {
+      targetScroll = Math.min(maxScroll, currentScroll + scrollAmount);
+    }
+    
+    container.scrollTo({
+      left: targetScroll,
       behavior: "smooth",
     });
     
