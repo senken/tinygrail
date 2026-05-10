@@ -1,7 +1,7 @@
 {
   "name": "TinyGrail Exchange Plugin",
   "namespace": "TinyGrail Exchange Plugin",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "author": "senken, mtcode",
   "match": [
     "*://*.bgm.tv/*",
