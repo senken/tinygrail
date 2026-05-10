@@ -1,7 +1,8 @@
 import { Temple } from "@src/components/Temple.jsx";
 import { unescapeHtml } from "@src/utils/escape";
-import { ChevronDownIcon, SlidersHorizontalIcon } from "@src/icons/index.js";
+import { ChevronDownIcon, SlidersHorizontalIcon, SparklesIcon } from "@src/icons/index.js";
 import { openTempleFilterModal } from "./TempleFilterModal.jsx";
+import { formatNumber, formatDateTime } from "@src/utils/format.js";
 
 /**
  * 根据圣殿等级获取加成文本
@@ -236,6 +237,20 @@ export function TradeBoxTemple({
             displayTemples.map((temple, index) => {
               const coverKey = temple.Cover || "empty";
               const count = deduplicateByCover ? templeCounts[coverKey] : 1;
+              const sortBy = templeFilterOptions.sort?.sortBy;
+
+              // 根据排序方式决定显示的额外信息
+              let extraInfo = null;
+              if (sortBy === "StarForces") {
+                extraInfo = (
+                  <div className="flex items-center gap-1">
+                    <SparklesIcon className="h-3 w-3 flex-shrink-0 text-yellow-400" />
+                    <span>{formatNumber(temple.StarForces || 0)}</span>
+                  </div>
+                );
+              } else if (sortBy === "Create" && temple.Create) {
+                extraInfo = formatDateTime(temple.Create, "YYYY-MM-DD");
+              }
 
               return (
                 <div
@@ -259,6 +274,11 @@ export function TradeBoxTemple({
                     @{unescapeHtml(temple.Nickname)}{" "}
                     {deduplicateByCover && count > 1 ? `×${count}` : ""}
                   </div>
+                  {extraInfo && (
+                    <div className="w-full truncate text-left text-xs opacity-60">
+                      {extraInfo}
+                    </div>
+                  )}
                 </div>
               );
             })
