@@ -1,5 +1,13 @@
 import { isGameMaster } from "@src/utils/session.js";
-import { GavelIcon, HistoryIcon, ClipboardClockIcon, ImageUpIcon, RepeatIcon, ChevronLeftIcon, ChevronRightIcon } from "@src/icons";
+import {
+  GavelIcon,
+  HistoryIcon,
+  ClipboardClockIcon,
+  ImageUpIcon,
+  RepeatIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@src/icons";
 
 /**
  * 交易盒子按钮组组件
@@ -50,16 +58,17 @@ export function TradeBoxHeaderActions(props) {
   const updateArrowsVisibility = (container) => {
     const leftBtn = container.parentElement.querySelector("#tg-scroll-left");
     const rightBtn = container.parentElement.querySelector("#tg-scroll-right");
-    
+
     if (!leftBtn || !rightBtn) return;
 
     const threshold = 5; // 容错阈值
     const isAtStart = container.scrollLeft <= threshold;
-    const isAtEnd = container.scrollLeft + container.clientWidth >= container.scrollWidth - threshold;
+    const isAtEnd =
+      container.scrollLeft + container.clientWidth >= container.scrollWidth - threshold;
 
     leftBtn.style.display = isAtStart ? "none" : "flex";
     rightBtn.style.display = isAtEnd ? "none" : "flex";
-    
+
     // 如果内容不需要滚动，隐藏所有箭头
     if (container.scrollWidth <= container.clientWidth) {
       leftBtn.style.display = "none";
@@ -76,19 +85,19 @@ export function TradeBoxHeaderActions(props) {
     const scrollAmount = 200;
     const currentScroll = container.scrollLeft;
     const maxScroll = container.scrollWidth - container.clientWidth;
-    
+
     let targetScroll;
     if (direction === "left") {
       targetScroll = Math.max(0, currentScroll - scrollAmount);
     } else {
       targetScroll = Math.min(maxScroll, currentScroll + scrollAmount);
     }
-    
+
     container.scrollTo({
       left: targetScroll,
       behavior: "smooth",
     });
-    
+
     // 等待滚动完成后更新箭头显示
     setTimeout(() => updateArrowsVisibility(container), 300);
   };
@@ -100,18 +109,26 @@ export function TradeBoxHeaderActions(props) {
       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       onScroll={(e) => updateArrowsVisibility(e.target)}
     >
-      <button id="tg-btn-sacrifice" className="btn-bgm btn btn-xs gap-1 flex-shrink-0" onClick={onSacrificeClick}>
+      <button
+        id="tg-btn-sacrifice"
+        className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
+        onClick={onSacrificeClick}
+      >
         <RepeatIcon className="h-3 w-3" />
         资产重组
       </button>
       <div className="join flex-shrink-0">
-        <button id="tg-btn-auction" className="btn-bgm btn join-item btn-xs gap-1" onClick={onAuctionClick}>
+        <button
+          id="tg-btn-auction"
+          className="btn-bgm btn join-item no-animation btn-xs gap-1"
+          onClick={onAuctionClick}
+        >
           <GavelIcon className="h-3 w-3" />
           {tinygrailCharacter?.Amount > 0 ? "参与竞拍" : "萌王投票"}
         </button>
         <button
           id="tg-btn-auction-history"
-          className="btn-bgm btn join-item btn-xs border-l border-l-white/30 dark:border-l-white/20"
+          className="btn-bgm btn join-item no-animation btn-xs border-l border-l-white/30 dark:border-l-white/20"
           onClick={onAuctionHistoryClick}
           title="往期拍卖"
           aria-label="往期拍卖"
@@ -120,17 +137,29 @@ export function TradeBoxHeaderActions(props) {
         </button>
       </div>
       {canChangeAvatar && (
-        <button id="tg-btn-change-avatar" className="btn-bgm btn btn-xs gap-1 flex-shrink-0" onClick={onChangeAvatarClick}>
+        <button
+          id="tg-btn-change-avatar"
+          className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
+          onClick={onChangeAvatarClick}
+        >
           <ImageUpIcon className="h-3 w-3" />
           更换头像
         </button>
       )}
-      <button id="tg-btn-trade-history" className="btn-bgm btn btn-xs gap-1 flex-shrink-0" onClick={onTradeHistoryClick}>
+      <button
+        id="tg-btn-trade-history"
+        className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
+        onClick={onTradeHistoryClick}
+      >
         <ClipboardClockIcon className="h-3 w-3" />
         交易记录
       </button>
       {isGameMaster() && (
-        <button id="tg-btn-gm-trade-history" className="btn-bgm btn btn-xs gap-1 flex-shrink-0" onClick={onGMTradeHistoryClick}>
+        <button
+          id="tg-btn-gm-trade-history"
+          className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
+          onClick={onGMTradeHistoryClick}
+        >
           <ClipboardClockIcon className="h-3 w-3" />
           交易记录(gm)
         </button>
@@ -144,7 +173,9 @@ export function TradeBoxHeaderActions(props) {
       className="absolute left-0 top-0 z-10 hidden h-full w-20 items-center justify-start pl-2"
       style={{ background: leftGradient }}
       onClick={(e) => {
-        const container = e.target.closest("#tg-trade-box-header-actions").querySelector("#tg-actions-scroll-container");
+        const container = e.target
+          .closest("#tg-trade-box-header-actions")
+          .querySelector("#tg-actions-scroll-container");
         scroll(container, "left");
       }}
       aria-label="向左滚动"
@@ -159,7 +190,9 @@ export function TradeBoxHeaderActions(props) {
       className="absolute right-0 top-0 z-10 flex h-full w-20 items-center justify-end pr-2"
       style={{ background: rightGradient }}
       onClick={(e) => {
-        const container = e.target.closest("#tg-trade-box-header-actions").querySelector("#tg-actions-scroll-container");
+        const container = e.target
+          .closest("#tg-trade-box-header-actions")
+          .querySelector("#tg-actions-scroll-container");
         scroll(container, "right");
       }}
       aria-label="向右滚动"
