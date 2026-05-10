@@ -201,7 +201,7 @@ export function TradeBoxTemple({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            className="flex items-center gap-1 px-1 opacity-60 hover:opacity-100"
+            className="flex items-center gap-1 px-1 text-xs opacity-60 hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
               openTempleFilterModal({
@@ -210,9 +210,9 @@ export function TradeBoxTemple({
                 onTempleFilterChange,
               });
             }}
-            title="排序与筛选"
           >
             <SlidersHorizontalIcon className="h-4 w-4" />
+            <span>筛选</span>
           </button>
           <div
             className="flex items-center justify-center opacity-60 transition-all"

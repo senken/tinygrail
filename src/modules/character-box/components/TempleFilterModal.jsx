@@ -33,7 +33,7 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold">排序</h3>
               <button
-                className="select-none text-sm opacity-60 hover:opacity-100"
+                className="flex select-none items-center gap-1 text-xs opacity-60 hover:opacity-100"
                 onClick={() => {
                   const newOrder = currentSort.order === "desc" ? "asc" : "desc";
                   const newSort = { ...currentSort, order: newOrder };
@@ -42,12 +42,17 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
                     onTempleFilterChange({ ...templeFilterOptions, sort: newSort });
                   }
                 }}
-                title={currentSort.order === "desc" ? "降序" : "升序"}
               >
                 {currentSort.order === "desc" ? (
-                  <ArrowDownNarrowWideIcon className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    <span>降序</span>
+                    <ArrowDownNarrowWideIcon className="h-4 w-4" />
+                  </div>
                 ) : (
-                  <ArrowUpNarrowWideIcon className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    <span>升序</span>
+                    <ArrowUpNarrowWideIcon className="h-4 w-4" />
+                  </div>
                 )}
               </button>
             </div>
@@ -83,7 +88,7 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-sm font-semibold">过滤</h3>
               <button
-                className="select-none text-sm opacity-60 hover:opacity-100"
+                className="flex select-none items-center gap-1 text-xs opacity-60 hover:opacity-100"
                 onClick={() => {
                   const newMode = currentFilter.mode === "or" ? "and" : "or";
                   const newFilter = { ...currentFilter, mode: newMode };
@@ -92,12 +97,17 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
                     onTempleFilterChange({ ...templeFilterOptions, filter: newFilter });
                   }
                 }}
-                title={currentFilter.mode === "or" ? "满足任一条件" : "满足所有条件"}
               >
                 {currentFilter.mode === "or" ? (
-                  <VectorUnionIcon className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    <span>满足任一条件</span>
+                    <VectorUnionIcon className="h-4 w-4" />
+                  </div>
                 ) : (
-                  <VectorIntersectionIcon className="h-4 w-4" />
+                  <div className="flex items-center gap-1">
+                    <span>满足所有条件</span>
+                    <VectorIntersectionIcon className="h-4 w-4" />
+                  </div>
                 )}
               </button>
             </div>
@@ -232,7 +242,7 @@ export function openTempleFilterModal({ characterId, templeFilterOptions, onTemp
   const modalId = `temple-filter-${characterId}`;
 
   const { close } = openModal(modalId, {
-    title: "排序方式",
+    title: "排序和筛选",
     content: (
       <TempleFilterContent
         templeFilterOptions={templeFilterOptions}
