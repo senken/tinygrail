@@ -543,6 +543,7 @@ export function TradeBoxSection({
                         data-depth-type="ask"
                         data-price={ask.Price}
                         data-amount={ask.Amount}
+                        style={{ fontSize: "12px", lineHeight: "20px" }}
                       >
                         <div
                           className="absolute inset-y-0 right-0 bg-[#b8e7ff]"
@@ -571,6 +572,7 @@ export function TradeBoxSection({
                       data-depth-type="bid"
                       data-price={bid.Price}
                       data-amount={bid.Amount}
+                      style={{ fontSize: "12px", lineHeight: "20px" }}
                     >
                       <div
                         className="absolute inset-y-0 right-0 bg-[#ffcfe3]"
