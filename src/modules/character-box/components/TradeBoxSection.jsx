@@ -331,6 +331,16 @@ export function TradeBoxSection({
                   placeholder="单价"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
                   onInput={updateBidTotal}
+                  onWheel={(e) => {
+                    if (document.activeElement === e.target) {
+                      e.preventDefault();
+                      const step = e.deltaY > 0 ? -1 : 1;
+                      const currentValue = parseFloat(e.target.value) || 0;
+                      const newValue = Math.max(0, currentValue + step);
+                      e.target.value = newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
+                      updateBidTotal(e);
+                    }
+                  }}
                 />
                 <input
                   id="bid-amount-input"
@@ -338,6 +348,15 @@ export function TradeBoxSection({
                   placeholder="数量"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
                   onInput={updateBidTotal}
+                  onWheel={(e) => {
+                    if (document.activeElement === e.target) {
+                      e.preventDefault();
+                      const step = e.deltaY > 0 ? -1 : 1;
+                      const currentValue = parseInt(e.target.value) || 0;
+                      e.target.value = Math.max(0, currentValue + step);
+                      updateBidTotal(e);
+                    }
+                  }}
                 />
                 <div id="bid-total" className="text-xs opacity-60">
                   总计：₵0.00
@@ -432,6 +451,16 @@ export function TradeBoxSection({
                   placeholder="单价"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
                   onInput={updateAskTotal}
+                  onWheel={(e) => {
+                    if (document.activeElement === e.target) {
+                      e.preventDefault();
+                      const step = e.deltaY > 0 ? -1 : 1;
+                      const currentValue = parseFloat(e.target.value) || 0;
+                      const newValue = Math.max(0, currentValue + step);
+                      e.target.value = newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
+                      updateAskTotal(e);
+                    }
+                  }}
                 />
                 <input
                   id="ask-amount-input"
@@ -439,6 +468,15 @@ export function TradeBoxSection({
                   placeholder="数量"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
                   onInput={updateAskTotal}
+                  onWheel={(e) => {
+                    if (document.activeElement === e.target) {
+                      e.preventDefault();
+                      const step = e.deltaY > 0 ? -1 : 1;
+                      const currentValue = parseInt(e.target.value) || 0;
+                      e.target.value = Math.max(0, currentValue + step);
+                      updateAskTotal(e);
+                    }
+                  }}
                 />
                 <div id="ask-total" className="text-xs opacity-60">
                   总计：₵0.00
