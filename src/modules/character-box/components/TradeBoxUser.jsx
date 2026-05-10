@@ -70,7 +70,7 @@ export function TradeBoxUser({
       // 计算持股百分比
       const displayPercentage =
         user.Balance > 0 && characterData.Total > 0
-          ? `（${((user.Balance / characterData.Total) * 100).toFixed(2)}%）`
+          ? `(${((user.Balance / characterData.Total) * 100).toFixed(2)})`
           : "";
 
       // 计算用户是否不活跃（超过5天未活跃）
@@ -87,19 +87,19 @@ export function TradeBoxUser({
       const templeSacrifices = userTemple?.Sacrifices || 0;
 
       // 根据序列号和活跃天数决定颜色
-      let badgeColor = "";
+      let badgeStyle = {};
       if (isInactive) {
         // 超过5天未活跃，灰色
-        badgeColor = "#d2d2d2";
+        badgeStyle = { backgroundColor: "#d2d2d2", color: "#fff" };
       } else if (serialNumber === 1) {
         // 第1名，金色
-        badgeColor = "#FFC107";
+        badgeStyle = { backgroundColor: "#FFC107", color: "#fff" };
       } else if (serialNumber >= 2 && serialNumber <= 9) {
         // 2-9名，紫色
-        badgeColor = "#d965ff";
+        badgeStyle = { backgroundColor: "#d965ff", color: "#fff" };
       } else {
         // 其他，绿色
-        badgeColor = "#45d216";
+        badgeStyle = { backgroundColor: "#45d216", color: "#fff" };
       }
 
       const itemContainer = (
@@ -136,11 +136,11 @@ export function TradeBoxUser({
 
             {/* 持股数 */}
             <div
-              className="text-[10px] font-bold"
-              style={{ color: badgeColor }}
+              className="inline-block w-fit max-w-full truncate rounded px-1.5 py-1 text-[10px] font-bold leading-none"
+              style={badgeStyle}
               title={activeTooltip}
             >
-              {displayBalance}{displayPercentage}
+              {displayBalance} {displayPercentage}
             </div>
 
             {/* 圣殿信息 */}
