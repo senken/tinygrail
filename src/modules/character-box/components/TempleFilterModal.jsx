@@ -61,7 +61,7 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
                 { id: "Sacrifices", label: "固定资产" },
                 { id: "StarForces", label: "星之力" },
                 { id: "Refine", label: "精炼等级" },
-                { id: "Create", label: "创建日期" },
+                { id: "Create", label: "建塔日期" },
               ].map((sort) => (
                 <button
                   className={`rounded-full px-3 py-1 text-sm transition-colors ${
@@ -83,10 +83,10 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
             </div>
           </div>
 
-          {/* 过滤区域 */}
+          {/* 筛选区域 */}
           <div>
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-sm font-semibold">过滤</h3>
+              <h3 className="text-sm font-semibold">筛选</h3>
               <button
                 className="flex select-none items-center gap-1 text-xs opacity-60 hover:opacity-100"
                 onClick={() => {
@@ -184,7 +184,7 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
                   }
                 }}
               >
-                封面去重
+                隐藏重复
               </button>
             </div>
           </div>
