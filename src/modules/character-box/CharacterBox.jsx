@@ -87,7 +87,10 @@ export function CharacterBox(props) {
       loading,
       error,
       canChangeAvatar,
-      hideDuplicates = true,
+      templeFilterOptions = {
+        sort: { sortBy: "Sacrifices", order: "desc" },
+        filter: { selectedFilters: [], mode: "or", pinUserTemple: true, deduplicateByCover: true },
+      },
       isLinkCollapsed = initialCollapsedStates.link,
       isSectionCollapsed = initialCollapsedStates.section,
       isTempleCollapsed = initialCollapsedStates.temple,
@@ -155,8 +158,8 @@ export function CharacterBox(props) {
             openCharacterModal={openCharacterBoxModal}
             {...modalCallbacks}
             canChangeAvatar={canChangeAvatar}
-            hideDuplicates={hideDuplicates}
-            onToggleDuplicates={() => setState({ hideDuplicates: !hideDuplicates })}
+            templeFilterOptions={templeFilterOptions}
+            onTempleFilterChange={(options) => setState({ templeFilterOptions: options })}
             isLinkCollapsed={isLinkCollapsed}
             onToggleLinkCollapse={createToggleCollapseHandler("isLinkCollapsed", "link")}
             isSectionCollapsed={isSectionCollapsed}

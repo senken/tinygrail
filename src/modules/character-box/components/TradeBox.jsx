@@ -34,14 +34,14 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Function} props.openGMTradeHistoryModal - 打开GM交易记录Modal的函数
  * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
  * @param {boolean} props.canChangeAvatar - 是否可以更换头像
- * @param {boolean} props.hideDuplicates - 是否隐藏重复圣殿
- * @param {Function} props.onToggleDuplicates - 切换隐藏重复圣殿的回调函数
  * @param {boolean} props.isLinkCollapsed - LINK区域是否折叠
  * @param {Function} props.onToggleLinkCollapse - 切换LINK折叠状态的回调函数
  * @param {boolean} props.isSectionCollapsed - 交易区域是否折叠
  * @param {Function} props.onToggleSectionCollapse - 切换交易区域折叠状态的回调函数
  * @param {boolean} props.isTempleCollapsed - 圣殿区域是否折叠
  * @param {Function} props.onToggleTempleCollapse - 切换圣殿区域折叠状态的回调函数
+ * @param {Object} props.templeFilterOptions - 圣殿筛选排序选项
+ * @param {Function} props.onTempleFilterChange - 圣殿筛选排序变更回调
  * @param {boolean} props.isUserCollapsed - 用户区域是否折叠
  * @param {Function} props.onToggleUserCollapse - 切换用户区域折叠状态的回调函数
  * @returns {HTMLElement} 完整的组件容器
@@ -73,14 +73,17 @@ export function TradeBox(props) {
     openGMTradeHistoryModal,
     openTempleModal,
     canChangeAvatar,
-    hideDuplicates = true,
-    onToggleDuplicates,
     isLinkCollapsed = false,
     onToggleLinkCollapse,
     isSectionCollapsed = false,
     onToggleSectionCollapse,
     isTempleCollapsed = false,
     onToggleTempleCollapse,
+    templeFilterOptions = {
+      sort: { sortBy: "Sacrifices", order: "desc" },
+      filter: { selectedFilters: [], mode: "or", pinUserTemple: true, deduplicateByCover: true },
+    },
+    onTempleFilterChange,
     isUserCollapsed = false,
     onToggleUserCollapse,
   } = props || {};
@@ -144,8 +147,8 @@ export function TradeBox(props) {
             temples={temples}
             openUserModal={openUserModal}
             openTempleModal={openTempleModal}
-            hideDuplicates={hideDuplicates}
-            onToggleDuplicates={onToggleDuplicates}
+            templeFilterOptions={templeFilterOptions}
+            onTempleFilterChange={onTempleFilterChange}
             isCollapsed={isTempleCollapsed}
             onToggleCollapse={onToggleTempleCollapse}
           />

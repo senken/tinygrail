@@ -138,8 +138,8 @@ function createTradeBoxModalContent(options) {
     openGMTradeHistoryModal,
     openTempleModal,
     canChangeAvatar,
-    hideDuplicates = true,
-    onToggleDuplicates,
+    templeFilterOptions,
+    onTempleFilterChange,
     isLinkCollapsed = false,
     onToggleLinkCollapse,
     isSectionCollapsed = false,
@@ -219,8 +219,8 @@ function createTradeBoxModalContent(options) {
           openUserModal={openUserModal}
           openTempleModal={openTempleModal}
           stickyTop={0}
-          hideDuplicates={hideDuplicates}
-          onToggleDuplicates={onToggleDuplicates}
+          templeFilterOptions={templeFilterOptions}
+          onTempleFilterChange={onTempleFilterChange}
           isCollapsed={isTempleCollapsed}
           onToggleCollapse={onToggleTempleCollapse}
           headerBgClass="bg-base-100"
@@ -350,7 +350,10 @@ async function openTradeBoxModal(characterId, characterData, userAssets, existin
       users,
       fixedAssets,
       canChangeAvatar,
-      hideDuplicates = true,
+      templeFilterOptions = {
+        sort: { sortBy: "Sacrifices", order: "desc" },
+        filter: { selectedFilters: [], mode: "or", pinUserTemple: true, deduplicateByCover: true },
+      },
       isLinkCollapsed = initialCollapsedStates.link,
       isSectionCollapsed = initialCollapsedStates.section,
       isTempleCollapsed = initialCollapsedStates.temple,
@@ -396,8 +399,8 @@ async function openTradeBoxModal(characterId, characterData, userAssets, existin
       openCharacterModal: openCharacterBoxModal,
       ...modalCallbacks,
       canChangeAvatar,
-      hideDuplicates,
-      onToggleDuplicates: () => setContentState({ hideDuplicates: !hideDuplicates }),
+      templeFilterOptions,
+      onTempleFilterChange: (options) => setContentState({ templeFilterOptions: options }),
       isLinkCollapsed,
       onToggleLinkCollapse: createToggleCollapseHandler("isLinkCollapsed", "link"),
       isSectionCollapsed,
