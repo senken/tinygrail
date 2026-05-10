@@ -334,10 +334,12 @@ export function TradeBoxSection({
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
-                      const step = e.deltaY > 0 ? -1 : 1;
+                      const deltaY = e.originalEvent?.deltaY ?? e.deltaY;
+                      const step = deltaY > 0 ? -1 : 1;
                       const currentValue = parseFloat(e.target.value) || 0;
                       const newValue = Math.max(0, currentValue + step);
-                      e.target.value = newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
+                      e.target.value =
+                        newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
                       updateBidTotal(e);
                     }
                   }}
@@ -351,7 +353,8 @@ export function TradeBoxSection({
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
-                      const step = e.deltaY > 0 ? -1 : 1;
+                      const deltaY = e.originalEvent?.deltaY ?? e.deltaY;
+                      const step = deltaY > 0 ? -1 : 1;
                       const currentValue = parseInt(e.target.value) || 0;
                       e.target.value = Math.max(0, currentValue + step);
                       updateBidTotal(e);
@@ -454,10 +457,12 @@ export function TradeBoxSection({
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
-                      const step = e.deltaY > 0 ? -1 : 1;
+                      const deltaY = e.originalEvent?.deltaY ?? e.deltaY;
+                      const step = deltaY > 0 ? -1 : 1;
                       const currentValue = parseFloat(e.target.value) || 0;
                       const newValue = Math.max(0, currentValue + step);
-                      e.target.value = newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
+                      e.target.value =
+                        newValue % 1 === 0 ? newValue.toString() : newValue.toFixed(2);
                       updateAskTotal(e);
                     }
                   }}
@@ -471,7 +476,8 @@ export function TradeBoxSection({
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
-                      const step = e.deltaY > 0 ? -1 : 1;
+                      const deltaY = e.originalEvent?.deltaY ?? e.deltaY;
+                      const step = deltaY > 0 ? -1 : 1;
                       const currentValue = parseInt(e.target.value) || 0;
                       e.target.value = Math.max(0, currentValue + step);
                       updateAskTotal(e);
