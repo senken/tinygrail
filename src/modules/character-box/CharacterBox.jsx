@@ -81,6 +81,7 @@ export function CharacterBox(props) {
       links,
       temples,
       users,
+      killVotes,
       fixedAssets,
       icoUsers,
       userIcoInfo,
@@ -150,6 +151,7 @@ export function CharacterBox(props) {
             links={links}
             temples={temples}
             users={users}
+            killVotes={killVotes}
             fixedAssets={fixedAssets}
             onRefresh={refreshTradeBoxData}
             setLoading={setLoading}

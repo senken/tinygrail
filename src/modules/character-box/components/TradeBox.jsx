@@ -19,6 +19,7 @@ import { TradeBoxUser } from "./TradeBoxUser.jsx";
  * @param {Array} props.links - LINK数据
  * @param {Array} props.temples - 圣殿数据
  * @param {Object} props.users - 持股用户数据
+ * @param {Array} props.killVotes - 删除投票数据
  * @param {string} props.fixedAssets - 固定资产字符串
  * @param {Function} props.onRefresh - 刷新数据的回调函数
  * @param {Function} props.setLoading - 设置全局加载状态的函数
@@ -58,6 +59,7 @@ export function TradeBox(props) {
     links,
     temples,
     users,
+    killVotes,
     fixedAssets,
     onRefresh,
     setLoading,
@@ -99,6 +101,7 @@ export function TradeBox(props) {
           characterData={characterData}
           userCharacter={userCharacter}
           fixedAssets={fixedAssets}
+          killVotes={killVotes}
           onFavoriteClick={openFavoriteModal}
         />
         <TradeBoxHeaderDetails
@@ -111,6 +114,7 @@ export function TradeBox(props) {
           characterId={characterData?.CharacterId}
           tinygrailCharacter={tinygrailCharacter}
           canChangeAvatar={canChangeAvatar}
+          killVotes={killVotes}
           onSacrificeClick={openSacrificeModal}
           onAuctionClick={openAuctionModal}
           onAuctionHistoryClick={openAuctionHistoryModal}

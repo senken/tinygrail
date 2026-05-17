@@ -10,6 +10,7 @@ import {
   getCharacterUsers,
   getICOUsers,
   getUserICOInfo,
+  getKillVotes,
 } from "@src/api/chara.js";
 
 /**
@@ -107,6 +108,7 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
     templesResult,
     usersResult,
     topTenUsersResult,
+    killVotesResult,
   ] = await Promise.all([
     getCharacterPool(characterId),
     getUserCharacter(characterId),
@@ -117,6 +119,7 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
     getCharacterTemples(characterId),
     getCharacterUsers(characterId, currentUsersPage),
     getCharacterUsers(characterId, 1, 10),
+    getKillVotes(characterId),
   ]);
 
   // 从缓存中获取当前用户资产
@@ -152,6 +155,7 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
     users: usersResult.success ? usersResult.data : null,
     canChangeAvatar,
     fixedAssets,
+    killVotes: killVotesResult?.success ? killVotesResult.data : null,
   };
 }
 

@@ -20,6 +20,7 @@ import { handleVoteKill, handleRevokeVote, handleViewVotes } from "./voteKillHan
  * @param {number} props.characterId - 角色ID
  * @param {boolean} props.canChangeAvatar - 是否可以更换头像
  * @param {boolean} props.isInModal - 是否在弹窗中
+ * @param {Array} props.killVotes - 删除投票数据
  * @param {Function} props.onSacrificeClick - 点击资产重组按钮的回调
  * @param {Function} props.onAuctionClick - 点击拍卖按钮的回调
  * @param {Function} props.onAuctionHistoryClick - 点击往期拍卖按钮的回调
@@ -33,6 +34,7 @@ export function TradeBoxHeaderActions(props) {
     characterId,
     canChangeAvatar,
     isInModal = false,
+    killVotes,
     onSacrificeClick,
     onAuctionClick,
     onAuctionHistoryClick,
@@ -195,7 +197,7 @@ export function TradeBoxHeaderActions(props) {
         <button
           id="tg-btn-view-votes"
           className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
-          onClick={() => handleViewVotes(characterId)}
+          onClick={() => handleViewVotes(killVotes)}
         >
           <VoteIcon className="h-3 w-3" />
           查看投票

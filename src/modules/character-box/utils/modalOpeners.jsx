@@ -123,6 +123,7 @@ function createTradeBoxModalContent(options) {
     links,
     temples,
     users,
+    killVotes,
     fixedAssets,
     onRefresh,
     setLoading,
@@ -161,6 +162,7 @@ function createTradeBoxModalContent(options) {
         characterData={characterData}
         userCharacter={userCharacter}
         fixedAssets={fixedAssets}
+        killVotes={killVotes}
         onFavoriteClick={openFavoriteModal}
       />
       <TradeBoxHeaderDetails
@@ -173,6 +175,7 @@ function createTradeBoxModalContent(options) {
         characterId={characterData?.CharacterId}
         tinygrailCharacter={tinygrailCharacter}
         canChangeAvatar={canChangeAvatar}
+        killVotes={killVotes}
         isInModal={true}
         onSacrificeClick={openSacrificeModal}
         onAuctionClick={openAuctionModal}
@@ -306,6 +309,7 @@ async function openTradeBoxModal(characterId, characterData, userAssets, existin
       tinygrailCharacter,
       gensokyoCharacter,
       pool,
+      killVotes,
       fixedAssets,
       canChangeAvatar,
     } = state || {};
@@ -328,6 +332,7 @@ async function openTradeBoxModal(characterId, characterData, userAssets, existin
       tinygrailCharacter,
       gensokyoCharacter,
       pool,
+      killVotes,
       fixedAssets,
       canChangeAvatar,
       ...modalCallbacks,

@@ -1,4 +1,4 @@
-import { voteKillCharacter, revokeKillVote, getKillVotes } from "@src/api/chara.js";
+import { voteKillCharacter, revokeKillVote } from "@src/api/chara.js";
 import { showSuccess, showError } from "@src/utils/toastManager.jsx";
 import { openModal, openConfirmModal } from "@src/utils/modalManager.js";
 import { formatDateTime } from "@src/utils/format.js";
@@ -81,49 +81,42 @@ export function handleRevokeVote(characterId) {
 
 /**
  * 查看投票结果
- * @param {number} characterId - 角色ID
+ * @param {Array} votes - 投票数据
  */
-export async function handleViewVotes(characterId) {
-  const result = await getKillVotes(characterId);
+export function handleViewVotes(votes) {
+  const modalId = `view-votes-${Date.now()}`;
   
-  if (result.success) {
-    const votes = result.data;
-    const modalId = `view-votes-${characterId}`;
-    
-    const { close } = openModal(modalId, {
-      title: "投票删除结果",
-      content: (
-        <div className="space-y-4">
-          <div className="text-sm">
-            <p>总投票数: {votes?.length || 0}</p>
-            {votes && votes.length > 0 ? (
-              <div className="mt-4 space-y-2">
-                <p className="font-semibold">投票列表:</p>
-                <div className="max-h-96 space-y-2 overflow-y-auto">
-                  {votes.map((vote, index) => (
-                    <div key={index} className="rounded border border-base-300 p-2">
-                      <p className="font-medium">{vote.UserId !== 0 ? "我的投票" : "其他GM"}</p>
-                      {vote.Reason && <p className="mt-1 text-xs opacity-70">理由: {vote.Reason}</p>}
-                      <p className="mt-1 text-xs opacity-50">投票时间: {formatDateTime(vote.VoteTime)}</p>
-                    </div>
-                  ))}
-                </div>
+  const { close } = openModal(modalId, {
+    title: "投票删除结果",
+    content: (
+      <div className="space-y-4">
+        <div className="text-sm">
+          <p>总投票数: {votes?.length || 0}</p>
+          {votes && votes.length > 0 ? (
+            <div className="mt-4 space-y-2">
+              <p className="font-semibold">投票列表:</p>
+              <div className="max-h-96 space-y-2 overflow-y-auto">
+                {votes.map((vote, index) => (
+                  <div key={index} className="rounded border border-base-300 p-2">
+                    <p className="font-medium">{vote.UserId !== 0 ? "我的投票" : "其他GM"}</p>
+                    {vote.Reason && <p className="mt-1 text-xs opacity-70">理由: {vote.Reason}</p>}
+                    <p className="mt-1 text-xs opacity-50">投票时间: {formatDateTime(vote.VoteTime)}</p>
+                  </div>
+                ))}
               </div>
-            ) : (
-              <p className="mt-4 text-center opacity-60">暂无投票</p>
-            )}
-          </div>
-          <button
-            className="btn no-animation btn-sm w-full"
-            onClick={() => close()}
-          >
-            关闭
-          </button>
+            </div>
+          ) : (
+            <p className="mt-4 text-center opacity-60">暂无投票</p>
+          )}
         </div>
-      ),
-      size: "sm",
-    });
-  } else {
-    showError(result.message || "获取投票结果失败");
-  }
+        <button
+          className="btn no-animation btn-sm w-full"
+          onClick={() => close()}
+        >
+          关闭
+        </button>
+      </div>
+    ),
+    size: "sm",
+  });
 }
