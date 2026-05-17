@@ -328,9 +328,15 @@ export function TradeBoxSection({
                 <input
                   id="bid-price-input"
                   type="number"
+                  min="0"
                   placeholder="单价"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
-                  onInput={updateBidTotal}
+                  onInput={(e) => {
+                    if (parseFloat(e.target.value) < 0) {
+                      e.target.value = "0";
+                    }
+                    updateBidTotal(e);
+                  }}
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
@@ -347,9 +353,15 @@ export function TradeBoxSection({
                 <input
                   id="bid-amount-input"
                   type="number"
+                  min="0"
                   placeholder="数量"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
-                  onInput={updateBidTotal}
+                  onInput={(e) => {
+                    if (parseInt(e.target.value) < 0) {
+                      e.target.value = "0";
+                    }
+                    updateBidTotal(e);
+                  }}
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
@@ -451,9 +463,15 @@ export function TradeBoxSection({
                 <input
                   id="ask-price-input"
                   type="number"
+                  min="0"
                   placeholder="单价"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
-                  onInput={updateAskTotal}
+                  onInput={(e) => {
+                    if (parseFloat(e.target.value) < 0) {
+                      e.target.value = "0";
+                    }
+                    updateAskTotal(e);
+                  }}
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
@@ -470,9 +488,15 @@ export function TradeBoxSection({
                 <input
                   id="ask-amount-input"
                   type="number"
+                  min="0"
                   placeholder="数量"
                   className="w-full rounded border border-gray-300 px-2 py-1 text-xs focus:border-blue-500 focus:outline-none dark:border-gray-600"
-                  onInput={updateAskTotal}
+                  onInput={(e) => {
+                    if (parseInt(e.target.value) < 0) {
+                      e.target.value = "0";
+                    }
+                    updateAskTotal(e);
+                  }}
                   onWheel={(e) => {
                     if (document.activeElement === e.target) {
                       e.preventDefault();
@@ -543,7 +567,6 @@ export function TradeBoxSection({
                         data-depth-type="ask"
                         data-price={ask.Price}
                         data-amount={ask.Amount}
-                        style={{ fontSize: "12px", lineHeight: "20px" }}
                       >
                         <div
                           className="absolute inset-y-0 right-0 bg-[#b8e7ff]"
@@ -572,7 +595,6 @@ export function TradeBoxSection({
                       data-depth-type="bid"
                       data-price={bid.Price}
                       data-amount={bid.Amount}
-                      style={{ fontSize: "12px", lineHeight: "20px" }}
                     >
                       <div
                         className="absolute inset-y-0 right-0 bg-[#ffcfe3]"
