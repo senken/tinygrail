@@ -60,7 +60,6 @@ export async function getUserAssets(username) {
     };
   } catch (error) {
     console.error("获取用户资产失败:", error);
-    handleAuthFailure();
     return {
       success: false,
       message: "获取用户资产失败",
