@@ -38,6 +38,8 @@ export { StarIcon } from "./StarIcon.js";
 export { SunIcon } from "./SunIcon.js";
 export { TrashIcon } from "./TrashIcon.js";
 export { TriangleAlertIcon } from "./TriangleAlertIcon.js";
+export { UndoIcon } from "./UndoIcon.js";
 export { VectorIntersectionIcon } from "./VectorIntersectionIcon.js";
 export { VectorUnionIcon } from "./VectorUnionIcon.js";
+export { VoteIcon } from "./VoteIcon.js";
 export { XIcon } from "./XIcon.js";
