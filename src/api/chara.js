@@ -44,13 +44,24 @@ export async function getUserCharaLinks(username, page = 1, pageSize = 12) {
  * @param {number} page - 页码
  * @param {number} pageSize - 每页数量
  * @param {string} keyword - 搜索关键字（可选）
+ * @param {number[]} characterIds - 角色ID数组（可选）
  * @returns {Promise<Object>} 圣殿列表
  */
-export async function getUserTemples(username, page = 1, pageSize = 24, keyword = "") {
+export async function getUserTemples(username, page = 1, pageSize = 24, keyword = "", characterIds = []) {
   try {
     let url = `chara/user/temple/${username}/${page}/${pageSize}`;
+    const params = [];
+    
     if (keyword) {
-      url += `?keyword=${encodeURIComponent(keyword)}`;
+      params.push(`keyword=${encodeURIComponent(keyword)}`);
+    }
+    
+    if (characterIds && characterIds.length > 0) {
+      params.push(`characterIds=${characterIds.join(',')}`);
+    }
+    
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
     }
     
     const data = await get(url);
@@ -88,13 +99,24 @@ export async function getUserTemples(username, page = 1, pageSize = 24, keyword 
  * @param {number} page - 页码
  * @param {number} pageSize - 每页数量
  * @param {string} sort - 排序方式（可选，'asc'或'desc'）
+ * @param {number[]} characterIds - 角色ID数组（可选）
  * @returns {Promise<Object>} 角色列表
  */
-export async function getUserCharas(username, page = 1, pageSize = 48, sort = "") {
+export async function getUserCharas(username, page = 1, pageSize = 48, sort = "", characterIds = []) {
   try {
     let url = `chara/user/chara/${username}/${page}/${pageSize}`;
+    const params = [];
+    
     if (sort) {
-      url += `?sort=${encodeURIComponent(sort)}`;
+      params.push(`sort=${encodeURIComponent(sort)}`);
+    }
+    
+    if (characterIds && characterIds.length > 0) {
+      params.push(`characterIds=${characterIds.join(',')}`);
+    }
+    
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
     }
     
     const data = await post(url);
