@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 .tinygrail {
-  /* 防止iOS自动调整字体大小 */
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
+  /* 防止移动端浏览器自动调整字体大小 */
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
 
   /* 页面背景色变量 */
   --page-bg: #ffffff;
