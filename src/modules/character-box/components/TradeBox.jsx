@@ -108,6 +108,7 @@ export function TradeBox(props) {
           gensokyoCharacter={gensokyoCharacter}
         />
         <TradeBoxHeaderActions
+          characterId={characterData?.CharacterId}
           tinygrailCharacter={tinygrailCharacter}
           canChangeAvatar={canChangeAvatar}
           onSacrificeClick={openSacrificeModal}

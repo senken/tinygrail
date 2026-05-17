@@ -170,6 +170,7 @@ function createTradeBoxModalContent(options) {
         gensokyoCharacter={gensokyoCharacter}
       />
       <TradeBoxHeaderActions
+        characterId={characterData?.CharacterId}
         tinygrailCharacter={tinygrailCharacter}
         canChangeAvatar={canChangeAvatar}
         isInModal={true}

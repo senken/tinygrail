@@ -7,12 +7,17 @@ import {
   RepeatIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  TrashIcon,
+  UndoIcon,
+  VoteIcon,
 } from "@src/icons";
+import { handleVoteKill, handleRevokeVote, handleViewVotes } from "./voteKillHandlers.jsx";
 
 /**
  * 交易盒子按钮组组件
  * @param {Object} props
  * @param {Object} props.tinygrailCharacter - tinygrail的角色数据
+ * @param {number} props.characterId - 角色ID
  * @param {boolean} props.canChangeAvatar - 是否可以更换头像
  * @param {boolean} props.isInModal - 是否在弹窗中
  * @param {Function} props.onSacrificeClick - 点击资产重组按钮的回调
@@ -25,6 +30,7 @@ import {
 export function TradeBoxHeaderActions(props) {
   const {
     tinygrailCharacter,
+    characterId,
     canChangeAvatar,
     isInModal = false,
     onSacrificeClick,
@@ -162,6 +168,37 @@ export function TradeBoxHeaderActions(props) {
         >
           <ClipboardClockIcon className="h-3 w-3" />
           交易记录(gm)
+        </button>
+      )}
+      {isGameMaster() && (
+        <div className="join flex-shrink-0">
+          <button
+            id="tg-btn-vote-kill"
+            className="btn-bgm btn join-item no-animation btn-xs gap-1"
+            onClick={() => handleVoteKill(characterId)}
+          >
+            <TrashIcon className="h-3 w-3" />
+            投票删除
+          </button>
+          <button
+            id="tg-btn-revoke-vote"
+            className="btn-bgm btn join-item no-animation btn-xs border-l border-l-white/30 dark:border-l-white/20"
+            onClick={() => handleRevokeVote(characterId)}
+            title="撤回投票"
+            aria-label="撤回投票"
+          >
+            <UndoIcon className="h-3 w-3" />
+          </button>
+        </div>
+      )}
+      {isGameMaster() && (
+        <button
+          id="tg-btn-view-votes"
+          className="btn-bgm btn no-animation btn-xs flex-shrink-0 gap-1"
+          onClick={() => handleViewVotes(characterId)}
+        >
+          <VoteIcon className="h-3 w-3" />
+          查看投票
         </button>
       )}
     </div>

@@ -1787,3 +1787,91 @@ export async function getCharacterTradeHistory(characterId, page = 1, pageSize =
     };
   }
 }
+
+/**
+ * 投票删除角色
+ * @param {number} characterId - 角色ID
+ * @param {string} [reason=""] - 删除理由
+ * @returns {Promise<Object>} 投票结果
+ */
+export async function voteKillCharacter(characterId, reason = "") {
+  try {
+    const data = await post(`chara/kill/vote/${characterId}`, reason);
+
+    if (!data || data.State !== 0) {
+      return {
+        success: false,
+        message: data?.Message || "投票失败",
+      };
+    }
+
+    return {
+      success: true,
+      data: data.Value,
+    };
+  } catch (error) {
+    console.error("投票失败:", error);
+    return {
+      success: false,
+      message: "投票失败",
+    };
+  }
+}
+
+/**
+ * 撤回删除投票
+ * @param {number} characterId - 角色ID
+ * @returns {Promise<Object>} 撤回结果
+ */
+export async function revokeKillVote(characterId) {
+  try {
+    const data = await post(`chara/kill/vote/${characterId}/revoke`);
+
+    if (!data || data.State !== 0) {
+      return {
+        success: false,
+        message: data?.Message || "撤回投票失败",
+      };
+    }
+
+    return {
+      success: true,
+      data: data.Value,
+    };
+  } catch (error) {
+    console.error("撤回投票失败:", error);
+    return {
+      success: false,
+      message: "撤回投票失败",
+    };
+  }
+}
+
+/**
+ * 查看角色删除投票结果
+ * @param {number} characterId - 角色ID
+ * @returns {Promise<Object>} 投票结果
+ */
+export async function getKillVotes(characterId) {
+  try {
+    const data = await get(`chara/kill/votes/${characterId}`);
+
+    if (!data || data.State !== 0) {
+      return {
+        success: false,
+        message: data?.Message || "获取投票结果失败",
+      };
+    }
+
+    return {
+      success: true,
+      data: data.Value,
+    };
+  } catch (error) {
+    console.error("获取投票结果失败:", error);
+    return {
+      success: false,
+      message: "获取投票结果失败",
+    };
+  }
+}
