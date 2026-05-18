@@ -2,6 +2,8 @@ import { formatCurrency } from "@src/utils/format.js";
 import { get } from "@src/utils/http.js";
 import { openConfirmModal } from "@src/utils/modalManager.js";
 import { showWarning } from "@src/utils/toastManager.jsx";
+import { getKillVotes } from "@src/api/chara.js";
+import { TriangleAlertIcon } from "@src/icons";
 
 /**
  * 获取角色名称
@@ -90,30 +92,44 @@ export function IcoBoxInit({ characterId, userAssets, onInit }) {
   const nameSpan = <span />;
   getCharacterName(characterId, nameSpan);
 
-  const input = (
-    <input
-      id="tg-ico-box-init-input"
-      type="number"
-      className="input input-sm input-bordered w-full"
-      placeholder="请输入注资金额"
-      min="10000"
-      value="10000"
-    />
-  );
+  // 创建投票警告容器
+  const voteWarningContainer = <div className="contents" />;
+  
+  // 创建输入框和按钮容器
+  const inputContainer = <div className="flex w-full max-w-md flex-col gap-3" />;
 
-  container.appendChild(
-    <div className="flex w-full flex-col items-center gap-4">
-      {/* 提示文字 */}
-      <div className="text-center text-lg text-gray-700 dark:text-gray-300">
-        "{nameSpan}"已做好准备，点击启动按钮，加入"小圣杯"的争夺！
-      </div>
-
-      {/* 输入框和按钮 */}
-      <div className="flex w-full max-w-md flex-col gap-3">
+  // 异步加载投票数据
+  getKillVotes(characterId).then((result) => {
+    const hasVotes = result.success && result.data && result.data.length > 0;
+    
+    if (hasVotes) {
+      // 显示警告信息
+      voteWarningContainer.appendChild(
+        <div className="flex items-center gap-1 text-sm text-warning">
+          <TriangleAlertIcon className="h-4 w-4 flex-shrink-0" />
+          <span>此角色因违规被强制删除，无法启动ICO</span>
+        </div>
+      );
+    } else {
+      // 没有投票记录，显示输入框和按钮
+      const input = (
+        <input
+          id="tg-ico-box-init-input"
+          type="number"
+          className="input input-sm input-bordered w-full"
+          placeholder="请输入注资金额"
+          min="10000"
+          value="10000"
+        />
+      );
+      
+      inputContainer.appendChild(
         <div className="text-right text-xs text-gray-500 dark:text-gray-500">
           账户余额：{formatCurrency(balance, "₵", 2, false)}
         </div>
-        {input}
+      );
+      inputContainer.appendChild(input);
+      inputContainer.appendChild(
         <button
           className="btn-bgm btn btn-sm btn-block"
           onClick={() => {
@@ -136,7 +152,22 @@ export function IcoBoxInit({ characterId, userAssets, onInit }) {
         >
           启动ICO
         </button>
+      );
+    }
+  });
+
+  container.appendChild(
+    <div className="flex w-full flex-col items-center gap-4">
+      {/* 提示文字 */}
+      <div className="text-center text-lg text-gray-700 dark:text-gray-300">
+        "{nameSpan}"已做好准备，点击启动按钮，加入"小圣杯"的争夺！
       </div>
+
+      {/* 投票警告 */}
+      {voteWarningContainer}
+
+      {/* 输入框和按钮 */}
+      {inputContainer}
     </div>
   );
 
