@@ -1,6 +1,5 @@
 import { get, post } from "@src/utils/http.js";
 import { unescapeHtml } from "@src/utils/escape.js";
-import { performBangumiAuth } from "@src/utils/session.js";
 
 /**
  * 获取用户资产信息
@@ -8,22 +7,11 @@ import { performBangumiAuth } from "@src/utils/session.js";
  * @returns {Promise<Object>} 用户资产信息
  */
 export async function getUserAssets(username) {
-  // 处理授权失败的函数
-  const handleAuthFailure = () => {
-    if (!username) {
-      performBangumiAuth(() => {
-        // 授权成功后重新加载页面
-        window.location.reload();
-      });
-    }
-  };
-
   try {
     const url = username ? `chara/user/assets/${username}` : "chara/user/assets";
     const data = await get(url);
 
     if (!data || data.State !== 0 || !data.Value) {
-      handleAuthFailure();
       return {
         success: false,
         message: data?.Message || "获取用户资产失败",
@@ -44,15 +32,6 @@ export async function getUserAssets(username) {
       showDaily: !!value.ShowDaily,
       showWeekly: !!value.ShowWeekly,
     };
-
-    // 如果是获取自己的资产，缓存数据
-    if (!username) {
-      try {
-        localStorage.setItem("tinygrail:user-assets", JSON.stringify(result));
-      } catch (e) {
-        console.warn("缓存用户资产失败:", e);
-      }
-    }
 
     return {
       success: true,
