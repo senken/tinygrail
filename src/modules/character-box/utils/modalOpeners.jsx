@@ -1,6 +1,6 @@
 import { getCharacter, getCharacterUsers, getICOUsers, initICO, joinICO } from "@src/api/chara.js";
-import { getUserAssets } from "@src/api/user.js";
 import { AddToFavorite } from "@src/modules/favorite/index.js";
+import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
 import { createMountedComponent } from "@src/utils/createMountedComponent.js";
 import { calculateICO } from "@src/utils/ico.js";
@@ -54,7 +54,7 @@ export async function openCharacterBoxModal(characterId) {
   // 异步加载角色数据和用户资产
   const [characterResult, userAssetsResult] = await Promise.all([
     getCharacter(characterId),
-    getUserAssets(),
+    getUserAssetsWithSync(),
   ]);
 
   const userAssets = userAssetsResult.success ? userAssetsResult.data : null;
@@ -444,7 +444,7 @@ async function openTradeBoxModal(characterId, characterData, userAssets, existin
   const updateCharacterAndUserData = async () => {
     const [characterResult, userAssetsResult] = await Promise.all([
       getCharacter(characterId),
-      getUserAssets(),
+      getUserAssetsWithSync(),
     ]);
 
     if (characterResult.success && userAssetsResult.success) {
@@ -626,7 +626,7 @@ async function openIcoBoxModal(characterId, characterData, userAssets, existingM
   const updateCharacterAndUserData = async () => {
     const [characterResult, userAssetsResult] = await Promise.all([
       getCharacter(characterId),
-      getUserAssets(),
+      getUserAssetsWithSync(),
     ]);
 
     if (characterResult.success && userAssetsResult.success) {

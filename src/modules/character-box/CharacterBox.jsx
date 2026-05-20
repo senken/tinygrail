@@ -8,7 +8,7 @@ import {
   joinICO,
   initICO,
 } from "@src/api/chara.js";
-import { getUserAssets } from "@src/api/user.js";
+import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { IcoBox } from "./components/IcoBox.jsx";
 import { IcoBoxInit } from "./components/IcoBoxInit.jsx";
 import { TradeBox } from "./components/TradeBox.jsx";
@@ -210,7 +210,7 @@ export function CharacterBox(props) {
   const loadCharacterAndUserData = async () => {
     const [characterResult, userAssetsResult] = await Promise.all([
       getCharacter(characterId),
-      getUserAssets(),
+      getUserAssetsWithSync(),
     ]);
 
     return { characterResult, userAssetsResult };
