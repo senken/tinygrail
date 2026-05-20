@@ -5,13 +5,15 @@ import {
   claimWeeklyBonus,
   getDailyEventCount,
 } from "@src/api/event.js";
-import { getUserAssets, logout } from "@src/api/user.js";
+import { logout } from "@src/api/user.js";
 import { Favorite } from "@src/modules/favorite";
 import { openUserAssetsLogModal } from "@src/modules/user-assets-log";
+import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { openUserTinygrailModal } from "@src/modules/user-tinygrail";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { createMountedComponentWithStore } from "@src/utils/createMountedComponentWithStore.js";
 import { openAlertModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { showWarning } from "@src/utils/toastManager.jsx";
+import { USER_CARD_STORE_KEY } from "./constants.js";
 import { LoginBox } from "./components/LoginBox.jsx";
 import { openScratchConfirmModal } from "./components/ScratchConfirm.jsx";
 import { openShareBonusModal } from "./components/ShareBonusModal.jsx";
@@ -21,96 +23,106 @@ import { UserInfoBox } from "./components/UserInfoBox.jsx";
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
 
-  const { setState } = createMountedComponent(container, (state, setState) => {
-    const {
-      authorized,
-      name,
-      nickname,
-      avatar,
-      balance,
-      assets,
-      lastIndex,
-      showDaily,
-      showWeekly,
-      showHoliday,
-      holidayName,
-      abbreviateBalance = true,
-    } = state || {};
+  const { setState } = createMountedComponentWithStore(
+    container,
+    USER_CARD_STORE_KEY,
+    (state, setState) => {
+      const {
+        authorized,
+        name,
+        nickname,
+        avatar,
+        balance,
+        assets,
+        lastIndex,
+        showDaily,
+        showWeekly,
+        showHoliday,
+        holidayName,
+        abbreviateBalance = true,
+      } = state || {};
 
-    // 未登录
-    if (!authorized) {
+      if (authorized == null) {
+        return <div />;
+      }
+
+      // 未登录
+      if (!authorized) {
+        return (
+          <LoginBox
+            onLogin={() => {
+              loadUserAssets();
+            }}
+          />
+        );
+      }
+
+      // 检查Modal是否已存在
+      const isModalExist = (modalId) => {
+        return (
+          modalId &&
+          document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode ===
+            document.body
+        );
+      };
+
       return (
-        <LoginBox
-          onLogin={() => {
-            loadUserAssets();
-          }}
-        />
+        <div>
+          <UserInfoBox
+            name={name}
+            nickname={nickname}
+            avatar={avatar}
+            balance={balance}
+            lastIndex={lastIndex}
+            showDaily={showDaily}
+            showWeekly={showWeekly}
+            showHoliday={showHoliday}
+            holidayName={holidayName}
+            abbreviateBalance={abbreviateBalance}
+            onBonus={handleDailyBonus}
+            onShareBonus={handleWeeklyBonus}
+            onHolidayBonus={handleHolidayBonus}
+            onLogout={handleLogout}
+            onShareBonusTest={handleShareBonusTest}
+            onScratch={handleOpenScratch}
+            onAvatarClick={() => {
+              openUserTinygrailModal(name);
+            }}
+            onToggleAbbreviate={() => {
+              setState({ abbreviateBalance: !abbreviateBalance });
+            }}
+            onBalanceLog={() => {
+              openUserAssetsLogModal();
+            }}
+            onFavorite={() => {
+              openModal("favorite-modal", {
+                title: "收藏夹",
+                content: <Favorite />,
+              });
+            }}
+            onTarot={() => {
+              openTarotModal();
+            }}
+          />
+        </div>
       );
+    },
+    {
+      initialState: {
+        authorized: null,
+        abbreviateBalance: true,
+      },
+      autoRender: true,
     }
-
-    // 检查Modal是否已存在
-    const isModalExist = (modalId) => {
-      return (
-        modalId &&
-        document.querySelector(`#tg-modal[data-modal-id="${modalId}"]`)?.parentNode ===
-          document.body
-      );
-    };
-
-    return (
-      <div>
-        <UserInfoBox
-          name={name}
-          nickname={nickname}
-          avatar={avatar}
-          balance={balance}
-          lastIndex={lastIndex}
-          showDaily={showDaily}
-          showWeekly={showWeekly}
-          showHoliday={showHoliday}
-          holidayName={holidayName}
-          abbreviateBalance={abbreviateBalance}
-          onBonus={handleDailyBonus}
-          onShareBonus={handleWeeklyBonus}
-          onHolidayBonus={handleHolidayBonus}
-          onLogout={handleLogout}
-          onShareBonusTest={handleShareBonusTest}
-          onScratch={handleOpenScratch}
-          onAvatarClick={() => {
-            openUserTinygrailModal(name);
-          }}
-          onToggleAbbreviate={() => {
-            setState({ abbreviateBalance: !abbreviateBalance });
-          }}
-          onBalanceLog={() => {
-            openUserAssetsLogModal();
-          }}
-          onFavorite={() => {
-            openModal("favorite-modal", {
-              title: "收藏夹",
-              content: <Favorite />,
-            });
-          }}
-          onTarot={() => {
-            openTarotModal();
-          }}
-        />
-      </div>
-    );
-  });
+  );
 
   // 加载用户资产
   const loadUserAssets = () => {
-    getUserAssets().then((result) => {
+    getUserAssetsWithSync().then((result) => {
       if (!result.success) {
         setState({ authorized: false });
         return;
       }
-
-      setState({
-        authorized: true,
-        ...result.data,
-      });
 
       // 加载完用户资产后检查节日
       checkHoliday();
