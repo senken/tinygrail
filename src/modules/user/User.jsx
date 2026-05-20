@@ -1,4 +1,4 @@
-import { getUserAssets } from "@src/api/user.js";
+import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 
 /**
@@ -40,7 +40,7 @@ export function User() {
   }
 
   // 获取用户资产信息判断用户是否已注册
-  getUserAssets(username).then((result) => {
+  getUserAssetsWithSync(username).then((result) => {
     if (!result.success) {
       return;
     }
