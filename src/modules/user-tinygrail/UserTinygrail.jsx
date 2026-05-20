@@ -1,9 +1,10 @@
 import { getUserCharaLinks, getUserCharas, getUserICOs, getUserTemples } from "@src/api/chara.js";
-import { banUser, getUserAssets, unbanUser } from "@src/api/user.js";
+import { banUser, unbanUser } from "@src/api/user.js";
 import { openCharacterBoxModal } from "@src/modules/character-box/utils/modalOpeners.jsx";
 import { GMTradeHistory } from "@src/modules/gm-trade-history/GMTradeHistory.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
-import { createMountedComponent } from "@src/utils/createMountedComponent.js";
+import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
+import { createMountedComponentWithStore } from "@src/utils/createMountedComponentWithStore.js";
 import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { createRequestManager } from "@src/utils/requestManager.js";
 import { scrollToTop } from "@src/utils/scroll.js";
@@ -16,6 +17,7 @@ import { UserLinksTab } from "./components/UserLinksTab.jsx";
 import { UserTemplesTab } from "./components/UserTemplesTab.jsx";
 import { UserTinygrailHeader } from "./components/UserTinygrailHeader.jsx";
 import { UserTinygrailTabs } from "./components/UserTinygrailTabs.jsx";
+import { getUserTinygrailStoreKey } from "./constants.js";
 
 /**
  * 创建用户小圣杯组件
@@ -33,14 +35,19 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   // 创建内容容器
   const contentContainer = <div />;
 
+  const storeKey = getUserTinygrailStoreKey(username, modalId);
+  const mountedOptions = {
+    initialState: {
+      activeTab: 0,
+    },
+    destroyStoreOnDestroy: modalId != null,
+  };
+
   // 创建请求管理器
   const templesRequestManager = createRequestManager();
   const charasRequestManager = createRequestManager();
   const icosRequestManager = createRequestManager();
   const linksRequestManager = createRequestManager();
-
-  // 存储用户ID
-  let userId = null;
 
   // 存储当前页数
   let currentLinksPage = 1;
@@ -49,7 +56,7 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   let currentICOsPage = 1;
 
   // 交易记录点击处理
-  const handleTradeHistoryClick = (nickname) => {
+  const handleTradeHistoryClick = (userId, nickname) => {
     openModal(`trade-history-${username}`, {
       title: `「${nickname}」的交易记录`,
       content: (
@@ -101,129 +108,141 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   };
 
   // 创建标题组件状态管理
-  const { setState: setTitleState } = createMountedComponent(titleContainer, (state) => {
-    const { name, nickname, balance, lastIndex, assets, avatar, state: userState } = state || {};
+  const { setState: setTitleState, destroy: destroyTitle } = createMountedComponentWithStore(
+    titleContainer,
+    storeKey,
+    (state) => {
+      const { id, name, nickname, balance, lastIndex, assets, avatar, state: userState } =
+        state || {};
 
-    if (!nickname) {
-      return <div />;
-    }
+      if (!nickname) {
+        return <div />;
+      }
 
-    return (
-      <UserTinygrailHeader
-        name={name}
-        nickname={nickname}
-        balance={balance}
-        lastIndex={lastIndex}
-        assets={assets}
-        avatar={avatar}
-        state={userState}
-        bgClassName={bgClassName}
-        onRedPacketLogClick={() => openRedPacketLogModal({ username, nickname })}
-        onSendRedPacketClick={() =>
-          openSendRedPacketModal({
-            username,
-            nickname,
-            onSuccess: () => {
-              loadUserAssets();
-            },
-          })
-        }
-        onTradeHistoryClick={() => handleTradeHistoryClick(nickname)}
-        onBanClick={handleBanClick}
-        onUnbanClick={handleUnbanClick}
-      />
-    );
-  });
+      return (
+        <UserTinygrailHeader
+          name={name}
+          nickname={nickname}
+          balance={balance}
+          lastIndex={lastIndex}
+          assets={assets}
+          avatar={avatar}
+          state={userState}
+          bgClassName={bgClassName}
+          onRedPacketLogClick={() => openRedPacketLogModal({ username, nickname })}
+          onSendRedPacketClick={() =>
+            openSendRedPacketModal({
+              username,
+              nickname,
+              onSuccess: () => {
+                loadUserAssets();
+              },
+            })
+          }
+          onTradeHistoryClick={() => handleTradeHistoryClick(id, nickname)}
+          onBanClick={handleBanClick}
+          onUnbanClick={handleUnbanClick}
+        />
+      );
+    },
+    mountedOptions
+  );
 
   // 创建内容组件状态管理
-  const { setState: setContentState } = createMountedComponent(contentContainer, (state) => {
-    const { activeTab = 0, charaLinks, temples, charas, icos } = state || {};
+  const { setState: setContentState, destroy: destroyContent } =
+    createMountedComponentWithStore(
+      contentContainer,
+      storeKey,
+      (state) => {
+        const { activeTab = 0, charaLinks, temples, charas, icos } = state || {};
 
-    // 打开圣殿详情弹窗
-    const handleTempleClick = (temple) => {
-      openModal(`temple-${temple.Id}`, {
-        content: <TempleDetail temple={temple} characterName={temple.Name} />,
-        borderless: true,
-        showCloseButton: true,
-        position: "middle",
-        onClose: () => {
-          loadCharaData();
-        },
-      });
-    };
+        // 打开圣殿详情弹窗
+        const handleTempleClick = (temple) => {
+          openModal(`temple-${temple.Id}`, {
+            content: <TempleDetail temple={temple} characterName={temple.Name} />,
+            borderless: true,
+            showCloseButton: true,
+            position: "middle",
+            onClose: () => {
+              loadCharaData();
+            },
+          });
+        };
 
-    // 构建tabs配置
-    const tabConfigs = [
-      {
-        condition: charaLinks && charaLinks.totalItems > 0,
-        label: `${charaLinks?.totalItems || 0}组连接`,
-        content: (
-          <UserLinksTab
-            data={charaLinks}
-            onPageChange={handleLinksPageChange}
-            onCharacterClick={openCharacterBoxModal}
-            onTempleClick={handleTempleClick}
-          />
-        ),
-      },
-      {
-        condition: temples,
-        label: `${temples?.totalItems || 0}座圣殿`,
-        content: (
-          <UserTemplesTab
-            data={temples}
-            onPageChange={handleTemplesPageChange}
-            onCharacterClick={openCharacterBoxModal}
-            onTempleClick={handleTempleClick}
-          />
-        ),
-      },
-      {
-        condition: charas,
-        label: `${charas?.totalItems || 0}个人物`,
-        content: (
-          <UserCharasTab
-            data={charas}
-            onPageChange={handleCharasPageChange}
-            onCharacterClick={openCharacterBoxModal}
-          />
-        ),
-      },
-      {
-        condition: icos,
-        label: `${icos?.totalItems || 0}个ICO`,
-        content: (
-          <UserICOsTab
-            data={icos}
-            onPageChange={handleICOsPageChange}
-            onCharacterClick={openCharacterBoxModal}
-          />
-        ),
-      },
-    ];
+        // 构建tabs配置
+        const tabConfigs = [
+          {
+            condition: charaLinks && charaLinks.totalItems > 0,
+            label: `${charaLinks?.totalItems || 0}组连接`,
+            content: (
+              <UserLinksTab
+                data={charaLinks}
+                onPageChange={handleLinksPageChange}
+                onCharacterClick={openCharacterBoxModal}
+                onTempleClick={handleTempleClick}
+              />
+            ),
+          },
+          {
+            condition: temples,
+            label: `${temples?.totalItems || 0}座圣殿`,
+            content: (
+              <UserTemplesTab
+                data={temples}
+                onPageChange={handleTemplesPageChange}
+                onCharacterClick={openCharacterBoxModal}
+                onTempleClick={handleTempleClick}
+              />
+            ),
+          },
+          {
+            condition: charas,
+            label: `${charas?.totalItems || 0}个人物`,
+            content: (
+              <UserCharasTab
+                data={charas}
+                onPageChange={handleCharasPageChange}
+                onCharacterClick={openCharacterBoxModal}
+              />
+            ),
+          },
+          {
+            condition: icos,
+            label: `${icos?.totalItems || 0}个ICO`,
+            content: (
+              <UserICOsTab
+                data={icos}
+                onPageChange={handleICOsPageChange}
+                onCharacterClick={openCharacterBoxModal}
+              />
+            ),
+          },
+        ];
 
-    // 过滤出需要显示的tabs
-    const tabs = tabConfigs
-      .filter((config) => config.condition)
-      .map(({ label, content }) => ({ label, content }));
+        // 过滤出需要显示的tabs
+        const tabs = tabConfigs
+          .filter((config) => config.condition)
+          .map(({ label, content }) => ({ label, content }));
 
-    return (
-      <UserTinygrailTabs
-        tabs={tabs}
-        activeTab={activeTab}
-        onTabChange={(index) => {
-          setContentState({ activeTab: index });
-          scrollToTop(contentContainer);
-        }}
-        stickyTop={stickyTop}
-        bgClassName={bgClassName}
-      />
+        return (
+          <UserTinygrailTabs
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={(index) => {
+              setContentState({ activeTab: index });
+              scrollToTop(contentContainer);
+            }}
+            stickyTop={stickyTop}
+            bgClassName={bgClassName}
+          />
+        );
+      },
+      mountedOptions
     );
-  });
 
   // 加载用户资产
   const loadUserAssets = () => {
-    getUserAssets(username).then((result) => {
+    getUserAssetsWithSync(username).then((result) => {
       if (!result.success) {
         if (modalId) {
           closeModal(modalId);
@@ -232,7 +251,6 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
         return;
       }
 
-      userId = result.data.id;
       setTitleState(result.data);
     });
   };
@@ -317,6 +335,10 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   return {
     title: titleContainer,
     content: contentContainer,
+    destroy: () => {
+      destroyTitle();
+      destroyContent();
+    },
   };
 }
 
@@ -358,7 +380,7 @@ export function openUserTinygrailModal(username) {
 
   const modalId = `user-tinygrail-modal-${username}`;
 
-  const { title, content } = createUserTinygrailModal({
+  const { title, content, destroy } = createUserTinygrailModal({
     username,
     stickyTop: "0",
     modalId,
@@ -371,6 +393,7 @@ export function openUserTinygrailModal(username) {
     content,
     contentClassName: "pt-0",
     size: "xl",
+    onClose: destroy,
     modalBoxProps: {
       id: "tg-user-tinygrail",
       dataset: {
