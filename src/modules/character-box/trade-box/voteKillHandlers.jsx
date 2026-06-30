@@ -5,7 +5,8 @@ import { formatDateTime } from "@src/utils/format.js";
 
 /**
  * 处理投票删除
- * @param {number} characterId - 角色ID
+ * @param {number} characterId 角色ID
+ * @returns {void}
  */
 export function handleVoteKill(characterId) {
   const modalId = `vote-kill-${characterId}`;
@@ -60,7 +61,8 @@ export function handleVoteKill(characterId) {
 
 /**
  * 处理撤回投票
- * @param {number} characterId - 角色ID
+ * @param {number} characterId 角色ID
+ * @returns {void}
  */
 export function handleRevokeVote(characterId) {
   openConfirmModal({
@@ -81,7 +83,8 @@ export function handleRevokeVote(characterId) {
 
 /**
  * 查看投票结果
- * @param {Array} votes - 投票数据
+ * @param {Array} votes 投票数据
+ * @returns {void}
  */
 export function handleViewVotes(votes) {
   const modalId = `view-votes-${Date.now()}`;

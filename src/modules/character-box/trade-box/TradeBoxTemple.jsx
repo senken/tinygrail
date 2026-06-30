@@ -6,7 +6,7 @@ import { formatNumber, formatDateTime } from "@src/utils/format.js";
 
 /**
  * 根据圣殿等级获取加成文本
- * @param {number} level - 圣殿等级
+ * @param {number} level 圣殿等级
  * @returns {string} 加成文本
  */
 function getTempleLevelBonus(level) {
@@ -20,9 +20,9 @@ function getTempleLevelBonus(level) {
 
 /**
  * 根据Cover字段去重圣殿列表并计数
- * @param {Array} temples - 圣殿列表
- * @param {number} userTempleIndex - 用户圣殿在原列表中的索引
- * @param {boolean} pinUserTemple - 是否置顶用户圣殿
+ * @param {Array} temples 圣殿列表
+ * @param {number} userTempleIndex 用户圣殿在原列表中的索引
+ * @param {boolean} pinUserTemple 是否置顶用户圣殿
  * @returns {Object} { displayTemples: 去重后的圣殿列表, templeCounts: 每个封面的数量 }
  */
 function deduplicateTemplesByCover(temples, userTempleIndex, pinUserTemple) {
@@ -71,18 +71,19 @@ function deduplicateTemplesByCover(temples, userTempleIndex, pinUserTemple) {
 
 /**
  * 圣殿区域组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {Object} props.userAssets - 用户资产数据
- * @param {Array} props.temples - 圣殿数据
- * @param {Function} props.openUserModal - 打开用户信息Modal的函数
- * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
- * @param {Object} props.templeFilterOptions - 圣殿筛选排序选项 { sortBy: string, filters: {} }
- * @param {Function} props.onTempleFilterChange - 圣殿筛选排序变更回调
- * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
- * @param {boolean} props.isCollapsed - 是否折叠
- * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
- * @param {string} props.headerBgClass - 标题背景色类名
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {Object} props.userAssets 用户资产数据
+ * @param {Array} props.temples 圣殿数据
+ * @param {Function} props.openUserModal 打开用户信息弹窗的函数
+ * @param {Function} props.openTempleModal 打开圣殿弹窗的函数
+ * @param {Object} props.templeFilterOptions 圣殿筛选排序选项 { sortBy: string, filters: {} }
+ * @param {Function} props.onTempleFilterChange 圣殿筛选排序变更回调
+ * @param {number} props.stickyTop 粘性布局的top值，不传则不启用粘性布局
+ * @param {boolean} props.isCollapsed 是否折叠
+ * @param {Function} props.onToggleCollapse 切换折叠状态的回调
+ * @param {string} props.headerBgClass 标题背景色类名
+ * @returns {HTMLElement} 圣殿区域元素
  */
 export function TradeBoxTemple({
   characterData,

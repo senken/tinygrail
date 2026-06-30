@@ -1,14 +1,16 @@
 import { formatCurrency } from "@src/utils/format.js";
 import { get } from "@src/utils/http.js";
-import { openConfirmModal } from "@src/utils/modalManager.js";
+import { openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { showWarning } from "@src/utils/toastManager.jsx";
 import { getKillVotes } from "@src/api/chara.js";
 import { TriangleAlertIcon } from "@src/icons";
+import { createIcoInitHandler } from "../utils/characterBoxActions.js";
 
 /**
  * 获取角色名称
- * @param {number} characterId - 角色ID
- * @param {HTMLElement} nameElement - 名称显示元素
+ * @param {number} characterId 角色ID
+ * @param {HTMLElement} nameElement 名称显示元素
+ * @returns {void}
  */
 function getCharacterName(characterId, nameElement) {
   let name = document.querySelector(".nameSingle small")?.textContent;
@@ -71,11 +73,48 @@ function getCharacterName(characterId, nameElement) {
 }
 
 /**
+ * 打开启动ICO弹窗
+ *
+ * @param {Object} options 配置项
+ * @param {string} options.modalId 弹窗ID
+ * @param {number} options.characterId 角色ID
+ * @param {Object|null} options.userAssets 当前用户资产
+ * @param {Function} options.onClose 弹窗关闭后的回调
+ * @param {Function} options.reopenCharacterModal 重新打开角色弹窗的函数
+ * @returns {void}
+ */
+export function openIcoInitModal({ modalId, characterId, userAssets, onClose, reopenCharacterModal }) {
+  const { close } = openModal(modalId, {
+    content: (
+      <IcoBoxInit
+        characterId={characterId}
+        userAssets={userAssets}
+        onInit={createIcoInitHandler({
+          characterId,
+          onSuccess: () => {
+            close();
+            reopenCharacterModal(characterId);
+          },
+        })}
+      />
+    ),
+    modalBoxProps: {
+      id: "tg-character-box",
+      dataset: {
+        characterId: characterId.toString(),
+      },
+    },
+    onClose,
+  });
+}
+
+/**
  * ICO启动组件
- * @param {Object} props
- * @param {number} props.characterId - 角色ID
- * @param {Object} props.userAssets - 用户资产数据
- * @param {Function} props.onInit - 启动ICO回调函数
+ * @param {Object} props 组件参数
+ * @param {number} props.characterId 角色ID
+ * @param {Object} props.userAssets 用户资产数据
+ * @param {Function} props.onInit 启动ICO回调函数
+ * @returns {HTMLElement} ICO启动组件元素
  */
 export function IcoBoxInit({ characterId, userAssets, onInit }) {
   const balance = userAssets?.balance || 0;

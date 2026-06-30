@@ -15,12 +15,12 @@ import {
 
 /**
  * 计算用户权限和固定资产
- * @param {Object} params
- * @param {Object} params.topTenUsersResult - 前10名用户数据
- * @param {Object} params.userAssets - 用户资产数据
- * @param {Object} params.linksResult - LINK数据
- * @param {Object} params.templesResult - 圣殿数据
- * @param {Object} params.userCharacterResult - 用户角色数据
+ * @param {Object} params 权限和资产计算参数
+ * @param {Object} params.topTenUsersResult 前10名用户数据
+ * @param {Object} params.userAssets 用户资产数据
+ * @param {Object} params.linksResult LINK数据
+ * @param {Object} params.templesResult 圣殿数据
+ * @param {Object} params.userCharacterResult 用户角色数据
  * @returns {Object} { canChangeAvatar, fixedAssets }
  */
 export function calculateUserPermissionsAndAssets({
@@ -92,12 +92,12 @@ export function calculateUserPermissionsAndAssets({
 }
 
 /**
- * 加载TradeBox所需的数据
- * @param {number} characterId - 角色ID
- * @param {number} currentUsersPage - 当前用户列表页数
+ * 加载TradeBox详情数据
+ * @param {number} characterId 角色ID
+ * @param {number} currentUsersPage 当前用户列表页数
  * @returns {Promise<Object>} 返回所有数据
  */
-export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
+export async function loadTradeBoxDetailData(characterId, currentUsersPage = 1) {
   const [
     poolResult,
     userCharacterResult,
@@ -160,12 +160,12 @@ export async function loadTradeBoxAllData(characterId, currentUsersPage = 1) {
 }
 
 /**
- * 加载IcoBox所需的数据
- * @param {number} icoId - ICO ID
- * @param {number} currentIcoUsersPage - 当前ICO用户列表页数
+ * 加载IcoBox详情数据
+ * @param {number} icoId ICO ID
+ * @param {number} currentIcoUsersPage 当前ICO用户列表页数
  * @returns {Promise<Object>} 返回所有数据
  */
-export async function loadIcoBoxAllData(icoId, currentIcoUsersPage = 1) {
+export async function loadIcoBoxDetailData(icoId, currentIcoUsersPage = 1) {
   const [icoUsersResult, userIcoInfoResult] = await Promise.all([
     getICOUsers(icoId, currentIcoUsersPage),
     getUserICOInfo(icoId),

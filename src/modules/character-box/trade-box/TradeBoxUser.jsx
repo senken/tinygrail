@@ -7,16 +7,17 @@ import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * 持股用户区域组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {Object} props.users - 持股用户数据
- * @param {Array} props.temples - 圣殿数据
- * @param {Function} props.loadUsersPage - 加载指定页用户数据的函数
- * @param {Function} props.openUserModal - 打开用户信息Modal的函数
- * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
- * @param {boolean} props.isCollapsed - 是否折叠
- * @param {Function} props.onToggleUserCollapse - 切换折叠状态的回调
- * @param {string} props.headerBgClass - 标题背景色类名
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {Object} props.users 持股用户数据
+ * @param {Array} props.temples 圣殿数据
+ * @param {Function} props.loadUsersPage 加载指定页用户数据的函数
+ * @param {Function} props.openUserModal 打开用户信息弹窗的函数
+ * @param {number} props.stickyTop 粘性布局的top值，不传则不启用粘性布局
+ * @param {boolean} props.isCollapsed 是否折叠
+ * @param {Function} props.onToggleUserCollapse 切换折叠状态的回调
+ * @param {string} props.headerBgClass 标题背景色类名
+ * @returns {HTMLElement} 持股用户区域元素
  */
 export function TradeBoxUser({
   characterData,
@@ -40,7 +41,11 @@ export function TradeBoxUser({
     Items: items = [],
   } = users || {};
 
-  // 处理分页切换
+  /**
+   * 处理分页切换
+   * @param {number} page 页码
+   * @returns {void}
+   */
   const handlePageChange = (page) => {
     if (loadUsersPage) {
       loadUsersPage(page);
@@ -51,7 +56,11 @@ export function TradeBoxUser({
   const gridDiv = <div id="tg-trade-box-user-list" className="grid gap-1" />;
   const paginationDiv = <div id="tg-trade-box-user-pagination" className="mt-4 pb-1" />;
 
-  // 渲染用户列表
+  /**
+   * 按指定列数渲染持股用户列表
+   * @param {number} cols 列数
+   * @returns {void}
+   */
   const renderItems = (cols) => {
     gridDiv.innerHTML = "";
     gridDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -161,7 +170,11 @@ export function TradeBoxUser({
     });
   };
 
-  // 计算列数
+  /**
+   * 根据容器宽度计算持股用户列表列数
+   * @param {number} width 容器宽度
+   * @returns {number} 列数
+   */
   const calculateColumns = (width) => {
     const minCellWidth = 160;
     const gap = 8;

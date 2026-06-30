@@ -6,14 +6,15 @@ import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { openFavoriteDetail } from "@src/modules/favorite/FavoriteDetail";
-import { openCharacterBoxModal } from "@src/modules/character-box/index.js";
+import { openCharacterBoxModal } from "../modals/openCharacterBoxModal.jsx";
 
 /**
- * ICO盒子头部组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色ICO数据
- * @param {Object} props.predicted - 计算后的ICO数据
- * @param {Function} props.onFavoriteClick - 点击收藏按钮的回调
+ * IcoBox头部组件
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色ICO数据
+ * @param {Object} props.predicted 计算后的ICO数据
+ * @param {Function} props.onFavoriteClick 点击收藏按钮的回调
+ * @returns {HTMLElement|null} 头部组件元素
  */
 export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   if (!characterData) {
@@ -23,7 +24,10 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
   const { CharacterId, Name, Icon, Begin, End, Total, Users, Type, Bonus } = characterData;
   const avatarUrl = normalizeAvatar(Icon);
 
-  // 获取包含当前角色的收藏夹
+  /**
+   * 获取包含当前角色的收藏夹
+   * @returns {Array} 收藏夹列表
+   */
   const getCharacterFavorites = () => {
     const userAssets = getCachedUserAssets();
     const currentUserId = userAssets?.id;
@@ -85,6 +89,10 @@ export function IcoBoxHeader({ characterData, predicted, onFavoriteClick }) {
     const endTimeText = End ? formatDateTime(End, "YYYY-MM-DD HH:mm:ss") : "未知";
     endTimeSpan.textContent = `（${endTimeText}）`;
 
+    /**
+     * 更新ICO结束倒计时
+     * @returns {void}
+     */
     const updateCountdown = () => {
       const endDate = new Date(End);
       const now = new Date();

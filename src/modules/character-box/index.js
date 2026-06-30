@@ -1,2 +1,2 @@
 export { CharacterBox } from "./CharacterBox.jsx";
-export { openCharacterBoxModal } from "./utils/modalOpeners.jsx";
+export { openCharacterBoxModal } from "./modals/openCharacterBoxModal.jsx";

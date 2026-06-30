@@ -14,19 +14,20 @@ import {
 import { handleVoteKill, handleRevokeVote, handleViewVotes } from "./voteKillHandlers.jsx";
 
 /**
- * 交易盒子按钮组组件
- * @param {Object} props
- * @param {Object} props.tinygrailCharacter - tinygrail的角色数据
- * @param {number} props.characterId - 角色ID
- * @param {boolean} props.canChangeAvatar - 是否可以更换头像
- * @param {boolean} props.isInModal - 是否在弹窗中
- * @param {Array} props.killVotes - 删除投票数据
- * @param {Function} props.onSacrificeClick - 点击资产重组按钮的回调
- * @param {Function} props.onAuctionClick - 点击拍卖按钮的回调
- * @param {Function} props.onAuctionHistoryClick - 点击往期拍卖按钮的回调
- * @param {Function} props.onChangeAvatarClick - 点击更换头像按钮的回调
- * @param {Function} props.onTradeHistoryClick - 点击交易记录按钮的回调
- * @param {Function} props.onGMTradeHistoryClick - 点击GM交易记录按钮的回调
+ * TradeBox按钮组组件
+ * @param {Object} props 组件参数
+ * @param {Object} props.tinygrailCharacter tinygrail的角色数据
+ * @param {number} props.characterId 角色ID
+ * @param {boolean} props.canChangeAvatar 是否可以更换头像
+ * @param {boolean} props.isInModal 是否在弹窗中
+ * @param {Array} props.killVotes 删除投票数据
+ * @param {Function} props.onSacrificeClick 点击资产重组按钮的回调
+ * @param {Function} props.onAuctionClick 点击拍卖按钮的回调
+ * @param {Function} props.onAuctionHistoryClick 点击往期拍卖按钮的回调
+ * @param {Function} props.onChangeAvatarClick 点击更换头像按钮的回调
+ * @param {Function} props.onTradeHistoryClick 点击交易记录按钮的回调
+ * @param {Function} props.onGMTradeHistoryClick 点击GM交易记录按钮的回调
+ * @returns {HTMLElement} 按钮组元素
  */
 export function TradeBoxHeaderActions(props) {
   const {
@@ -61,7 +62,7 @@ export function TradeBoxHeaderActions(props) {
 
   /**
    * 更新左右箭头按钮的显示状态
-   * @param {HTMLElement} container - 滚动容器元素
+   * @param {HTMLElement} container 滚动容器元素
    */
   const updateArrowsVisibility = (container) => {
     const leftBtn = container.parentElement.querySelector("#tg-scroll-left");
@@ -69,7 +70,8 @@ export function TradeBoxHeaderActions(props) {
 
     if (!leftBtn || !rightBtn) return;
 
-    const threshold = 5; // 容错阈值
+    // 容错阈值用于避免小数滚动位置导致箭头闪烁
+    const threshold = 5;
     const isAtStart = container.scrollLeft <= threshold;
     const isAtEnd =
       container.scrollLeft + container.clientWidth >= container.scrollWidth - threshold;
@@ -86,8 +88,8 @@ export function TradeBoxHeaderActions(props) {
 
   /**
    * 滚动容器到指定方向
-   * @param {HTMLElement} container - 滚动容器元素
-   * @param {"left" | "right"} direction - 滚动方向
+   * @param {HTMLElement} container 滚动容器元素
+   * @param {"left" | "right"} direction 滚动方向
    */
   const scroll = (container, direction) => {
     const scrollAmount = 200;

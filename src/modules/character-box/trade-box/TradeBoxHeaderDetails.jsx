@@ -8,12 +8,13 @@ import { formatCurrency, formatDateTime, formatNumber } from "@src/utils/format.
 import { openModal } from "@src/utils/modalManager.js";
 
 /**
- * 交易盒子角色属性和详细信息组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {number} props.pool - 奖池数量
- * @param {Object} props.tinygrailCharacter - tinygrail用户的角色数据
- * @param {Object} props.gensokyoCharacter - gensokyo用户的角色数据
+ * TradeBox角色属性和详细信息组件
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {number} props.pool 奖池数量
+ * @param {Object} props.tinygrailCharacter tinygrail用户的角色数据
+ * @param {Object} props.gensokyoCharacter gensokyo用户的角色数据
+ * @returns {HTMLElement|null} 角色属性和详细信息元素
  */
 export function TradeBoxHeaderDetails(props) {
   const { characterData, pool, tinygrailCharacter, gensokyoCharacter } = props || {};
@@ -44,7 +45,10 @@ export function TradeBoxHeaderDetails(props) {
       ? `${formatCurrency(Rate)} × ${formatNumber(0.005 * (601 - Rank))}`
       : `₵${Stars} × 2`;
 
-  // 打开详细信息弹窗
+  /**
+   * 打开角色详细信息弹窗
+   * @returns {void}
+   */
   const openDetailsModal = () => {
     const modalContent = (
       <div

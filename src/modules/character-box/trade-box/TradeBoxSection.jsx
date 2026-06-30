@@ -5,17 +5,18 @@ import { showError, showSuccess, showWarning } from "@src/utils/toastManager";
 
 /**
  * 交易区域组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {Object} props.userAssets - 用户资产数据
- * @param {Object} props.userCharacter - 用户角色数据
- * @param {Object} props.depth - 市场深度数据
- * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
- * @param {Function} props.onRefresh - 刷新数据的回调函数
- * @param {Function} props.setLoading - 设置全局加载状态的函数
- * @param {boolean} props.isCollapsed - 是否折叠
- * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
- * @param {string} props.headerBgClass - 标题背景色类名
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {Object} props.userAssets 用户资产数据
+ * @param {Object} props.userCharacter 用户角色数据
+ * @param {Object} props.depth 市场深度数据
+ * @param {number} props.stickyTop 粘性布局的top值，不传则不启用粘性布局
+ * @param {Function} props.onRefresh 刷新数据的回调函数
+ * @param {Function} props.setLoading 设置全局加载状态的函数
+ * @param {boolean} props.isCollapsed 是否折叠
+ * @param {Function} props.onToggleCollapse 切换折叠状态的回调
+ * @param {string} props.headerBgClass 标题背景色类名
+ * @returns {HTMLElement} 交易区域元素
  */
 export function TradeBoxSection({
   characterData,
@@ -34,7 +35,10 @@ export function TradeBoxSection({
 
   const { LastOrder: lastOrder = "", LastDeal: lastDeal = "" } = characterData || {};
 
-  // 计算最大价格用于显示进度条
+  /**
+   * 计算进度条最高价格
+   * @returns {number} 进度条最高价格
+   */
   const getMaxAmount = () => {
     if (!depth) return 0;
     const maxAsk = Math.max(...(depth.Asks?.map((item) => item.Amount) || [0]));
@@ -44,7 +48,11 @@ export function TradeBoxSection({
 
   const maxAmount = getMaxAmount();
 
-  // 计算买入总价
+  /**
+   * 根据买入价格和数量更新买入总价
+   * @param {Event} e 输入事件
+   * @returns {void}
+   */
   const updateBidTotal = (e) => {
     const container = e.target.parentElement;
     const priceInput = container.querySelector("#bid-price-input");
@@ -55,7 +63,11 @@ export function TradeBoxSection({
     totalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
   };
 
-  // 计算卖出总价
+  /**
+   * 根据卖出价格和数量更新卖出总价
+   * @param {Event} e 输入事件
+   * @returns {void}
+   */
   const updateAskTotal = (e) => {
     const container = e.target.parentElement;
     const priceInput = container.querySelector("#ask-price-input");
@@ -66,7 +78,13 @@ export function TradeBoxSection({
     totalSpan.textContent = `总计：${formatCurrency(price * amount, "₵", 2, false)}`;
   };
 
-  // 点击卖单深度填充到买入输入框
+  /**
+   * 点击卖单深度后填充买入输入框
+   * @param {Event} e 点击事件
+   * @param {number} price 委托价格
+   * @param {number} amount 委托数量
+   * @returns {void}
+   */
   const handleAskDepthClick = (e, price, amount) => {
     // 向上查找最近的交易区域容器
     const container = e.currentTarget.closest("#trade-section");
@@ -83,7 +101,13 @@ export function TradeBoxSection({
     }
   };
 
-  // 点击买单深度填充到卖出输入框
+  /**
+   * 点击买单深度后填充卖出输入框
+   * @param {Event} e 点击事件
+   * @param {number} price 委托价格
+   * @param {number} amount 委托数量
+   * @returns {void}
+   */
   const handleBidDepthClick = (e, price, amount) => {
     // 向上查找最近的交易区域容器
     const container = e.currentTarget.closest("#trade-section");
@@ -100,7 +124,12 @@ export function TradeBoxSection({
     }
   };
 
-  // 买入按钮点击处理
+  /**
+   * 提交买入委托
+   * @param {Event} e 点击事件
+   * @param {boolean} isIceberg 是否冰山委托
+   * @returns {Promise<void>}
+   */
   const handleBid = async (e, isIceberg = false) => {
     const container = e.currentTarget.closest("#trade-section");
     if (!container) return;
@@ -149,7 +178,12 @@ export function TradeBoxSection({
     }
   };
 
-  // 卖出按钮点击处理
+  /**
+   * 提交卖出委托
+   * @param {Event} e 点击事件
+   * @param {boolean} isIceberg 是否冰山委托
+   * @returns {Promise<void>}
+   */
   const handleAsk = async (e, isIceberg = false) => {
     const container = e.currentTarget.closest("#trade-section");
     if (!container) return;
@@ -198,7 +232,11 @@ export function TradeBoxSection({
     }
   };
 
-  // 取消买入委托
+  /**
+   * 取消买入委托
+   * @param {number} bidId 买入委托ID
+   * @returns {Promise<void>}
+   */
   const handleCancelBid = async (bidId) => {
     if (setLoading) setLoading(true);
 
@@ -214,7 +252,11 @@ export function TradeBoxSection({
     }
   };
 
-  // 取消卖出委托
+  /**
+   * 取消卖出委托
+   * @param {number} askId 卖出委托ID
+   * @returns {Promise<void>}
+   */
   const handleCancelAsk = async (askId) => {
     if (setLoading) setLoading(true);
 

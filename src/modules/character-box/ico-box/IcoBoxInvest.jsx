@@ -4,14 +4,21 @@ import { showWarning } from "@src/utils/toastManager.jsx";
 
 /**
  * ICO注资组件
- * @param {Object} props
- * @param {Object} props.userIcoInfo - 当前用户ICO注资信息
- * @param {Object} props.userAssets - 用户资产数据
- * @param {Object} props.characterData - 角色ICO数据
- * @param {Object} props.predicted - 计算后的ICO数据
- * @param {Function} props.onInvest - 注资回调函数
+ * @param {Object} props 组件参数
+ * @param {Object} props.userIcoInfo 当前用户ICO注资信息
+ * @param {Object} props.userAssets 用户资产数据
+ * @param {Object} props.characterData 角色ICO数据
+ * @param {Object} props.predicted 计算后的ICO数据
+ * @param {Function} props.onInvest 注资回调函数
+ * @returns {HTMLElement} ICO注资组件元素
  */
-export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted, onInvest }) {
+export function IcoBoxInvest({
+  userIcoInfo,
+  userAssets,
+  characterData,
+  predicted,
+  onInvest,
+}) {
   const hasInvested = userIcoInfo?.Amount > 0;
   const investedAmount = userIcoInfo?.Amount || 0;
   const balance = userAssets?.balance || 0;
@@ -65,7 +72,10 @@ export function IcoBoxInvest({ userIcoInfo, userAssets, characterData, predicted
               return;
             }
 
-            // 注资确认
+            /**
+             * 打开注资确认弹窗并执行注资
+             * @returns {void}
+             */
             const executeInvest = () => {
               openConfirmModal({
                 title: "确认注资",

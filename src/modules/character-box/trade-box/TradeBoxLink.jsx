@@ -5,16 +5,17 @@ import { ChevronDownIcon } from "@src/icons/index.js";
 
 /**
  * LINK区域组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {Array} props.links - LINK数据
- * @param {Function} props.openUserModal - 打开用户信息Modal的函数
- * @param {Function} props.openCharacterModal - 打开角色信息Modal的函数
- * @param {Function} props.openTempleModal - 打开圣殿Modal的函数
- * @param {number} props.stickyTop - 粘性布局的top值，不传则不启用粘性布局
- * @param {boolean} props.isCollapsed - 是否折叠
- * @param {Function} props.onToggleCollapse - 切换折叠状态的回调
- * @param {string} props.headerBgClass - 标题背景色类名
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {Array} props.links LINK数据
+ * @param {Function} props.openUserModal 打开用户信息弹窗的函数
+ * @param {Function} props.openCharacterModal 打开角色信息弹窗的函数
+ * @param {Function} props.openTempleModal 打开圣殿弹窗的函数
+ * @param {number} props.stickyTop 粘性布局的top值，不传则不启用粘性布局
+ * @param {boolean} props.isCollapsed 是否折叠
+ * @param {Function} props.onToggleCollapse 切换折叠状态的回调
+ * @param {string} props.headerBgClass 标题背景色类名
+ * @returns {HTMLElement} LINK区域元素
  */
 export function TradeBoxLink({
   characterData,

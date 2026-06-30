@@ -6,25 +6,28 @@ import {
   VectorIntersectionIcon,
   VectorUnionIcon,
 } from "@src/icons/index.js";
+import { createDefaultTempleFilterOptions } from "./tradeBoxState.js";
 
 /**
  * 圣殿筛选排序内容组件
- * @param {Object} props
- * @param {Object} props.templeFilterOptions - 当前筛选排序选项
- * @param {Function} props.onTempleFilterChange - 筛选排序变更回调
- * @param {Function} props.onClose - 关闭弹窗函数
+ * @param {Object} props 组件参数
+ * @param {Object} props.templeFilterOptions 当前筛选排序选项
+ * @param {Function} props.onTempleFilterChange 筛选排序变更回调
+ * @param {Function} props.onClose 关闭弹窗函数
+ * @returns {HTMLElement} 圣殿筛选排序内容元素
  */
 function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClose }) {
   const container = <div className="space-y-4"></div>;
+  const defaultTempleFilterOptions = createDefaultTempleFilterOptions();
 
   createMountedComponent(
     container,
     (state, setState) => {
       // 从state或templeFilterOptions获取当前值
       const currentSort = state.sort ||
-        templeFilterOptions.sort || { sortBy: "Sacrifices", order: "desc" };
+        templeFilterOptions.sort || defaultTempleFilterOptions.sort;
       const currentFilter = state.filter ||
-        templeFilterOptions.filter || { selectedFilters: [], mode: "or" };
+        templeFilterOptions.filter || defaultTempleFilterOptions.filter;
 
       return (
         <div className="space-y-4">
@@ -194,15 +197,7 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
             <button
               className="btn no-animation btn-sm"
               onClick={() => {
-                const resetOptions = {
-                  sort: { sortBy: "Sacrifices", order: "desc" },
-                  filter: {
-                    selectedFilters: [],
-                    mode: "or",
-                    pinUserTemple: true,
-                    deduplicateByCover: true,
-                  },
-                };
+                const resetOptions = createDefaultTempleFilterOptions();
                 setState(resetOptions);
                 if (onTempleFilterChange) {
                   onTempleFilterChange(resetOptions);
@@ -233,10 +228,11 @@ function TempleFilterContent({ templeFilterOptions, onTempleFilterChange, onClos
 
 /**
  * 打开圣殿筛选排序弹窗
- * @param {Object} options
- * @param {string} options.characterId - 角色ID
- * @param {Object} options.templeFilterOptions - 当前筛选排序选项
- * @param {Function} options.onTempleFilterChange - 筛选排序变更回调
+ * @param {Object} options 弹窗配置
+ * @param {string} options.characterId 角色ID
+ * @param {Object} options.templeFilterOptions 当前筛选排序选项
+ * @param {Function} options.onTempleFilterChange 筛选排序变更回调
+ * @returns {void}
  */
 export function openTempleFilterModal({ characterId, templeFilterOptions, onTempleFilterChange }) {
   const modalId = `temple-filter-${characterId}`;

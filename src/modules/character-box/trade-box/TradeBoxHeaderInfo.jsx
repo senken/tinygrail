@@ -5,16 +5,17 @@ import { getUserFavorites } from "@src/modules/favorite/favoriteStorage.js";
 import { getCachedUserAssets } from "@src/utils/session.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
 import { openFavoriteDetail } from "@src/modules/favorite/FavoriteDetail.jsx";
-import { openCharacterBoxModal } from "@src/modules/character-box/index.js";
+import { openCharacterBoxModal } from "../modals/openCharacterBoxModal.jsx";
 
 /**
- * 交易盒子头像和基本信息组件
- * @param {Object} props
- * @param {Object} props.characterData - 角色数据
- * @param {Object} props.userCharacter - 用户角色数据
- * @param {string} props.fixedAssets - 固定资产字符串
- * @param {Array} props.killVotes - 删除投票数据
- * @param {Function} props.onFavoriteClick - 点击收藏按钮的回调
+ * TradeBox头像和基本信息组件
+ * @param {Object} props 组件参数
+ * @param {Object} props.characterData 角色数据
+ * @param {Object} props.userCharacter 用户角色数据
+ * @param {string} props.fixedAssets 固定资产字符串
+ * @param {Array} props.killVotes 删除投票数据
+ * @param {Function} props.onFavoriteClick 点击收藏按钮的回调
+ * @returns {HTMLElement|null} 头像和基本信息元素
  */
 export function TradeBoxHeaderInfo(props) {
   const { characterData, userCharacter, fixedAssets, killVotes, onFavoriteClick } = props || {};
@@ -26,7 +27,10 @@ export function TradeBoxHeaderInfo(props) {
   const { CharacterId, Name, Icon, Level, ZeroCount } = characterData;
   const avatarUrl = normalizeAvatar(Icon);
 
-  // 获取包含当前角色的收藏夹
+  /**
+   * 获取包含当前角色的收藏夹
+   * @returns {Array} 收藏夹列表
+   */
   const getCharacterFavorites = () => {
     const userAssets = getCachedUserAssets();
     const currentUserId = userAssets?.id;
