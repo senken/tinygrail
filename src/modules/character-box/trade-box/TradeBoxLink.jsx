@@ -31,9 +31,12 @@ export function TradeBoxLink({
   const stickyClass = stickyTop !== undefined ? "sticky" : "";
   const stickyStyle = stickyTop !== undefined ? { top: `${stickyTop}px` } : {};
 
+  // 后端可能返回Link为空的异常记录，这类数据无法渲染配对圣殿
+  const validLinks = Array.isArray(links) ? links.filter((link) => link?.Link) : [];
+
   // 按 LinkId 分组
   const groupedLinks = {};
-  links.forEach((link) => {
+  validLinks.forEach((link) => {
     if (!groupedLinks[link.LinkId]) {
       groupedLinks[link.LinkId] = [];
     }
@@ -61,7 +64,7 @@ export function TradeBoxLink({
         style={stickyStyle}
         onClick={onToggleCollapse}
       >
-        <span className="bgm-color text-sm font-semibold">LINK {links.length}</span>
+        <span className="bgm-color text-sm font-semibold">LINK {validLinks.length}</span>
         <div
           className="flex items-center justify-center opacity-60 transition-all"
           style={{
@@ -92,6 +95,10 @@ export function TradeBoxLink({
               {/* 渲染 TempleLink 组件 */}
               <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(188px,1fr))] justify-items-center gap-2">
                 {group.items.map((item, itemIndex) => {
+                  if (!item.Link) {
+                    return null;
+                  }
+
                   const sacrifices = Math.min(item.Assets, item.Link.Assets);
                   return (
                     <div className="flex flex-col">
