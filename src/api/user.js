@@ -1,5 +1,7 @@
 import { get, post } from "@src/utils/http.js";
+import { clearAccessToken } from "@src/utils/authToken.js";
 import { unescapeHtml } from "@src/utils/escape.js";
+import { removeStorageItem } from "@src/utils/storage.js";
 
 /**
  * 获取用户资产信息
@@ -60,6 +62,10 @@ export async function logout() {
         message: data?.Message || "退出登录失败",
       };
     }
+
+    // 服务端退出成功后再清理本地会话
+    clearAccessToken();
+    removeStorageItem("user-assets");
 
     return {
       success: true,
