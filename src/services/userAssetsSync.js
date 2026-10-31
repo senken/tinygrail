@@ -1,7 +1,7 @@
 import { getUserAssets } from "@src/api/user.js";
 import { USER_CARD_STORE_KEY } from "@src/modules/rakuen-home/user-card/constants.js";
 import { getUserTinygrailStoreKeys } from "@src/modules/user-tinygrail/constants.js";
-import { getCachedUserAssets, performBangumiAuth } from "@src/utils/session.js";
+import { getCachedUserAssets } from "@src/utils/session.js";
 import { setStoreState } from "@src/utils/store.js";
 
 /**
@@ -55,18 +55,6 @@ function cacheAndSyncCurrentUserAssets(userAssets) {
 }
 
 /**
- * 执行当前登录用户授权失败处理
- */
-function handleCurrentUserAuthFailure() {
-  performBangumiAuth(async () => {
-    const result = await getUserAssets();
-    if (result.success) {
-      cacheAndSyncCurrentUserAssets(result.data);
-    }
-  });
-}
-
-/**
  * 获取用户资产并同步当前登录用户状态
  *
  * @param {string} username 用户名
@@ -77,9 +65,6 @@ export async function getUserAssetsWithSync(username) {
   const result = await getUserAssets(username);
 
   if (!result.success) {
-    if (isCurrentUserRequest) {
-      handleCurrentUserAuthFailure();
-    }
     return result;
   }
 

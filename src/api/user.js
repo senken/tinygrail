@@ -5,6 +5,7 @@ import { removeStorageItem } from "@src/utils/storage.js";
 
 /**
  * 获取用户资产信息
+ * 当前用户无资产响应表示尚未完成小圣杯授权，指定用户无资产不代表访问者未授权
  * @param {string} [username] - 可选的用户名，如果不传则获取当前登录用户的资产
  * @returns {Promise<Object>} 用户资产信息
  */
@@ -16,6 +17,7 @@ export async function getUserAssets(username) {
     if (!data || data.State !== 0 || !data.Value) {
       return {
         success: false,
+        unauthorized: !username && data?.State === 1 && data?.Message === "此用户暂无资产信息。",
         message: data?.Message || "获取用户资产失败",
       };
     }
@@ -43,7 +45,8 @@ export async function getUserAssets(username) {
     console.error("获取用户资产失败:", error);
     return {
       success: false,
-      message: "获取用户资产失败",
+      unauthorized: error?.status === 401,
+      message: error?.status === 401 ? "请先授权登录" : "获取用户资产失败，请稍后重试",
     };
   }
 }

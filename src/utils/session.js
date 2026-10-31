@@ -24,7 +24,7 @@ export function getCachedUserAssets() {
 }
 
 /**
- * 执行Bangumi授权登录
+ * 在用户点击后执行Bangumi授权登录，关闭窗口或失败后允许再次尝试
  * @param {Function} onSuccess - 授权成功后的回调函数
  * @returns {Promise<void>}
  */
@@ -40,6 +40,7 @@ export async function performBangumiAuth(onSuccess) {
     const finish = (success) => {
       window.removeEventListener("message", messageHandler);
       window.clearTimeout(timeoutId);
+      window.clearInterval(closeCheckId);
       resolve(success);
     };
 
@@ -73,6 +74,11 @@ export async function performBangumiAuth(onSuccess) {
       finish(false);
       showWarning("授权等待超时，请重新登录");
     }, AUTH_TIMEOUT_MS);
+
+    // 用户关闭授权窗口时结束等待，让授权按钮恢复可点击状态
+    const closeCheckId = window.setInterval(() => {
+      if (authWindow?.closed) finish(false);
+    }, 500);
 
     window.addEventListener("message", messageHandler);
 

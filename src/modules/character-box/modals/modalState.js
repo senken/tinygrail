@@ -218,13 +218,15 @@ function openCharacterBoxMountedModal(options) {
  * @param {HTMLElement} options.contentContainer 内容容器
  * @param {Function} options.loadData 加载弹窗数据的函数
  * @param {Function} options.onClose 弹窗关闭后的回调
+ * @param {Function} options.shouldOpen 详情加载结束后是否仍需打开弹窗
  * @returns {Promise<void>}
  */
 async function initializeCharacterBoxModal(options) {
-  const { modalId, characterId, titleContainer, contentContainer, loadData, initialState, onClose } =
+  const { modalId, characterId, titleContainer, contentContainer, loadData, initialState, onClose, shouldOpen } =
     options || {};
 
   await loadData(initialState);
+  if (shouldOpen && !shouldOpen()) return;
   openCharacterBoxMountedModal({
     modalId,
     characterId,

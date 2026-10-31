@@ -1,11 +1,12 @@
 import { getUserCharaLinks, getUserCharas, getUserICOs, getUserTemples } from "@src/api/chara.js";
 import { banUser, unbanUser } from "@src/api/user.js";
+import { UserAssetsFeedback } from "@src/components/UserAssetsFeedback.jsx";
 import { openCharacterBoxModal } from "@src/modules/character-box/utils/modalOpeners.jsx";
 import { GMTradeHistory } from "@src/modules/gm-trade-history/GMTradeHistory.jsx";
 import { TempleDetail } from "@src/modules/temple-detail/TempleDetail.jsx";
 import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { createMountedComponentWithStore } from "@src/utils/createMountedComponentWithStore.js";
-import { closeModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
+import { openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { createRequestManager } from "@src/utils/requestManager.js";
 import { scrollToTop } from "@src/utils/scroll.js";
 import { showError, showSuccess } from "@src/utils/toastManager.jsx";
@@ -36,6 +37,7 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   const contentContainer = <div />;
 
   const storeKey = getUserTinygrailStoreKey(username, modalId);
+  let destroyed = false;
   const mountedOptions = {
     initialState: {
       activeTab: 0,
@@ -115,6 +117,8 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
       const { id, name, nickname, balance, lastIndex, assets, avatar, state: userState } =
         state || {};
 
+      if (state?.assetsError) return <div />;
+
       if (!nickname) {
         return <div />;
       }
@@ -155,6 +159,10 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
       storeKey,
       (state) => {
         const { activeTab = 0, charaLinks, temples, charas, icos } = state || {};
+
+        if (state?.assetsError) {
+          return <UserAssetsFeedback result={state.assetsError} onRetry={reloadData} />;
+        }
 
         // 打开圣殿详情弹窗
         const handleTempleClick = (temple) => {
@@ -240,29 +248,34 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
       mountedOptions
     );
 
-  // 加载用户资产
-  const loadUserAssets = () => {
-    getUserAssetsWithSync(username).then((result) => {
-      if (!result.success) {
-        if (modalId) {
-          closeModal(modalId);
-        }
-        showError("加载用户信息失败");
-        return;
-      }
+  /**
+   * 加载目标用户资产，失败时保留当前页面或弹窗
+   * @returns {Promise<boolean>} 是否成功加载用户资产
+   */
+  const loadUserAssets = async () => {
+    const result = await getUserAssetsWithSync(username);
+    if (destroyed) return false;
+    if (!result.success) {
+      setTitleState({ assetsError: result });
+      return false;
+    }
 
-      setTitleState(result.data);
-    });
+    setTitleState({ ...result.data, assetsError: null });
+    return true;
   };
 
-  // 加载角色数据
+  /**
+   * 加载目标用户的连接、圣殿、角色与ICO列表
+   * @returns {Promise<void>} 列表加载结束
+   */
   const loadCharaData = () => {
-    Promise.all([
+    return Promise.all([
       getUserCharaLinks(username, currentLinksPage),
       getUserTemples(username, currentTemplesPage),
       getUserCharas(username, currentCharasPage),
       getUserICOs(username, currentICOsPage),
     ]).then(([linksResult, templesResult, charasResult, icosResult]) => {
+      if (destroyed) return;
       setContentState({
         charaLinks: linksResult.success ? linksResult.data : null,
         temples: templesResult.success ? templesResult.data : null,
@@ -270,6 +283,14 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
         icos: icosResult.success ? icosResult.data : null,
       });
     });
+  };
+
+  /**
+   * 授权或手动重试后重新加载当前用户内容
+   * @returns {Promise<void>} 当前用户内容加载结束
+   */
+  const reloadData = async () => {
+    if (await loadUserAssets()) await loadCharaData();
   };
 
   // 连接分页变化处理
@@ -329,13 +350,13 @@ function createUserTinygrailModal({ username, stickyTop = null, modalId = null, 
   };
 
   // 加载数据
-  loadUserAssets();
-  loadCharaData();
+  reloadData();
 
   return {
     title: titleContainer,
     content: contentContainer,
     destroy: () => {
+      destroyed = true;
       destroyTitle();
       destroyContent();
     },

@@ -11,10 +11,11 @@ import { createTradeBoxModalMount } from "../modals/modalMounts.jsx";
  * @param {string} options.modalId 弹窗ID
  * @param {Function} options.onClose 弹窗关闭后的回调
  * @param {Function} options.openCharacterModal 打开角色弹窗的函数
+ * @param {Function} options.shouldOpen 详情加载结束后是否仍需打开弹窗
  * @returns {Promise<void>}
  */
 export async function openTradeBoxModal(options) {
-  const { characterId, characterData, userAssets, modalId, onClose, openCharacterModal } =
+  const { characterId, characterData, userAssets, modalId, onClose, openCharacterModal, shouldOpen } =
     options || {};
   const { titleStoreKey, contentStoreKey, setTitleState, setContentState, initialize } =
     createTradeBoxModalMount({
@@ -48,5 +49,6 @@ export async function openTradeBoxModal(options) {
   await initialize({
     loadData: loadTradeBoxData,
     onClose,
+    shouldOpen,
   });
 }

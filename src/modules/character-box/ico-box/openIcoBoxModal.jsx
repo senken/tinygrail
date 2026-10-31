@@ -10,10 +10,11 @@ import { createIcoBoxModalMount } from "../modals/modalMounts.jsx";
  * @param {Object|null} options.userAssets 当前用户资产
  * @param {string} options.modalId 弹窗ID
  * @param {Function} options.onClose 弹窗关闭后的回调
+ * @param {Function} options.shouldOpen 详情加载结束后是否仍需打开弹窗
  * @returns {Promise<void>}
  */
 export async function openIcoBoxModal(options) {
-  const { characterId, characterData, userAssets, modalId, onClose } = options || {};
+  const { characterId, characterData, userAssets, modalId, onClose, shouldOpen } = options || {};
   const { titleStoreKey, contentStoreKey, setTitleState, setContentState, initialize } =
     createIcoBoxModalMount({
       modalId,
@@ -46,5 +47,6 @@ export async function openIcoBoxModal(options) {
   await initialize({
     loadData: loadIcoBoxData,
     onClose,
+    shouldOpen,
   });
 }

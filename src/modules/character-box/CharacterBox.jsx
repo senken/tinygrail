@@ -1,4 +1,5 @@
 import { createMountedComponentWithStore } from "@src/utils/createMountedComponentWithStore.js";
+import { UserAssetsFeedback } from "@src/components/UserAssetsFeedback.jsx";
 import { CharacterBoxContent } from "./components/CharacterBoxContent.jsx";
 import { CharacterBoxLoading } from "./components/CharacterBoxLoading.jsx";
 import { openUserTinygrailModal } from "@src/modules/user-tinygrail/UserTinygrail.jsx";
@@ -31,7 +32,12 @@ export function CharacterBox(props) {
       const { loading, error } = state || {};
 
       if (error) {
-        return <div className="p-4 text-center">加载失败</div>;
+        return (
+          <UserAssetsFeedback
+            result={state.assetsError || { message: "加载失败" }}
+            onRetry={dataController.loadInitialData}
+          />
+        );
       }
 
       if (loading) {

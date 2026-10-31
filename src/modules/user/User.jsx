@@ -1,8 +1,8 @@
-import { getUserAssetsWithSync } from "@src/services/userAssetsSync.js";
 import { UserTinygrail } from "@src/modules/user-tinygrail";
 
 /**
  * 用户页面组件
+ * @returns {void} 在宿主用户页面挂载小圣杯内容
  */
 export function User() {
   // 从URL中获取username
@@ -39,60 +39,53 @@ export function User() {
     mediaQuery.addEventListener("change", updateNavTabsGap);
   }
 
-  // 获取用户资产信息判断用户是否已注册
-  getUserAssetsWithSync(username).then((result) => {
-    if (!result.success) {
-      return;
-    }
-
-    // 创建容器并挂载
-    const container = (
-      <div id="tinygrail" class="section">
-        <div
-          class="horizontalOptions clearit"
-          style="display: flex; justify-content: space-between; align-items: center;"
-        >
-          <ul style="margin-right: auto;">
-            <li class="title">
-              <h2>
-                <span>小圣杯</span>
-              </h2>
-            </li>
-          </ul>
-          <div id="tinygrail-toggle" style="cursor: pointer; opacity: 0.6;">
-            [折叠]
-          </div>
+  // 先挂载容器，用户信息加载失败时保留授权或重试入口
+  const container = (
+    <div id="tinygrail" class="section">
+      <div
+        class="horizontalOptions clearit"
+        style="display: flex; justify-content: space-between; align-items: center;"
+      >
+        <ul style="margin-right: auto;">
+          <li class="title">
+            <h2>
+              <span>小圣杯</span>
+            </h2>
+          </li>
+        </ul>
+        <div id="tinygrail-toggle" style="cursor: pointer; opacity: 0.6;">
+          [折叠]
         </div>
-        <div className="tinygrail" />
       </div>
-    );
-    mountPoint.after(container);
+      <div className="tinygrail" />
+    </div>
+  );
+  mountPoint.after(container);
 
-    const tinygrailDiv = container.querySelector(".tinygrail");
-    const toggleBtn = container.querySelector("#tinygrail-toggle");
+  const tinygrailDiv = container.querySelector(".tinygrail");
+  const toggleBtn = container.querySelector("#tinygrail-toggle");
 
-    // 从 localStorage 读取折叠状态
-    const storageKey = "tinygrail:user-collapsed";
-    let isCollapsed = localStorage.getItem(storageKey) === "true";
+  // 从 localStorage 读取折叠状态
+  const storageKey = "tinygrail:user-collapsed";
+  let isCollapsed = localStorage.getItem(storageKey) === "true";
 
-    // 初始化状态
+  // 初始化状态
+  tinygrailDiv.style.display = isCollapsed ? "none" : "block";
+  toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
+
+  // 折叠功能
+  toggleBtn.addEventListener("click", () => {
+    isCollapsed = !isCollapsed;
     tinygrailDiv.style.display = isCollapsed ? "none" : "block";
     toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
-
-    // 折叠功能
-    toggleBtn.addEventListener("click", () => {
-      isCollapsed = !isCollapsed;
-      tinygrailDiv.style.display = isCollapsed ? "none" : "block";
-      toggleBtn.textContent = isCollapsed ? "[展开]" : "[折叠]";
-      // 保存到 localStorage
-      localStorage.setItem(storageKey, isCollapsed);
-    });
-
-    const userTinygrail = (
-      <div className="rounded-xl">
-        <UserTinygrail username={username} />
-      </div>
-    );
-    tinygrailDiv.appendChild(userTinygrail);
+    // 保存到 localStorage
+    localStorage.setItem(storageKey, isCollapsed);
   });
+
+  const userTinygrail = (
+    <div className="rounded-xl">
+      <UserTinygrail username={username} />
+    </div>
+  );
+  tinygrailDiv.appendChild(userTinygrail);
 }

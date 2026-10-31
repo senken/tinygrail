@@ -47,6 +47,7 @@ export function resolveCharacterBoxInitialState(characterResult, userAssetsResul
       state: {
         loading: false,
         error: true,
+        assetsError: userAssetsResult,
       },
     };
   }
@@ -56,6 +57,8 @@ export function resolveCharacterBoxInitialState(characterResult, userAssetsResul
       status: CHARACTER_BOX_STATUS.NOT_FOUND,
       state: {
         loading: false,
+        error: false,
+        assetsError: null,
         characterData: null,
         userAssets: userAssetsResult.data,
       },
@@ -68,6 +71,8 @@ export function resolveCharacterBoxInitialState(characterResult, userAssetsResul
       userAssets: userAssetsResult.data,
     }),
     state: {
+      error: false,
+      assetsError: null,
       characterData: characterResult.data,
       userAssets: userAssetsResult.data,
     },

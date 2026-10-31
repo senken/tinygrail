@@ -14,12 +14,16 @@ import { createMountedComponentWithStore } from "@src/utils/createMountedCompone
 import { openAlertModal, openConfirmModal, openModal } from "@src/utils/modalManager.js";
 import { showWarning } from "@src/utils/toastManager.jsx";
 import { USER_CARD_STORE_KEY } from "./constants.js";
-import { LoginBox } from "./components/LoginBox.jsx";
+import { UserAssetsFeedback } from "@src/components/UserAssetsFeedback.jsx";
 import { openScratchConfirmModal } from "./components/ScratchConfirm.jsx";
 import { openShareBonusModal } from "./components/ShareBonusModal.jsx";
 import { openTarotModal } from "./components/TarotModal.jsx";
 import { UserInfoBox } from "./components/UserInfoBox.jsx";
 
+/**
+ * 显示当前用户资产或手动授权和重试入口
+ * @returns {HTMLElement} 首页用户区域
+ */
 export function UserCard() {
   const container = <div id="tg-rakuen-home-user-card" />;
 
@@ -46,14 +50,12 @@ export function UserCard() {
         return <div />;
       }
 
-      // 未登录
+      // 授权和加载失败状态沿用首页用户信息的卡片外观
       if (!authorized) {
         return (
-          <LoginBox
-            onLogin={() => {
-              loadUserAssets();
-            }}
-          />
+          <div className="tg-bg-content tg-border-card my-2 rounded-xl shadow-sm transition-shadow hover:shadow-md">
+            <UserAssetsFeedback result={state.assetsError} onRetry={loadUserAssets} />
+          </div>
         );
       }
 
@@ -116,17 +118,19 @@ export function UserCard() {
     }
   );
 
-  // 加载用户资产
-  const loadUserAssets = () => {
-    getUserAssetsWithSync().then((result) => {
-      if (!result.success) {
-        setState({ authorized: false });
-        return;
-      }
+  /**
+   * 加载当前用户资产，失败时由用户选择授权或重试
+   * @returns {Promise<void>} 用户资产加载结束
+   */
+  const loadUserAssets = async () => {
+    const result = await getUserAssetsWithSync();
+    if (!result.success) {
+      setState({ authorized: false, assetsError: result });
+      return;
+    }
 
-      // 加载完用户资产后检查节日
-      checkHoliday();
-    });
+    // 加载完用户资产后检查节日
+    checkHoliday();
   };
 
   // 检查是否是节日
@@ -141,7 +145,10 @@ export function UserCard() {
     });
   };
 
-  // 退出登录
+  /**
+   * 确认退出成功后显示手动授权入口
+   * @returns {Promise<void>} 退出确认弹窗已打开
+   */
   const handleLogout = async () => {
     openConfirmModal({
       title: "退出登录",
@@ -150,7 +157,7 @@ export function UserCard() {
       onConfirm: async () => {
         const result = await logout();
         if (result.success) {
-          setState({ authorized: false });
+          setState({ authorized: false, assetsError: { unauthorized: true } });
         }
       },
     });

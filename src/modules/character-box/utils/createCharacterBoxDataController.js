@@ -84,6 +84,7 @@ export function createCharacterBoxDataController(options) {
    * @returns {Promise<void>}
    */
   const loadInitialData = async () => {
+    setState({ loading: true, error: false, assetsError: null });
     const initialState = await loadCharacterBoxInitialState(characterId);
 
     if (isCharacterBoxTerminalInitialState(initialState)) {
