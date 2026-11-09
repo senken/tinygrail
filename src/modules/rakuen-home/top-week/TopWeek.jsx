@@ -195,7 +195,7 @@ export function TopWeek() {
                     style={{ backgroundColor: rankColor }}
                     title="超出总额"
                   >
-                    +{formatCurrency(item.Extra, "₵", 0, false)}
+                    {item.Extra < 0 ? "" : "+"}{formatCurrency(item.Extra, "₵", 0, false)}
                   </div>
                 )}
               </div>
