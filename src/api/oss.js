@@ -19,11 +19,13 @@ export function buildOssUrl(path, hash, extension = "jpg") {
  * @param {string} path - 路径
  * @param {string} hash - 文件哈希
  * @param {string} type - 文件类型（encodeURIComponent）
+ * @param {string} [extension] 文件扩展名，省略时沿用服务端默认值
  * @returns {Promise<Object>} OSS签名信息
  */
-export async function getOssSignature(path, hash, type) {
+export async function getOssSignature(path, hash, type, extension) {
   try {
-    const data = await post(`chara/oss/sign/${path}/${hash}/${type}`);
+    const url = `chara/oss/sign/${path}/${hash}/${type}`;
+    const data = await post(extension ? `${url}/${extension}` : url);
 
     if (!data || data.State !== 0 || !data.Value) {
       return {

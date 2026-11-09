@@ -149,6 +149,18 @@
       max-height: calc(100vh - 5em);
       max-height: calc(100dvh - 5em);
     }
+
+    /* 圣殿大图加载前后共用毛玻璃背景，信息和操作区自行提供背景 */
+    .modal-box:has(#tg-temple-detail) {
+      background: rgb(255 255 255 / 50%);
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      box-shadow: none;
+    }
+
+    .modal-box:has(#tg-temple-detail):is(html[data-theme="dark"] *) {
+      background: rgb(48 48 48 / 50%);
+    }
   }
 
   /* 细滚动条样式 */

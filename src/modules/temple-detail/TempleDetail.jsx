@@ -36,7 +36,6 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
       data-character-id={temple.CharacterId}
       data-user-id={temple.UserId}
       data-name={temple.Name}
-      className="tg-bg-content"
       style={{ width: "fit-content", minWidth: "320px", maxWidth: "600px" }}
     />
   );
@@ -56,7 +55,10 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
       currentLine = temple.Line || "",
     } = state || {};
 
-    // 修改封面
+    /**
+     * 选择圣殿封面
+     * @returns {Promise<void>} 文件选择器已打开
+     */
     const handleChangeCover = async () => {
       const input = document.createElement("input");
       input.type = "file";
@@ -81,14 +83,16 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
             const hash = await hashDataURL(dataUrl);
             const blob = dataURLtoBlob(dataUrl);
 
-            // 构建OSS URL
-            const ossUrl = buildOssUrl("cover", hash, "jpg");
+            // PNG和GIF的上传地址与签名使用相同扩展名，其他格式沿用默认路径
+            const extension = { "image/png": "png", "image/gif": "gif" }[file.type];
+            const ossUrl = buildOssUrl("cover", hash, extension);
 
             // 获取OSS签名
             const signatureResult = await getOssSignature(
               "cover",
               hash,
-              encodeURIComponent(file.type)
+              encodeURIComponent(file.type),
+              extension
             );
             if (!signatureResult.success) {
               showError(signatureResult.message || "获取签名失败");
@@ -444,7 +448,7 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
           }}
         />
         {!imageOnly && (
-          <div style={{ maxWidth: "100%", overflow: "hidden" }}>
+          <div className="tg-bg-content" style={{ maxWidth: "100%", overflow: "hidden" }}>
             <TempleInfo templeData={templeData} />
             <TempleActions
               temple={templeData}

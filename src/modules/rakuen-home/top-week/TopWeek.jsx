@@ -1,5 +1,6 @@
 import { getAuctionList, getTopWeek, getTopWeekHistory } from "@src/api/chara.js";
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { TempleCover } from "@src/components/TempleCover.jsx";
 import { ChevronRightIcon } from "@src/icons/ChevronRightIcon.js";
 import { RefreshCwIcon } from "@src/icons/RefreshCwIcon.js";
 import { openAuctionModal } from "@src/modules/auction/Auction.jsx";
@@ -155,14 +156,7 @@ export function TopWeek() {
               >
                 {hasCover ? (
                   // 有圣殿图片
-                  <div
-                    className="h-full w-full"
-                    style={{
-                      backgroundImage: `url(${cover})`,
-                      backgroundPosition: "top",
-                      backgroundSize: "cover",
-                    }}
-                  />
+                  <TempleCover src={cover} />
                 ) : (
                   // 无圣殿图片
                   <div>

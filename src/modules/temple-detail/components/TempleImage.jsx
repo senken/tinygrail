@@ -1,7 +1,7 @@
 import { LoaderCircleIcon } from "@src/icons/index.js";
 
 /**
- * 圣殿大图组件
+ * 圣殿大图组件，加载前后沿用弹窗的毛玻璃背景
  * @param {Object} props
  * @param {string} props.imageUrl - 图片URL
  * @param {string} props.characterName - 角色名称
@@ -31,16 +31,15 @@ export function TempleImage({ imageUrl, characterName, line, onImageLoad }) {
       style={{
         minWidth: `${minWidth}px`,
         minHeight: "200px",
-        backgroundColor: "#1B1B1B",
       }}
     />
   );
 
   // 加载状态
   const loader = (
-    <div className="flex flex-col items-center gap-2">
-      <LoaderCircleIcon className="tg-spin h-8 w-8 text-gray-400" />
-      <span className="text-sm text-gray-500">加载中...</span>
+    <div className="flex flex-col items-center gap-2 text-gray-700 drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)] dark:text-gray-200 dark:drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
+      <LoaderCircleIcon className="tg-spin h-8 w-8" />
+      <span className="text-sm font-medium">加载中...</span>
     </div>
   );
   container.appendChild(loader);

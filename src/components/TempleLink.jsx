@@ -1,6 +1,7 @@
 import { getCover } from "@src/utils/oos.js";
 import { StarIcon } from "@src/icons";
 import { formatNumber } from "@src/utils/format.js";
+import { TempleCover } from "./TempleCover.jsx";
 
 /**
  * 角色连接组件
@@ -76,6 +77,8 @@ export function TempleLink({
   };
 
   const styles = sizeStyles[size];
+  // 每组LINK持有自己的播放状态通信，整体移除后随封面一起释放
+  const playbackGroup = new EventTarget();
 
   return (
     <div id="tg-temple-link" className="flex flex-col items-center">
@@ -94,11 +97,10 @@ export function TempleLink({
             className={`${styles.leftInner} relative box-content origin-top-left overflow-hidden border-2 border-r-0 ${leftColor}`}
             style={{
               transform: "skewX(10deg)",
-              backgroundImage: `url(${leftCover})`,
-              backgroundPosition: "top",
-              backgroundSize: "cover",
+              clipPath: "border-box",
             }}
           >
+            <TempleCover src={leftCover} playbackGroup={playbackGroup} />
             {/* 星之力标记 - 左上角 */}
             <div
               className="absolute left-1.5 top-1.5"
@@ -126,11 +128,14 @@ export function TempleLink({
             className={`${styles.rightInner} relative box-content origin-bottom-right overflow-hidden border-2 border-l-0 ${rightColor}`}
             style={{
               transform: "skewX(10deg)",
-              backgroundImage: `url(${rightCover})`,
-              backgroundPosition: "top",
-              backgroundSize: "cover",
+              clipPath: "border-box",
             }}
           >
+            <TempleCover
+              src={rightCover}
+              playButtonPosition="right"
+              playbackGroup={playbackGroup}
+            />
             {/* 星之力标记 - 右上角 */}
             <div
               className="absolute right-1.5 top-1.5"

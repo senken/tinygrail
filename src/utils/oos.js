@@ -4,7 +4,16 @@ const CDN = "https://tinygrail.mange.cn/";
 const OSS_URL = "https://tinygrail.oss-cn-hangzhou.aliyuncs.com/";
 
 /**
- * 获取圣殿图片URL
+ * 判断封面是否为GIF，兼容旧缩略图后缀和查询参数
+ * @param {string} cover 封面地址
+ * @returns {boolean} 是否为GIF封面
+ */
+export function isGifCover(cover) {
+  return typeof cover === "string" && /\.gif(?:!w\d+)?(?:[?#]|$)/i.test(cover);
+}
+
+/**
+ * 获取圣殿图片URL，GIF始终使用原图，由封面组件控制播放
  * @param {string} cover - 原始URL
  * @param {('small'|'large')} size - 尺寸
  * @returns {string} 处理后URL
@@ -12,7 +21,12 @@ const OSS_URL = "https://tinygrail.oss-cn-hangzhou.aliyuncs.com/";
 export function getCover(cover, size = "large") {
   if (!cover) return "";
 
+  const useOriginalGif = isGifCover(cover);
+  if (useOriginalGif) {
+    cover = cover.replace(/(\.gif)!w\d+(?=[?#]|$)/i, "$1");
+  }
   const width = size === "small" ? "150" : "480";
+  const suffix = useOriginalGif ? "" : `!w${width}`;
 
   if (cover.includes("/crt/")) {
     if (size === "large" && cover.includes("/crt/m/")) {
@@ -26,12 +40,12 @@ export function getCover(cover, size = "large") {
 
   // 转换OOS的URL
   if (cover.startsWith(OSS_URL)) {
-    return `${CDN}${cover.substring(OSS_URL.length)}!w${width}`;
+    return `${CDN}${cover.substring(OSS_URL.length)}${suffix}`;
   }
 
   // 转换相对路径的URL
   if (cover.startsWith("/cover")) {
-    return `${CDN}${cover}!w${width}`;
+    return `${CDN}${cover}${suffix}`;
   }
 
   // 处理//开头的URL

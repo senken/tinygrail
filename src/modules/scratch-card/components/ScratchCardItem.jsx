@@ -1,4 +1,5 @@
 import { LevelBadge } from "@src/components/LevelBadge.jsx";
+import { TempleCover } from "@src/components/TempleCover.jsx";
 import { formatNumber } from "@src/utils/format.js";
 import { getLargeCover } from "@src/utils/oos.js";
 
@@ -62,9 +63,9 @@ export function ScratchCardItem({
         }}
       >
         <div
-          className="h-full w-full rounded-lg bg-cover bg-top"
-          style={{ backgroundImage: `url(${cover})` }}
+          className="relative h-full w-full overflow-hidden rounded-lg"
         >
+          <TempleCover src={cover} />
           {/* 等级徽章 */}
           <div className="absolute left-2 top-2">
             <LevelBadge level={chara.Level} zeroCount={chara.ZeroCount} size="md" />

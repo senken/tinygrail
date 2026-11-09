@@ -2,6 +2,7 @@ import { getCover, normalizeAvatar } from "@src/utils/oos.js";
 import { ProgressBar } from "@src/components/ProgressBar.jsx";
 import { formatNumber } from "@src/utils/format.js";
 import { StarIcon } from "@src/icons/StarIcon.js";
+import { TempleCover } from "./TempleCover.jsx";
 
 /**
  * 圣殿组件
@@ -59,14 +60,7 @@ export function Temple({ temple, bottomText, onClick, showProgress = true }) {
       >
         {hasCover ? (
           // 有圣殿图片
-          <div
-            className="h-full w-full"
-            style={{
-              backgroundImage: `url(${cover})`,
-              backgroundPosition: "top",
-              backgroundSize: "cover",
-            }}
-          />
+          <TempleCover src={cover} />
         ) : (
           // 无圣殿图片
           <div>
