@@ -56,7 +56,7 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
     } = state || {};
 
     /**
-     * 选择圣殿封面
+     * 选择圣殿封面，GIF 文件限制为 10MB
      * @returns {Promise<void>} 文件选择器已打开
      */
     const handleChangeCover = async () => {
@@ -70,6 +70,11 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
 
         if (!/image/.test(file.type)) {
           showWarning("请选择图片文件");
+          return;
+        }
+
+        if (file.type === "image/gif" && file.size > 10 * 1024 * 1024) {
+          showWarning("GIF 图片不能超过 10MB");
           return;
         }
 
