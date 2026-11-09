@@ -391,7 +391,7 @@ export function TempleDetail({ temple, characterName, imageOnly = false }) {
         title: "确定「连接」的圣殿",
         content: (
           <div className="flex flex-col items-center gap-4">
-            <TempleLink temple1={templeData} temple2={selectedTemple} sort={false} size="small" />
+            <TempleLink temple1={templeData} temple2={selectedTemple} size="small" />
             <div className="flex w-full justify-end gap-2 p-1">
               <button className="btn btn-sm" onClick={() => closeModal(confirmModalId)}>
                 取消

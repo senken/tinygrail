@@ -4,13 +4,52 @@ import { formatNumber } from "@src/utils/format.js";
 import { TempleCover } from "./TempleCover.jsx";
 
 /**
+ * 解析圣殿创建时间
+ * @param {string} create 创建时间
+ * @returns {number|null} 可比较的时间戳，无法解析时返回null
+ */
+function parseCreateTime(create) {
+  if (!create) return null;
+
+  const timestamp = Date.parse(create);
+  return Number.isNaN(timestamp) ? null : timestamp;
+}
+
+/**
+ * 判断第一座圣殿是否应保留在左侧
+ * @param {Object} first 第一座圣殿
+ * @param {Object} second 第二座圣殿
+ * @returns {boolean} 是否保留第一座圣殿在左侧
+ */
+function keepsFirstOnLeft(first, second) {
+  const firstSacrifices = Number(first.Sacrifices);
+  const secondSacrifices = Number(second.Sacrifices);
+
+  if (
+    Number.isFinite(firstSacrifices) &&
+    Number.isFinite(secondSacrifices) &&
+    firstSacrifices !== secondSacrifices
+  ) {
+    return firstSacrifices > secondSacrifices;
+  }
+
+  const firstCreate = parseCreateTime(first.Create);
+  const secondCreate = parseCreateTime(second.Create);
+  if (firstCreate != null && secondCreate != null) {
+    return firstCreate >= secondCreate;
+  }
+
+  return true;
+}
+
+/**
  * 角色连接组件
  * @param {Object} props
  * @param {Object} props.temple1 - 第一个圣殿数据
  * @param {Object} props.temple2 - 第二个圣殿数据
  * @param {('default'|'small'|'mini')} props.size - 尺寸
  * @param {boolean} props.showCharaName - 是否显示角色名称
- * @param {boolean} props.sort - 是否根据Sacrifices排序，默认true
+ * @param {boolean} props.sort - 是否按Sacrifices和Create排序，默认true
  * @param {Function} props.onNameClick - 点击角色名称的回调函数
  * @param {Function} props.onCoverClick - 点击圣殿图片的回调函数
  */
@@ -28,7 +67,7 @@ export function TempleLink({
   // 根据sort决定是否排序
   let left = temple1;
   let right = temple2;
-  if (sort && temple1.Sacrifices < temple2.Sacrifices) {
+  if (sort && !keepsFirstOnLeft(temple1, temple2)) {
     right = temple1;
     left = temple2;
   }
